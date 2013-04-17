@@ -23,19 +23,36 @@ for filename in glob.glob(databaseLocation + '*.xml'):
     # Process the system
     assert root.tag == 'system', '{} does not contain a valid system'  # TODO remove or upgrade to raise or try
 
-    params = {}
+    systemParams = {}
+    for systemXML in root:
 
-    for child in root:
+        tag = systemXML.tag
 
-        tag = child.tag
+        if not tag == 'star':  # TODO this is for the class to reject not the loader
+            systemParams[tag] = systemXML.text
 
-        if not tag == 'star': # TODO this is for the class to reject not the loader
-            params[child.tag] = child.text
-
-    system = System(params)
+    system = System(systemParams)
     systems[system.params['name']] = system  # Add system to the index
 
     # Now look for stars
+    starsXML = root.findall(".//star")
+
+    for starXML in starsXML:
+
+        starParams = {}
+
+        for value in starXML:
+
+            tag = value.tag
+
+            if not tag == 'planet':  # TODO this is for the class to reject not the loader
+                starParams[tag] = value.text
+
+        star = Star(starParams)
+        star.parent = system
+
+        stars[star.params['name']] = star  # Add planet to the index
+
 
 
 

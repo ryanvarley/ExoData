@@ -44,7 +44,14 @@ class System(baseObject):
 
 
 class Star(baseObject):
-    pass
+
+    def _initialParams(self):
+
+        starParams = {
+            'name': None,
+            }
+
+        return starParams
 
 
 class Planet(baseObject):
