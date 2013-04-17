@@ -51,6 +51,7 @@ for filename in glob.glob(databaseLocation + '*.xml'):
         star = Star(starParams)
         star.parent = system
 
+        system._addChild(star.params['name'], star)  # Add planet to the system
         stars[star.params['name']] = star  # Add planet to the index
 
 
