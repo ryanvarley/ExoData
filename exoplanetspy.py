@@ -7,7 +7,6 @@ import xml.etree.ElementTree as ET
 import glob
 
 from astroclasses import System, Star, Planet
-from os.path import basename
 
 databaseLocation = '/Users/ryanv/Documents/git/open-exoplanet-catalogue/systems/'  # Temp
 
@@ -71,21 +70,6 @@ for filename in glob.glob(databaseLocation + '*.xml'):
 
             star._addChild(planet.params['name'], planet)  # Add planet to the star
             planets[planet.params['name']] = planet  # Add planet to the index
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

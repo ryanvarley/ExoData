@@ -60,3 +60,39 @@ class Planet(baseObject):
 
     def _calculateTransit(self):  # for a getter to pull .isTransiting from
         pass
+
+
+class Parameters(object):  #TODO would this subclassing dict be more preferable?
+    """ A class to hold parameter dictionaries, the input can be validated, units added and handling of multi valued
+    fields
+    """
+
+    def __init__(self):
+
+        self.params = {
+            'altnames': [],
+        }
+
+    def addParam(self, key, value):
+        """ Checks the key dosnt already exist, adds alternate names to a sperate list
+
+        Future
+            - format input and add units
+            - reject parent tags
+            - logging
+        """
+
+        if key in self.params:
+
+            if key is 'name':
+                self.params['altnames'].append(value)
+
+            else:
+                pass  # TODO: log rejected value
+
+        else:  # If the key dosnt already exist
+
+            # TODO check if its a nested class (ie /n...)
+
+            self.params[key] = value
+
