@@ -51,8 +51,26 @@ for filename in glob.glob(databaseLocation + '*.xml'):
         star = Star(starParams)
         star.parent = system
 
-        system._addChild(star.params['name'], star)  # Add planet to the system
-        stars[star.params['name']] = star  # Add planet to the index
+        system._addChild(star.params['name'], star)  # Add star to the system
+        stars[star.params['name']] = star  # Add star to the index
+
+        # And finally look for planets
+        planetsXML = root.findall(".//planet")
+
+        for planetXML in planetsXML:
+
+            planetParams = {}
+
+            for value in planetXML:
+                # TODO handle duplicate names
+                tag = value.tag
+                planetParams[tag] = value.text
+
+            planet = Planet(planetParams)
+            planet.parent = star
+
+            star._addChild(planet.params['name'], planet)  # Add planet to the star
+            planets[planet.params['name']] = planet  # Add planet to the index
 
 
 
