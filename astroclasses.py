@@ -62,9 +62,9 @@ class Planet(baseObject):
         pass
 
 
-class Parameters(object):  #TODO would this subclassing dict be more preferable?
+class Parameters(dict):  # TODO would this subclassing dict be more preferable?
     """ A class to hold parameter dictionaries, the input can be validated, units added and handling of multi valued
-    fields
+    fields. In future this may be better as a child of dict.
     """
 
     def __init__(self):
@@ -95,4 +95,5 @@ class Parameters(object):  #TODO would this subclassing dict be more preferable?
             # TODO check if its a nested class (ie /n...)
 
             self.params[key] = value
+
 
