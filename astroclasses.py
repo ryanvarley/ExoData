@@ -62,7 +62,7 @@ class Planet(baseObject):
         pass
 
 
-class Parameters(dict):  # TODO would this subclassing dict be more preferable?
+class Parameters(object):  # TODO would this subclassing dict be more preferable?
     """ A class to hold parameter dictionaries, the input can be validated, units added and handling of multi valued
     fields. In future this may be better as a child of dict.
     """
@@ -73,26 +73,29 @@ class Parameters(dict):  # TODO would this subclassing dict be more preferable?
             'altnames': [],
         }
 
+        self.rejectTags = ('system', 'star', 'planet', 'moon')  # These are handled in their own classes
+
     def addParam(self, key, value):
-        """ Checks the key dosnt already exist, adds alternate names to a sperate list
+        """ Checks the key dosnt already exist, adds alternate names to a seperate list
 
         Future
             - format input and add units
-            - reject parent tags
             - logging
         """
 
+        if key in self.rejectTags:
+            return False  # TODO Replace with exception
+
         if key in self.params:
 
-            if key is 'name':
+            if key == 'name':
                 self.params['altnames'].append(value)
 
             else:
-                pass  # TODO: log rejected value
+                print 'rejected duplicate {}: {}'.format(key, value)  # TODO: log rejected value
+                return False  # TODO Replace with exception
 
-        else:  # If the key dosnt already exist
-
-            # TODO check if its a nested class (ie /n...)
+        else:  # If the key dosnt already exist and isn't rejected
 
             self.params[key] = value
 
