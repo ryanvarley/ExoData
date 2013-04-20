@@ -10,10 +10,17 @@ class baseObject(object):
         self.parent = None
 
         self.params = {}
+        self._updateParams(params)  # TODO value validator?
 
     def _addChild(self, name, child):
 
         self.children.update({name: child})
+
+    def _updateParams(self, params):
+        """ This method updates parameters allowing for any validation / unit additions in the near future
+        """
+
+        self.params.update(params)
 
     @property
     def name(self):
@@ -94,7 +101,6 @@ class Planet(StarAndPlanetCommon):
     @property
     def a(self):
         return self.params['semimajoraxis']
-
 
 
 class Parameters(object):  # TODO would this subclassing dict be more preferable?

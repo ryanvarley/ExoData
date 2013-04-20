@@ -8,7 +8,7 @@ import glob
 
 from astroclasses import System, Star, Planet, Parameters
 
-databaseLocation = '/Users/ryanv/Documents/git/open-exoplanet-catalogue/systems/'  # Temp
+databaseLocation = '/Users/ryanv/Documents/git/open-exoplanet-catalogue-atmospheres/systems/'  # Temp
 
 # Initialise Database
 systems = {}
@@ -50,8 +50,8 @@ for filename in glob.glob(databaseLocation + '*.xml'):
         star = Star(starParams.params)
         star.parent = system
 
-        system._addChild(star.params['name'], star)  # Add star to the system
-        stars[star.params['name']] = star  # Add star to the index
+        system._addChild(star.name, star)  # Add star to the system
+        stars[star.name] = star  # Add star to the index
 
         # And finally look for planets
         planetsXML = root.findall(".//planet")
@@ -70,6 +70,6 @@ for filename in glob.glob(databaseLocation + '*.xml'):
             planet = Planet(planetParams.params)
             planet.parent = star
 
-            star._addChild(planet.params['name'], planet)  # Add planet to the star
-            planets[planet.params['name']] = planet  # Add planet to the index
+            star._addChild(planet.name, planet)  # Add planet to the star
+            planets[planet.name] = planet  # Add planet to the index
 
