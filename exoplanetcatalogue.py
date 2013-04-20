@@ -6,8 +6,7 @@ default xml.etree.ElementTree you will probably find that faster and more powerf
 import xml.etree.ElementTree as ET
 import glob
 
-from astroclasses import System, Star, Planet
-from os.path import basename
+from astroclasses import System, Star, Planet, Parameters
 
 databaseLocation = '/Users/ryanv/Documents/git/open-exoplanet-catalogue/systems/'  # Temp
 
@@ -23,15 +22,15 @@ for filename in glob.glob(databaseLocation + '*.xml'):
     # Process the system
     assert root.tag == 'system', '{} does not contain a valid system'  # TODO remove or upgrade to raise or try
 
-    systemParams = {}
+    systemParams = Parameters()
     for systemXML in root:
 
         tag = systemXML.tag
+        text = systemXML.text
 
-        if not tag == 'star':  # TODO this is for the class to reject not the loader
-            systemParams[tag] = systemXML.text
+        systemParams.addParam(tag, text)
 
-    system = System(systemParams)
+    system = System(systemParams.params)
     systems[system.params['name']] = system  # Add system to the index
 
     # Now look for stars
@@ -39,16 +38,16 @@ for filename in glob.glob(databaseLocation + '*.xml'):
 
     for starXML in starsXML:
 
-        starParams = {}
+        starParams = Parameters()
 
         for value in starXML:
 
             tag = value.tag
+            text = value.text
 
-            if not tag == 'planet':  # TODO this is for the class to reject not the loader
-                starParams[tag] = value.text
+            starParams.addParam(tag, text)
 
-        star = Star(starParams)
+        star = Star(starParams.params)
         star.parent = system
 
         system._addChild(star.params['name'], star)  # Add star to the system
@@ -59,33 +58,18 @@ for filename in glob.glob(databaseLocation + '*.xml'):
 
         for planetXML in planetsXML:
 
-            planetParams = {}
+            planetParams = Parameters()
 
             for value in planetXML:
-                # TODO handle duplicate names
-                tag = value.tag
-                planetParams[tag] = value.text
 
-            planet = Planet(planetParams)
+                tag = value.tag
+                text = value.text
+
+                planetParams.addParam(tag, text)
+
+            planet = Planet(planetParams.params)
             planet.parent = star
 
             star._addChild(planet.params['name'], planet)  # Add planet to the star
             planets[planet.params['name']] = planet  # Add planet to the index
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

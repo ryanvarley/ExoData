@@ -1,1 +1,1 @@
-from exoplanetspy import *
+from exoplanetcatalogue import *
