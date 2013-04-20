@@ -31,7 +31,7 @@ for filename in glob.glob(databaseLocation + '*.xml'):
         systemParams.addParam(tag, text)
 
     system = System(systemParams.params)
-    systems[system.params['name']] = system  # Add system to the index
+    systems[system.name] = system  # Add system to the index
 
     # Now look for stars
     starsXML = root.findall(".//star")

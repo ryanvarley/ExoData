@@ -10,56 +10,91 @@ class baseObject(object):
         self.parent = None
 
         self.params = {}
-        self._updateParams(self._initialParams())
-
-        self._updateParams(params)  # TODO value validator?
 
     def _addChild(self, name, child):
 
         self.children.update({name: child})
 
-    def _updateParams(self, params):
-        """ This method updates parameters allowing for any validation / unit additions in the near future
-        """
-
-        self.params.update(params)
-
-    def _initialParams(self):
-
-        return {}  # Only used in child classes
+    @property
+    def name(self):
+        return self.params['name']
 
 
 class System(baseObject):
 
-    def _initialParams(self):
+    @property
+    def ra(self):
+        return self.params['rightascension']
 
-        systemParams = {
-            'name': None,
-            'rightascension': None,
-            'declination': None,
-            'distance': None,
-            }
+    @property
+    def dec(self):
+        return self.params['declination']
 
-        return systemParams
-
-
-class Star(baseObject):
-
-    def _initialParams(self):
-
-        starParams = {
-            'name': None,
-            }
-
-        return starParams
+    @property
+    def d(self):
+        return self.params['distance']
 
 
-class Planet(baseObject):
+class StarAndPlanetCommon(baseObject):
 
-    pass
+    @property  # allows stars and planets to access system values by propagating up
+    def ra(self):
+        return self.parent.ra
 
-    def _calculateTransit(self):  # for a getter to pull .isTransiting from
-        pass
+    @property
+    def dec(self):
+        return self.parent.dec
+
+    @property
+    def d(self):
+        return self.parent.d
+
+    @property
+    def R(self):
+        return self.params['radius']
+
+    @property
+    def T(self):
+        return self.params['temperature']
+
+    @property
+    def M(self):
+        return self.params['mass']
+
+
+class Star(StarAndPlanetCommon):
+
+    @property
+    def Z(self):
+        return self.params['metallicity']
+
+    @property
+    def magV(self):
+        return self.params['magV']
+
+    @property
+    def spectralType(self):
+        return self.params['spectraltype']
+
+
+class Planet(StarAndPlanetCommon):
+
+    @property
+    def e(self):
+        return self.params['eccentricity']
+
+    @property
+    def i(self):
+        return self.params['inclination']
+
+    @property
+    def P(self):
+        return self.params['period']
+
+    @property
+    def a(self):
+        return self.params['semimajoraxis']
+
 
 
 class Parameters(object):  # TODO would this subclassing dict be more preferable?
