@@ -20,14 +20,10 @@ from a database. Units are entered using the py:module:`quantities`.
 * mu - mean molecular weight
 """
 
-from __future__ import division, print_function
-
 from numpy import sqrt, arcsin, sin, cos
 
 import quantities as pq
 import quantities.constants as const
-from ease.easesetup.validation import checkPlanetParamsAndUnits
-
 
 pi = const.pi
 sigma = const.Stefan_Boltzmann_constant
@@ -51,8 +47,6 @@ def scaleHeight(params):
 
     # TODO allow overwrite of scale heights assumed in atmosphere
 
-    checkPlanetParamsAndUnits(params, ('T_eff_p', 'mu_p', 'g_p'))
-
     T_p = params['T_eff_p']
     mu = params['mu_p']
     g = params['g_p']
@@ -73,8 +67,6 @@ def meanPlanetTemp(params):
     :param params: dict containing 'A_p', 'L_s', 'a'
     :return: :math:`T_p` (mean temp of planet)
     """
-
-    checkPlanetParamsAndUnits(params, ('A_p', 'L_s', 'a'))
 
     A = params['A_p']
     L_s = params['L_s']
@@ -98,8 +90,6 @@ def starLuminosity(params):
     :return: :math:`L_\star`
     """
 
-    checkPlanetParamsAndUnits(params, ('R_s', 'T_eff_s'))
-
     R_s = params['R_s']
     T_s = params['T_eff_s']
 
@@ -121,8 +111,6 @@ def ratioTerminatorToStar(params):
     :param params: dict containing 'H_p', 'R_p', 'R_s' with units
     :return: ratio of the terminator to the star
     """
-
-    checkPlanetParamsAndUnits(params, ('H_p', 'R_p', 'R_s'))
 
     H = params['H_p']
     R_p = params['R_p']
@@ -164,8 +152,6 @@ def surfaceGravity(params):
 
     :return: g - acceleration due to gravity * m / s**2
     """
-
-    checkPlanetParamsAndUnits(params, ('M_p', 'R_p'))
 
     M_p = params['M_p']
     R_p = params['R_p']
@@ -217,8 +203,6 @@ def transitDuration(params):
     :param params: dict with 'P', 'R_s', 'R_p', 'a', 'i' with units
     :return:
     """
-
-    checkPlanetParamsAndUnits(params, ('P', 'R_s', 'R_p', 'a', 'i'))
 
     P = params['P']
     R_s = params['R_s']
