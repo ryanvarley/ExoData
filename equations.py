@@ -1,10 +1,7 @@
 """
 Contains code for simulating observations and calculating signal to noise of various targets
 
-The idea is this can contain the equations and pull info on the stars from tempfunctions (and later from OEC)
 
-Functions in this module mostly take input from a params file. This is designed to be entered in advance or pulled
-from a database. Units are entered using the py:module:`quantities`.
 
 **Abbreviations used in this module**
 
@@ -29,33 +26,29 @@ pi = const.pi
 sigma = const.Stefan_Boltzmann_constant
 G = const.Newtonian_constant_of_gravitation
 
-# TODO investigate impact of data 'prevalidation' could do a try, except to give the same info with lower overhead
 
-
-def scaleHeight(params):
+def scaleHeight(T_eff_p, mu_p, g_p):
     """ Caculate the scale height H of the atmosphere
 
     .. math::
-        H = \\frac{k T_p}{\mu g}
+        H = \\frac{k T_eff}{\mu g}
 
-    Where H is the scale height of the planets atmosphere, :math:`T_p` is the planetary temperature,
+    Where H is the scale height of the planets atmosphere, :math:`T_eff` is the planetary effective temperature,
     :math:`\mu` is the mean molecular weight of the planetary atmosphere and g is the planets surface gravity.
 
-    :param params: dict containing 'T_eff_p', 'mu_p', 'g_p'
+    :param T_eff_p: Effective temperature
+    :param mu: mean molecular weight
+    :param g: surface gravity
     :return: H (scale Height)
     """
 
     # TODO allow overwrite of scale heights assumed in atmosphere
 
-    T_p = params['T_eff_p']
-    mu = params['mu_p']
-    g = params['g_p']
-
-    H = (const.k * T_p) / (mu * g)
+    H = (const.k * T_eff_p) / (mu_p * g_p)
     return H.rescale(pq.m)
 
 
-def meanPlanetTemp(params):
+def meanPlanetTemp(A_p, L_s, a):
     """ Calculate the equilibrium planet temperature
 
     .. math::
@@ -64,20 +57,18 @@ def meanPlanetTemp(params):
     Where :math:`T_p` is the equilibrium temperature of the planet, :math:`L_\star` is the stellar Luminosity,
     A is the bond albedo of the planet, :math:`\sigma` is the Stefan-Boltzman constant, a is the semi-major axis.
 
-    :param params: dict containing 'A_p', 'L_s', 'a'
+    :param A: planetary albedo
+    :param L_s: stellar luminosity
+    :param a: semi-major axis
     :return: :math:`T_p` (mean temp of planet)
     """
 
-    A = params['A_p']
-    L_s = params['L_s']
-    a = params['a']
-
-    T_p = (((1 - A) * L_s) / (16 * sigma * pi * a**2))**(1 / 4)
+    T_p = (((1 - A_p) * L_s) / (16 * sigma * pi * a**2))**(1 / 4)
 
     return T_p.rescale(pq.degK)
 
 
-def starLuminosity(params):
+def starLuminosity(R_s, T_eff):
     """ Calculate stellar luminosity
 
     .. math::
@@ -86,19 +77,17 @@ def starLuminosity(params):
     Where :math:`L_\star` is the Stellar luminosity, :math:`R_\star` stellar radius, :math:`\sigma` Stefan-Boltzman
     constant, :math:`T_\star` the temperature of the star
 
-    :param params: dict containing 'A_p', 'L_s', 'a', 'Rstar'
+    :param R: stellar radius
+    :param T_eff: effective surface temperature of the star
     :return: :math:`L_\star`
     """
 
-    R_s = params['R_s']
-    T_s = params['T_eff_s']
-
-    L_s = 4 * pi * R_s**2 * sigma * T_s**4
+    L_s = 4 * pi * R_s**2 * sigma * T_eff**4
 
     return L_s.rescale(pq.W)
 
 
-def ratioTerminatorToStar(params):
+def ratioTerminatorToStar(H_p, R_p, R_s):
     """ Calculates the ratio of the terminator to the star assuming 5 scale heights large. If you dont know all of the
     input try :py:func:`calcRatioTerminatorToStar`
 
@@ -108,15 +97,14 @@ def ratioTerminatorToStar(params):
     Where :math:`\Delta F` is the ration of the terminator to the star, H scale height planet atmosphere,
     :math:`R_p` radius of the planet, :math:`R_s` raidus of the star
 
-    :param params: dict containing 'H_p', 'R_p', 'R_s' with units
+    :param H_p:
+    :param R_p:
+    :param R_s:
     :return: ratio of the terminator to the star
     """
+    # TODO let user overwrite scale heights and auto function to select on planet type?
 
-    H = params['H_p']
-    R_p = params['R_p']
-    R_s = params['R_s']
-
-    deltaF = ((10 * H * R_p) + (25 * H**2)) / (R_s**2)
+    deltaF = ((10 * H_p * R_p) + (25 * H_p**2)) / (R_s**2)
     return deltaF.simplified
 
 
@@ -139,7 +127,7 @@ def SNRPlanet(SNRStar, starPlanetFlux, Nobs, pixPerbin, NVisits=1):
     return SNRplanet
 
 
-def surfaceGravity(params):
+def surfaceGravity(M_p, R_p):
     """ Calculates the surface acceleration due to gravity on the planet
 
     .. math::
@@ -153,8 +141,7 @@ def surfaceGravity(params):
     :return: g - acceleration due to gravity * m / s**2
     """
 
-    M_p = params['M_p']
-    R_p = params['R_p']
+    # TODO find out what logg is and how it can be used
 
     g_p = (G * M_p)/(R_p**2)
     return g_p.rescale(pq.m / pq.s**2)
@@ -189,7 +176,7 @@ def calcRatioTerminatorToStar(params):
     return params['delta_F_p_s']
 
 
-def transitDuration(params):
+def transitDuration(P, R_s, R_p, a, i):
     """ Estimation of the primary transit time. Assumes a circular orbit.
 
     .. Note: This code could do with reverifing and perhaps using the eccentricity version
@@ -200,18 +187,19 @@ def transitDuration(params):
     Where :math:`T_\\text{dur}` transit duration, P orbital period, :math:`R_\star` radius of the star,
     a is the semi-major axis, k is :math:`\\frac{R_p}{R_s}`
 
-    :param params: dict with 'P', 'R_s', 'R_p', 'a', 'i' with units
+    :param i: orbital inclination
     :return:
     """
 
-    P = params['P']
-    R_s = params['R_s']
-    R_p = params['R_p']
-    a = params['a']
-    i = params['i'].rescale(pq.rad)
+    # TODO use non circular orbit version?
+
+    i = i.rescale(pq.rad)
     k = R_p / R_s  # lit reference for eclipsing binaries
     b = (a * cos(i)) / R_s
 
     duration = (P / pi) * arcsin(((R_s * sqrt((1 + k) ** 2 - b ** 2)) / (a * sin(i))).simplified)
 
     return duration.rescale(pq.min)
+
+
+    # TODO more orbital equations like transit depth

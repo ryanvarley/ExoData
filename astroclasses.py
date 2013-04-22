@@ -85,6 +85,7 @@ class Star(StarAndPlanetCommon):
 
 
 class Planet(StarAndPlanetCommon):
+    
 
     @property
     def e(self):
