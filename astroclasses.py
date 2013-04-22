@@ -71,6 +71,9 @@ class StarAndPlanetCommon(baseObject):
 
 class Star(StarAndPlanetCommon):
 
+    def calcLuminosity(self):
+        raise NotImplementedError  # TODO
+
     @property
     def Z(self):
         return self.params['metallicity']
@@ -85,7 +88,25 @@ class Star(StarAndPlanetCommon):
 
 
 class Planet(StarAndPlanetCommon):
-    
+
+    def isTransiting(self):
+        raise NotImplementedError  # TODO
+
+    def calcTansitDuration(self):
+        raise NotImplementedError  # TODO
+
+    def calcSurfaceGravity(self):
+        raise NotImplementedError  # TODO
+
+    def calcMeanTemp(self):
+        raise NotImplementedError  # TODO
+
+    def calcScaleHeight(self):
+        raise NotImplementedError  # TODO
+
+    def planetType(self):
+        raise NotImplementedError  # TODO
+
 
     @property
     def e(self):
