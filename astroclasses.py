@@ -90,10 +90,17 @@ class Star(StarAndPlanetCommon):
 class Planet(StarAndPlanetCommon):
 
     def isTransiting(self):
-        raise NotImplementedError  # TODO
+        """ Checks the discovery method to see if the planet transits
+        """
+
+        if self.params['discoverymethod'] == 'transit':
+            return True
+        else:
+            return False
 
     def calcTansitDuration(self):
-        raise NotImplementedError  # TODO
+        """ Estimation of the primary transit time assuming a circular orbit (see :py:func:`equations.transitDuration`)
+        """
 
     def calcSurfaceGravity(self):
         raise NotImplementedError  # TODO
