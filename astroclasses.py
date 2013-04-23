@@ -1,6 +1,8 @@
 """ Contains structural classes ie binary, star, planet etc which mimic the xml structure with objects
 """
 
+import quantities as pq
+
 
 class baseObject(object):
 
@@ -168,5 +170,52 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
         else:  # If the key dosnt already exist and isn't rejected
 
             self.params[key] = value
+
+    def _default_units(self):
+        """ This lists the default units for database parameters in order to add them to values being imported
+        """
+
+        defaults = {
+            'temperature': pq.K,
+        }
+        return defaults
+
+
+class StarParameters(Parameters):
+
+    def _default_units(self):
+        """ This lists the default units for database parameters in order to add them to values being imported
+        """
+
+        parentDefaults = Parameters._default_units()
+
+        defaults = {
+            'mass': pq.M_s,
+            'metallicity': None,
+            'radius': pq.R_s,
+            'magV': None,
+        }
+
+        return parentDefaults.update(defaults)
+
+
+class PlanetParameters(Parameters):
+
+    def _default_units(self):
+        """ This lists the default units for database parameters in order to add them to values being imported
+        """
+
+        parentDefaults = Parameters._default_units()
+
+        defaults = {
+            'mass': pq.M_j,
+            'radius': pq.R_j,
+            'inclination': pq.deg,
+            'eccentricity': None,
+            'period': pq.day,
+            'semimajoraxis': pq.au
+        }
+
+        return parentDefaults.update(defaults)
 
 
