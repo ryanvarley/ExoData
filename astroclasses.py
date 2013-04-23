@@ -1,7 +1,11 @@
 """ Contains structural classes ie binary, star, planet etc which mimic the xml structure with objects
 """
 
-import quantities as pq
+try:
+    import quantities as pq
+    unitsEnabled = True
+except ImportError:
+    unitsEnabled = False
 
 
 class baseObject(object):
@@ -145,6 +149,8 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
             'altnames': [],
         }
 
+        self._defaultUnits = self._getDefaultUnits()
+
         self.rejectTags = ('system', 'star', 'planet', 'moon')  # These are handled in their own classes
 
     def addParam(self, key, value):
@@ -162,16 +168,20 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
 
             if key == 'name':
                 self.params['altnames'].append(value)
-
             else:
                 print 'rejected duplicate {}: {}'.format(key, value)  # TODO: log rejected value
                 return False  # TODO Replace with exception
 
         else:  # If the key dosnt already exist and isn't rejected
-
+            if unitsEnabled:
+                if key in self._defaultUnits:
+                    value *= self._defaultUnits[key]
             self.params[key] = value
 
-    def _default_units(self):
+    def add_units(self):
+        pass
+
+    def _getDefaultUnits(self):
         """ This lists the default units for database parameters in order to add them to values being imported
         """
 
@@ -183,11 +193,11 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
 
 class StarParameters(Parameters):
 
-    def _default_units(self):
+    def _getDefaultUnits(self):
         """ This lists the default units for database parameters in order to add them to values being imported
         """
 
-        parentDefaults = Parameters._default_units()
+        parentDefaults = Parameters._getDefaultUnits()
 
         defaults = {
             'mass': pq.M_s,
@@ -201,11 +211,11 @@ class StarParameters(Parameters):
 
 class PlanetParameters(Parameters):
 
-    def _default_units(self):
+    def _getDefaultUnits(self):
         """ This lists the default units for database parameters in order to add them to values being imported
         """
 
-        parentDefaults = Parameters._default_units()
+        parentDefaults = Parameters._getDefaultUnits()
 
         defaults = {
             'mass': pq.M_j,
