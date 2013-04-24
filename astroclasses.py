@@ -148,6 +148,7 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
 
         self.params = {
             'altnames': [],
+            'list': [],
         }
 
         self._defaultUnits = {
@@ -172,6 +173,8 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
 
             if key == 'name':
                 self.params['altnames'].append(value)
+            elif key == 'list':
+                self.params['list'].append(value)
             else:
                 print 'rejected duplicate {}: {} in {}'.format(key, value, self.params['name'])  # TODO: log rejected value
                 return False  # TODO Replace with exception
