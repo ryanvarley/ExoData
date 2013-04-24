@@ -100,13 +100,14 @@ class Planet(StarAndPlanetCommon):
         """
 
         if self.params['discoverymethod'] == 'transit':
-            return True
+            return True  # is this all or will it miss RV detected planets that transit?
         else:
             return False
 
     def calcTansitDuration(self):
         """ Estimation of the primary transit time assuming a circular orbit (see :py:func:`equations.transitDuration`)
         """
+        pass
 
     def calcSurfaceGravity(self):
         raise NotImplementedError  # TODO
@@ -149,7 +150,10 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
             'altnames': [],
         }
 
-        self._defaultUnits = self._getDefaultUnits()
+        self._defaultUnits = {
+            'temperature': pq.K,
+            'distance': pq.pc,
+        }
 
         self.rejectTags = ('system', 'star', 'planet', 'moon')  # These are handled in their own classes
 
@@ -175,57 +179,40 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
         else:  # If the key dosnt already exist and isn't rejected
             if unitsEnabled:
                 if key in self._defaultUnits:
-                    value *= self._defaultUnits[key]
+                    try:
+                        value = float(value) * self._defaultUnits[key]
+                    except:
+                        print 'caught an error with {} - {}'.format(key, value)
             self.params[key] = value
-
-    def add_units(self):
-        pass
-
-    def _getDefaultUnits(self):
-        """ This lists the default units for database parameters in order to add them to values being imported
-        """
-
-        defaults = {
-            'temperature': pq.K,
-        }
-        return defaults
 
 
 class StarParameters(Parameters):
 
-    def _getDefaultUnits(self):
-        """ This lists the default units for database parameters in order to add them to values being imported
-        """
+    def __init__(self):
 
-        parentDefaults = Parameters._getDefaultUnits()
+        Parameters.__init__(self)
 
-        defaults = {
+        self._defaultUnits.update({
             'mass': pq.M_s,
-            'metallicity': None,
+            'metallicity': 1,
             'radius': pq.R_s,
-            'magV': None,
-        }
-
-        return parentDefaults.update(defaults)
+            'magV': 1,
+        })
 
 
 class PlanetParameters(Parameters):
 
-    def _getDefaultUnits(self):
-        """ This lists the default units for database parameters in order to add them to values being imported
-        """
+    def __init__(self):
 
-        parentDefaults = Parameters._getDefaultUnits()
+        Parameters.__init__(self)
 
-        defaults = {
+        self._defaultUnits.update({
             'mass': pq.M_j,
             'radius': pq.R_j,
             'inclination': pq.deg,
-            'eccentricity': None,
+            'eccentricity': 1,
             'period': pq.day,
             'semimajoraxis': pq.au
-        }
-
-        return parentDefaults.update(defaults)
+        })
 
 
