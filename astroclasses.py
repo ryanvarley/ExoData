@@ -157,7 +157,7 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
 
         self.rejectTags = ('system', 'star', 'planet', 'moon')  # These are handled in their own classes
 
-    def addParam(self, key, value):
+    def addParam(self, key, value, attrib=None):
         """ Checks the key dosnt already exist, adds alternate names to a seperate list
 
         Future
@@ -173,10 +173,21 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
             if key == 'name':
                 self.params['altnames'].append(value)
             else:
-                print 'rejected duplicate {}: {}'.format(key, value)  # TODO: log rejected value
+                print 'rejected duplicate {}: {} in {}'.format(key, value, self.params['name'])  # TODO: log rejected value
                 return False  # TODO Replace with exception
 
         else:  # If the key dosnt already exist and isn't rejected
+
+            # Some tags have no value but a upperlimit in the attributes
+            if value is None and attrib is not None:
+                try:
+                    value = attrib['upperlimit']
+                except KeyError:
+                    try:
+                        value = attrib['lowerlimit']
+                    except KeyError:
+                        return False
+
             if unitsEnabled:
                 if key in self._defaultUnits:
                     try:

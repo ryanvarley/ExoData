@@ -27,8 +27,9 @@ for filename in glob.glob(databaseLocation + '*.xml'):
 
         tag = systemXML.tag
         text = systemXML.text
+        attrib = systemXML.attrib
 
-        systemParams.addParam(tag, text)
+        systemParams.addParam(tag, text, attrib)
 
     system = System(systemParams.params)
     systems[system.name] = system  # Add system to the index
@@ -44,8 +45,9 @@ for filename in glob.glob(databaseLocation + '*.xml'):
 
             tag = value.tag
             text = value.text
+            attrib = value.attrib
 
-            starParams.addParam(tag, text)
+            starParams.addParam(tag, text, attrib)
 
         star = Star(starParams.params)
         star.parent = system
@@ -64,8 +66,9 @@ for filename in glob.glob(databaseLocation + '*.xml'):
 
                 tag = value.tag
                 text = value.text
+                attrib = value. attrib
 
-                planetParams.addParam(tag, text)
+                planetParams.addParam(tag, text, attrib)
 
             planet = Planet(planetParams.params)
             planet.parent = star
