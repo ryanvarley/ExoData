@@ -1,6 +1,12 @@
 """ Contains structural classes ie binary, star, planet etc which mimic the xml structure with objects
 """
 
+try:
+    import quantities as pq
+    unitsEnabled = True
+except ImportError:
+    unitsEnabled = False
+
 
 class baseObject(object):
 
@@ -71,6 +77,9 @@ class StarAndPlanetCommon(baseObject):
 
 class Star(StarAndPlanetCommon):
 
+    def calcLuminosity(self):
+        raise NotImplementedError  # TODO
+
     @property
     def Z(self):
         return self.params['metallicity']
@@ -85,6 +94,33 @@ class Star(StarAndPlanetCommon):
 
 
 class Planet(StarAndPlanetCommon):
+
+    def isTransiting(self):
+        """ Checks the discovery method to see if the planet transits
+        """
+
+        if self.params['discoverymethod'] == 'transit':
+            return True  # is this all or will it miss RV detected planets that transit?
+        else:
+            return False
+
+    def calcTansitDuration(self):
+        """ Estimation of the primary transit time assuming a circular orbit (see :py:func:`equations.transitDuration`)
+        """
+        pass
+
+    def calcSurfaceGravity(self):
+        raise NotImplementedError  # TODO
+
+    def calcMeanTemp(self):
+        raise NotImplementedError  # TODO
+
+    def calcScaleHeight(self):
+        raise NotImplementedError  # TODO
+
+    def planetType(self):
+        raise NotImplementedError  # TODO
+
 
     @property
     def e(self):
@@ -112,11 +148,17 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
 
         self.params = {
             'altnames': [],
+            'list': [],
+        }
+
+        self._defaultUnits = {
+            'temperature': pq.K,
+            'distance': pq.pc,
         }
 
         self.rejectTags = ('system', 'star', 'planet', 'moon')  # These are handled in their own classes
 
-    def addParam(self, key, value):
+    def addParam(self, key, value, attrib=None):
         """ Checks the key dosnt already exist, adds alternate names to a seperate list
 
         Future
@@ -131,13 +173,60 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
 
             if key == 'name':
                 self.params['altnames'].append(value)
-
+            elif key == 'list':
+                self.params['list'].append(value)
             else:
-                print 'rejected duplicate {}: {}'.format(key, value)  # TODO: log rejected value
+                print 'rejected duplicate {}: {} in {}'.format(key, value, self.params['name'])  # TODO: log rejected value
                 return False  # TODO Replace with exception
 
         else:  # If the key dosnt already exist and isn't rejected
 
+            # Some tags have no value but a upperlimit in the attributes
+            if value is None and attrib is not None:
+                try:
+                    value = attrib['upperlimit']
+                except KeyError:
+                    try:
+                        value = attrib['lowerlimit']
+                    except KeyError:
+                        return False
+
+            if unitsEnabled:
+                if key in self._defaultUnits:
+                    try:
+                        value = float(value) * self._defaultUnits[key]
+                    except:
+                        print 'caught an error with {} - {}'.format(key, value)
             self.params[key] = value
+
+
+class StarParameters(Parameters):
+
+    def __init__(self):
+
+        Parameters.__init__(self)
+
+        self._defaultUnits.update({
+            'mass': pq.M_s,
+            'metallicity': 1,
+            'radius': pq.R_s,
+            'magV': 1,
+        })
+
+
+class PlanetParameters(Parameters):
+
+    def __init__(self):
+
+        Parameters.__init__(self)
+
+        self._defaultUnits.update({
+            'mass': pq.M_j,
+            'radius': pq.R_j,
+            'inclination': pq.deg,
+            'eccentricity': 1,
+            'period': pq.day,
+            'semimajoraxis': pq.au
+        })
 
 

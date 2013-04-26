@@ -6,7 +6,7 @@ default xml.etree.ElementTree you will probably find that faster and more powerf
 import xml.etree.ElementTree as ET
 import glob
 
-from astroclasses import System, Star, Planet, Parameters
+from astroclasses import System, Star, Planet, Parameters, StarParameters, PlanetParameters
 
 databaseLocation = '/Users/ryanv/Documents/git/open-exoplanet-catalogue-atmospheres/systems/'  # Temp
 
@@ -27,8 +27,9 @@ for filename in glob.glob(databaseLocation + '*.xml'):
 
         tag = systemXML.tag
         text = systemXML.text
+        attrib = systemXML.attrib
 
-        systemParams.addParam(tag, text)
+        systemParams.addParam(tag, text, attrib)
 
     system = System(systemParams.params)
     systems[system.name] = system  # Add system to the index
@@ -38,14 +39,15 @@ for filename in glob.glob(databaseLocation + '*.xml'):
 
     for starXML in starsXML:
 
-        starParams = Parameters()
+        starParams = StarParameters()
 
         for value in starXML:
 
             tag = value.tag
             text = value.text
+            attrib = value.attrib
 
-            starParams.addParam(tag, text)
+            starParams.addParam(tag, text, attrib)
 
         star = Star(starParams.params)
         star.parent = system
@@ -58,14 +60,15 @@ for filename in glob.glob(databaseLocation + '*.xml'):
 
         for planetXML in planetsXML:
 
-            planetParams = Parameters()
+            planetParams = PlanetParameters()
 
             for value in planetXML:
 
                 tag = value.tag
                 text = value.text
+                attrib = value. attrib
 
-                planetParams.addParam(tag, text)
+                planetParams.addParam(tag, text, attrib)
 
             planet = Planet(planetParams.params)
             planet.parent = star
