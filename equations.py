@@ -1,7 +1,6 @@
 """
-Contains code for simulating observations and calculating signal to noise of various targets
-
-
+Contains code for simulating observations and calculating signal to noise of various targets. The module was stolen
+from another private project and so contains a few equations i left in incase anyone finds them useful.
 
 **Abbreviations used in this module**
 
@@ -17,7 +16,7 @@ Contains code for simulating observations and calculating signal to noise of var
 * mu - mean molecular weight
 """
 
-from numpy import sqrt, arcsin, sin, cos
+from numpy import sqrt, arcsin, sin, cos, log
 
 import quantities as pq
 import quantities.constants as const
@@ -202,4 +201,15 @@ def transitDuration(P, R_s, R_p, a, i):
     return duration.rescale(pq.min)
 
 
-    # TODO more orbital equations like transit depth
+def logg(M_p, R_p):
+    """ Calculates the surface acceleration due to gravity on the planet as logg, the base 10 logarithm of g in cgs
+    units. This function uses :py:func:`surfaceGravity` and then rescales it to cgs and takes the log
+    """
+
+    g = surfaceGravity(M_p, R_p)
+    logg = log(float(g.rescale(pq.cm / pq.s**2))) # the float wrapper is needed to remove dimensionality
+
+    return logg
+
+
+# TODO more orbital equations like transit depth
