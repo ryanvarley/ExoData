@@ -2,6 +2,7 @@
 """
 import equations as eq
 import quantities as pq
+import assumptions as assum
 
 
 class baseObject(object):
@@ -124,7 +125,13 @@ class Planet(StarAndPlanetCommon):
         # return eq.scaleHeight(self.T, , self.g)  # TODO mu based on assumptions
 
     def planetType(self):
-        raise NotImplementedError  # TODO based on assumptions
+        return assum.planetType(self.T, self.M)
+
+    def planetMassType(self):
+        return assum.planetMassType(self.M)
+
+    def planetTempType(self):
+        return assum.planetTempType(self.T)
 
 
     @property
