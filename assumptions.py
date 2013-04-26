@@ -28,10 +28,23 @@ planetAssumptions = {
     'tempType':
         [
             (350 * pq.K, 'Habitable'),
-            (800* pq.K, 'Warm'),
+            (800 * pq.K, 'Warm'),
             (float('inf'), 'Hot'),
-        ]
+        ],
 
+    'mu':  # depends on masstype so takes the masstype as the first argument, and the value as the second
+        [
+            ('Super-Earth', 18 * pq.atomic_mass_unit), # TODO these should be more inherently linked to masstype
+            ('Neptune', 2 * pq.atomic_mass_unit),
+            ('Jupiter', 2 * pq.atomic_mass_unit)
+        ],
+
+    'albedo':  # depends on temperature so it takes tempType as the first and the value as the second
+        [
+            ('Habitable', 0.3),
+            ('Warm', 0.3),
+            ('Hot', 0.1)
+        ]
 }
 
 
