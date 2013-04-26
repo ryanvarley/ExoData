@@ -124,15 +124,20 @@ class Planet(StarAndPlanetCommon):
         raise NotImplementedError
         # return eq.scaleHeight(self.T, , self.g)  # TODO mu based on assumptions
 
-    def planetType(self):
+    def type(self):
         return assum.planetType(self.T, self.M)
 
-    def planetMassType(self):
+    def massType(self):
         return assum.planetMassType(self.M)
 
-    def planetTempType(self):
+    def tempType(self):
         return assum.planetTempType(self.T)
 
+    def mu(self):  # TODO make getter look in params first calc if not
+        return assum.planetMu(self.massType())
+
+    def albedo(self):
+        return assum.planetAlbedo(self.tempType())
 
     @property
     def e(self):

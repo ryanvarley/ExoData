@@ -32,19 +32,19 @@ planetAssumptions = {
             (float('inf'), 'Hot'),
         ],
 
-    'mu':  # depends on masstype so takes the masstype as the first argument, and the value as the second
-        [
-            ('Super-Earth', 18 * pq.atomic_mass_unit), # TODO these should be more inherently linked to masstype
-            ('Neptune', 2 * pq.atomic_mass_unit),
-            ('Jupiter', 2 * pq.atomic_mass_unit)
-        ],
+    'mu':  # depends on masstype so takes the masstype as the key, and mu as the value
+        {
+            'Super-Earth': 18 * pq.atomic_mass_unit,  # TODO these should be more inherently linked to masstype
+            'Neptune': 2 * pq.atomic_mass_unit,
+            'Jupiter': 2 * pq.atomic_mass_unit
+        },
 
-    'albedo':  # depends on temperature so it takes tempType as the first and the value as the second
-        [
-            ('Habitable', 0.3),
-            ('Warm', 0.3),
-            ('Hot', 0.1)
-        ]
+    'albedo':  # depends on temperature so it takes tempType as the key and the albedo as the value
+        {
+            'Habitable': 0.3,
+            'Warm': 0.3,
+            'Hot': 0.1
+        }
 }
 
 
@@ -74,3 +74,10 @@ def planetType(temperature, mass):
 
     return '{} {}'.format(planetTempType(temperature), planetMassType(mass))
 
+
+def planetMu(massType):
+    return planetAssumptions['mu'][massType]
+
+
+def planetAlbedo(tempType):
+    return planetAssumptions['albedo'][tempType]
