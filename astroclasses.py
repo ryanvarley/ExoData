@@ -1,11 +1,7 @@
 """ Contains structural classes ie binary, star, planet etc which mimic the xml structure with objects
 """
-
-try:
-    import quantities as pq
-    unitsEnabled = True
-except ImportError:
-    unitsEnabled = False
+import equations as eq
+import quantities as pq
 
 
 class baseObject(object):
@@ -78,7 +74,8 @@ class StarAndPlanetCommon(baseObject):
 class Star(StarAndPlanetCommon):
 
     def calcLuminosity(self):
-        raise NotImplementedError  # TODO
+
+        return eq.starLuminosity(self.R, self.T)
 
     @property
     def Z(self):
@@ -107,19 +104,27 @@ class Planet(StarAndPlanetCommon):
     def calcTansitDuration(self):
         """ Estimation of the primary transit time assuming a circular orbit (see :py:func:`equations.transitDuration`)
         """
-        pass
+
+        return eq.transitDuration(self.P, self.parent.R, self.R, self.a, self.i)
 
     def calcSurfaceGravity(self):
-        raise NotImplementedError  # TODO
+
+        return eq.surfaceGravity(self.M, self.R)
+
+    def calcLogg(self):
+
+        return eq.logg(self.M, self.R)
 
     def calcMeanTemp(self):
-        raise NotImplementedError  # TODO
+        raise NotImplementedError
+        # return eq.meanPlanetTemp()  # TODO implement albedo assumptions
 
     def calcScaleHeight(self):
-        raise NotImplementedError  # TODO
+        raise NotImplementedError
+        # return eq.scaleHeight(self.T, , self.g)  # TODO mu based on assumptions
 
     def planetType(self):
-        raise NotImplementedError  # TODO
+        raise NotImplementedError  # TODO based on assumptions
 
 
     @property
@@ -191,12 +196,11 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
                     except KeyError:
                         return False
 
-            if unitsEnabled:
-                if key in self._defaultUnits:
-                    try:
-                        value = float(value) * self._defaultUnits[key]
-                    except:
-                        print 'caught an error with {} - {}'.format(key, value)
+            if key in self._defaultUnits:
+                try:
+                    value = float(value) * self._defaultUnits[key]
+                except:
+                    print 'caught an error with {} - {}'.format(key, value)
             self.params[key] = value
 
 
@@ -228,5 +232,3 @@ class PlanetParameters(Parameters):
             'period': pq.day,
             'semimajoraxis': pq.au
         })
-
-
