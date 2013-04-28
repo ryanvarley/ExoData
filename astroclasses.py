@@ -29,6 +29,9 @@ class baseObject(object):
     def name(self):
         return self.params['name']
 
+    def __repr__(self):
+        return 'baseObject({!r})'.format(self.name)
+
 
 class System(baseObject):
 
@@ -43,6 +46,9 @@ class System(baseObject):
     @property
     def d(self):
         return self.params['distance']
+
+    def __repr__(self):
+        return 'System({!r})'.format(self.name)
 
 
 class StarAndPlanetCommon(baseObject):
@@ -71,6 +77,9 @@ class StarAndPlanetCommon(baseObject):
     def M(self):
         return self.params['mass']
 
+    def __repr__(self):
+        return 'StarAndPlanetCommon({!r})'.format(self.name)
+
 
 class Star(StarAndPlanetCommon):
 
@@ -89,6 +98,9 @@ class Star(StarAndPlanetCommon):
     @property
     def spectralType(self):
         return self.params['spectraltype']
+
+    def __repr__(self):
+        return 'Star({!r})'.format(self.name)
 
 
 class Planet(StarAndPlanetCommon):
@@ -154,6 +166,9 @@ class Planet(StarAndPlanetCommon):
     @property
     def a(self):
         return self.params['semimajoraxis']
+
+    def __repr__(self):
+        return 'Planet({!r})'.format(self.name)
 
 
 class Parameters(object):  # TODO would this subclassing dict be more preferable?
