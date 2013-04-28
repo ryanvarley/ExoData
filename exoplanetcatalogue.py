@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 import glob
 
 from astroclasses import System, Star, Planet, Parameters, StarParameters, PlanetParameters
+from database import OECDatabase
 
 databaseLocation = '/Users/ryanv/Documents/git/open-exoplanet-catalogue-atmospheres/systems/'  # Temp
 
@@ -75,4 +76,8 @@ for filename in glob.glob(databaseLocation + '*.xml'):
 
             star._addChild(planet.name, planet)  # Add planet to the star
             planets[planet.name] = planet  # Add planet to the index
+
+
+# Initialise the db (will take over in future)
+db = OECDatabase(planets)  # Use db.searchPlanet(name) to find a planet
 
