@@ -1,6 +1,6 @@
 """ This module is an interface for the open exoplanet catalogue. Its design motive is to be user friendly and readable
 with speed as a secondary consideration. Therefore if your using larger complex queries and are comfortable with the
-default xml.etree.ElementTree you will probably find that faster and more powerful.
+default xml.etree.ElementTree you will probably find that faster for basic queries.
 """
 
 import xml.etree.ElementTree as ET
@@ -8,6 +8,8 @@ import glob
 
 from astroclasses import System, Star, Planet, Parameters, StarParameters, PlanetParameters
 from database import OECDatabase
+import quantities as pq
+import astroquantities as aq
 
 databaseLocation = '/Users/ryanv/Documents/git/open-exoplanet-catalogue-atmospheres/systems/'  # Temp
 
@@ -80,4 +82,3 @@ for filename in glob.glob(databaseLocation + '*.xml'):
 
 # Initialise the db (will take over in future)
 db = OECDatabase(planets)  # Use db.searchPlanet(name) to find a planet
-

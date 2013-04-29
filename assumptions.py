@@ -8,6 +8,7 @@ If anyone has a good solution to this issue, please create it in a fork or email
 """
 
 import quantities as pq
+import astroquantities as aq
 
 # TODO open an issue about this module for community discussion
 
@@ -20,8 +21,8 @@ planetAssumptions = {
             # Planet types are defined by their Mass, using inf as an absolute upper limit
             # the format of the tuples are (mass upperlimit, name). The current format dosn't allow overlaps and must be
             # in order. If you append a value run .sort() after.
-            (0.35 * pq.M_j, 'Super-Earth'),
-            (0.7 * pq.M_j, 'Neptune'),
+            (0.35 * aq.M_j, 'Super-Earth'),
+            (0.7 * aq.M_j, 'Neptune'),
             (float('inf'), 'Jupiter')
         ],
 

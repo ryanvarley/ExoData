@@ -28,14 +28,18 @@ class OECDatabase(object):
         """
 
         searchName = compactString(name)
-        returnDict = {}
+        returnSet = set()
 
         for altname, planetObj in self.planetSearchDict.iteritems():
             if re.search(searchName, altname):
-                returnDict[planetObj.name] = planetObj
+                returnSet.add(planetObj.name)
 
-        if returnDict:
-            return returnDict
+        if returnSet:
+            if len(returnSet) == 1:
+                return self.planetSearchDict[returnSet.pop()]
+            else:
+                rlist = []
+
         else:
             return False
 
