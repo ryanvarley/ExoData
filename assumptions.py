@@ -1,7 +1,7 @@
 """ This module handles any assumptions the rest of the package uses.
 
 Im not sure how to best implement assumptions that are fully flexible to the user. This could be how the planet type
-is defined or other charcterisitics. Im using a simple 'OK' method here, overwriting assumptions would require loading
+is defined or other characteristics. Im using a simple 'OK' method here, overwriting assumptions would require loading
 this module and defining or changing the variables.
 
 If anyone has a good solution to this issue, please create it in a fork or email me!

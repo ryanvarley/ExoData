@@ -39,6 +39,21 @@ class OECDatabase(object):
         else:
             return False
 
+    def transitingPlanets(self):
+        """ Returns a list of transiting planet objects
+        """
+
+        transitingPlanets = []
+
+        for planet in self.planets.values():
+            try:
+                if planet.isTransiting():
+                    transitingPlanets.append(planet)
+            except KeyError:  # No 'discoverymethod' tag - this also filters Solar System planets
+                pass
+
+        return transitingPlanets
+
     def _generatePlanetSearchDict(self, planets):
         """ Generates a search dictionary for planets by taking all names and 'flattening' them to the most compact form
         (lowercase, no spaces and dashes)
