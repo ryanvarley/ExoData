@@ -1,11 +1,8 @@
 """ Contains structural classes ie binary, star, planet etc which mimic the xml structure with objects
 """
-
-try:
-    import quantities as pq
-    unitsEnabled = True
-except ImportError:
-    unitsEnabled = False
+import equations as eq
+import quantities as pq
+import assumptions as assum
 
 
 class baseObject(object):
@@ -32,6 +29,9 @@ class baseObject(object):
     def name(self):
         return self.params['name']
 
+    def __repr__(self):
+        return 'baseObject({!r})'.format(self.name)
+
 
 class System(baseObject):
 
@@ -46,6 +46,9 @@ class System(baseObject):
     @property
     def d(self):
         return self.params['distance']
+
+    def __repr__(self):
+        return 'System({!r})'.format(self.name)
 
 
 class StarAndPlanetCommon(baseObject):
@@ -74,11 +77,15 @@ class StarAndPlanetCommon(baseObject):
     def M(self):
         return self.params['mass']
 
+    def __repr__(self):
+        return 'StarAndPlanetCommon({!r})'.format(self.name)
+
 
 class Star(StarAndPlanetCommon):
 
     def calcLuminosity(self):
-        raise NotImplementedError  # TODO
+
+        return eq.starLuminosity(self.R, self.T)
 
     @property
     def Z(self):
@@ -91,6 +98,9 @@ class Star(StarAndPlanetCommon):
     @property
     def spectralType(self):
         return self.params['spectraltype']
+
+    def __repr__(self):
+        return 'Star({!r})'.format(self.name)
 
 
 class Planet(StarAndPlanetCommon):
@@ -107,20 +117,39 @@ class Planet(StarAndPlanetCommon):
     def calcTansitDuration(self):
         """ Estimation of the primary transit time assuming a circular orbit (see :py:func:`equations.transitDuration`)
         """
-        pass
+
+        return eq.transitDuration(self.P, self.parent.R, self.R, self.a, self.i)
 
     def calcSurfaceGravity(self):
-        raise NotImplementedError  # TODO
+
+        return eq.surfaceGravity(self.M, self.R)
+
+    def calcLogg(self):
+
+        return eq.logg(self.M, self.R)
 
     def calcMeanTemp(self):
-        raise NotImplementedError  # TODO
+        raise NotImplementedError
+        # return eq.meanPlanetTemp()  # TODO implement albedo assumptions
 
     def calcScaleHeight(self):
-        raise NotImplementedError  # TODO
+        raise NotImplementedError
+        # return eq.scaleHeight(self.T, , self.g)  # TODO mu based on assumptions
 
-    def planetType(self):
-        raise NotImplementedError  # TODO
+    def type(self):
+        return assum.planetType(self.T, self.M)
 
+    def massType(self):
+        return assum.planetMassType(self.M)
+
+    def tempType(self):
+        return assum.planetTempType(self.T)
+
+    def mu(self):  # TODO make getter look in params first calc if not
+        return assum.planetMu(self.massType())
+
+    def albedo(self):
+        return assum.planetAlbedo(self.tempType())
 
     @property
     def e(self):
@@ -137,6 +166,9 @@ class Planet(StarAndPlanetCommon):
     @property
     def a(self):
         return self.params['semimajoraxis']
+
+    def __repr__(self):
+        return 'Planet({!r})'.format(self.name)
 
 
 class Parameters(object):  # TODO would this subclassing dict be more preferable?
@@ -191,12 +223,11 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
                     except KeyError:
                         return False
 
-            if unitsEnabled:
-                if key in self._defaultUnits:
-                    try:
-                        value = float(value) * self._defaultUnits[key]
-                    except:
-                        print 'caught an error with {} - {}'.format(key, value)
+            if key in self._defaultUnits:
+                try:
+                    value = float(value) * self._defaultUnits[key]
+                except:
+                    print 'caught an error with {} - {}'.format(key, value)
             self.params[key] = value
 
 
@@ -228,5 +259,3 @@ class PlanetParameters(Parameters):
             'period': pq.day,
             'semimajoraxis': pq.au
         })
-
-
