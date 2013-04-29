@@ -45,7 +45,7 @@ class OECDatabase(object):
 
         transitingPlanets = []
 
-        for planet in self.planets.values():
+        for planet in self.planets:
             try:
                 if planet.isTransiting():
                     transitingPlanets.append(planet)
@@ -60,7 +60,7 @@ class OECDatabase(object):
         """
 
         planetNameDict = {}
-        for planet in planets.itervalues():
+        for planet in planets:
 
             name = planet.name
             altnames = planet.params['altnames']

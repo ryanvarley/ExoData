@@ -12,9 +12,9 @@ from database import OECDatabase
 databaseLocation = '/Users/ryanv/Documents/git/open-exoplanet-catalogue-atmospheres/systems/'  # Temp
 
 # Initialise Database
-systems = {}
-stars = {}
-planets = {}
+systems = []
+stars = []
+planets = []
 
 for filename in glob.glob(databaseLocation + '*.xml'):
     tree = ET.parse(open(filename, 'r'))
@@ -33,7 +33,7 @@ for filename in glob.glob(databaseLocation + '*.xml'):
         systemParams.addParam(tag, text, attrib)
 
     system = System(systemParams.params)
-    systems[system.name] = system  # Add system to the index
+    systems.append(system)  # Add system to the index
 
     # Now look for stars
     starsXML = root.findall(".//star")
@@ -54,7 +54,7 @@ for filename in glob.glob(databaseLocation + '*.xml'):
         star.parent = system
 
         system._addChild(star.name, star)  # Add star to the system
-        stars[star.name] = star  # Add star to the index
+        stars.append(star)  # Add star to the index
 
         # And finally look for planets
         planetsXML = root.findall(".//planet")
@@ -75,7 +75,7 @@ for filename in glob.glob(databaseLocation + '*.xml'):
             planet.parent = star
 
             star._addChild(planet.name, planet)  # Add planet to the star
-            planets[planet.name] = planet  # Add planet to the index
+            planets.append(planet)  # Add planet to the index
 
 
 # Initialise the db (will take over in future)
