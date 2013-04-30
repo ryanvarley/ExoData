@@ -11,8 +11,6 @@ from database import OECDatabase
 import quantities as pq
 import astroquantities as aq
 
-databaseLocation = '/Users/ryanv/Documents/git/open-exoplanet-catalogue-atmospheres/systems/'  # Temp
-
 # Initialise Database
 systems = []
 stars = []
