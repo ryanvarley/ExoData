@@ -1,7 +1,10 @@
 """ Contains structural classes ie binary, star, planet etc which mimic the xml structure with objects
 """
-import equations as eq
+import numpy as np
+
 import quantities as pq
+
+import equations as eq
 import astroquantities as aq
 import assumptions as assum
 
@@ -33,20 +36,32 @@ class baseObject(object):
     def __repr__(self):
         return 'baseObject({!r})'.format(self.name)
 
+    def getParam(self, paramKey):
+        """ Fetches a parameter from the params dictionary. If it's not there it will return NaN. This allows the use
+        of list comprehensions over the entire planet set without KeyErrors.
+
+        NaN was used as unlike False and None, NaN < 1 and NaN > 1 are both False
+        """
+
+        try:
+            return self.params[paramKey]
+        except KeyError:
+            return np.NaN
+
 
 class System(baseObject):
 
     @property
     def ra(self):
-        return self.params['rightascension']
+        return self.getParam('rightascension')
 
     @property
     def dec(self):
-        return self.params['declination']
+        return self.getParam('declination')
 
     @property
     def d(self):
-        return self.params['distance']
+        return self.getParam('distance')
 
     def __repr__(self):
         return 'System({!r})'.format(self.name)
@@ -72,15 +87,15 @@ class StarAndPlanetCommon(baseObject):
 
     @property
     def R(self):
-        return self.params['radius']
+        return self.getParam('radius')
 
     @property
     def T(self):
-        return self.params['temperature']
+        return self.getParam('temperature')
 
     @property
     def M(self):
-        return self.params['mass']
+        return self.getParam('mass')
 
     def __repr__(self):
         return 'StarAndPlanetCommon({!r})'.format(self.name)
@@ -98,15 +113,15 @@ class Star(StarAndPlanetCommon):
 
     @property
     def Z(self):
-        return self.params['metallicity']
+        return self.getParam(['metallicity'])
 
     @property
     def magV(self):
-        return self.params['magV']
+        return self.getParam(['magV'])
 
     @property
     def spectralType(self):
-        return self.params['spectraltype']
+        return self.getParam(['spectraltype'])
 
     @property
     def planets(self):
