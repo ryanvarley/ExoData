@@ -21,16 +21,24 @@ planetAssumptions = {
             # Planet types are defined by their Mass, using inf as an absolute upper limit
             # the format of the tuples are (mass upperlimit, name). The current format dosn't allow overlaps and must be
             # in order. If you append a value run .sort() after.
-            (0.35 * aq.M_j, 'Super-Earth'),
-            (0.7 * aq.M_j, 'Neptune'),
-            (float('inf'), 'Jupiter')
+            (5 * aq.M_e, 'Super-Earth'),
+            (15 * aq.M_e, 'Neptune'),
+            (300 * aq.M_e, 'Jupiter')  # 'possible' off the scale. can use float('inf') to avoid
+        ],
+
+    'radiusType': # TODO interface with rest of module
+        [
+            (1.8 * aq.R_e, 'Super-Earth'),
+            (4 * aq.R_e, 'Neptune'),
+            (10 * aq.R_e, 'Jupiter')  # 'possible' off the scale. can use float('inf') to avoid
         ],
 
     'tempType':
         [
-            (350 * pq.K, 'Habitable'),
-            (800 * pq.K, 'Warm'),
-            (float('inf'), 'Hot'),
+            (320 * pq.K, 'Temperate'),
+            (600 * pq.K, 'Warm'),
+            (1500 * pq.K, 'Hot'),
+            (float('inf'), 'Very Hot'),
         ],
 
     'mu':  # depends on masstype so takes the masstype as the key, and mu as the value
@@ -42,10 +50,11 @@ planetAssumptions = {
 
     'albedo':  # depends on temperature so it takes tempType as the key and the albedo as the value
         {
-            'Habitable': 0.3,
+            'Temperate': 0.3,
             'Warm': 0.3,
             'Hot': 0.1
         }
+    
 }
 
 
