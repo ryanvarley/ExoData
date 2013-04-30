@@ -1,6 +1,7 @@
 import unittest
 
 import quantities as pq
+import astroquantities as aq
 
 from ease.tools.sim import scaleHeight, meanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
     surfaceGravity, transitDuration
@@ -37,7 +38,7 @@ class Test_meanPlanetTemp(unittest.TestCase):
 class Test_starLuminosity(unittest.TestCase):
     def test_works_sun(self):
         params = {
-            'R_s': 1 * pq.R_s,
+            'R_s': 1 * aq.R_s,
             'T_eff_s': 5780 * pq.degK
         }
 
@@ -50,8 +51,8 @@ class Test_starLuminosity(unittest.TestCase):
 class Test_ratioTerminatorToStar(unittest.TestCase):
     def test_works_earth(self):
         params = {'H_p': 8500 * pq.m,
-                  'R_p': 1 * pq.R_e,
-                  'R_s': 1 * pq.R_s
+                  'R_p': 1 * aq.R_e,
+                  'R_s': 1 * aq.R_s
         }
 
         answer = 1.12264e-06 * pq.dimensionless
@@ -79,8 +80,8 @@ class Test_SNRPlanet(unittest.TestCase):
 class Test_surfaceGravity(unittest.TestCase):
     def test_works_earth(self):
 
-        params = {'R_p': 1 * pq.R_e,
-                  'M_p': 1 * pq.M_e,
+        params = {'R_p': 1 * aq.R_e,
+                  'M_p': 1 * aq.M_e,
                   }
 
         answer = 9.823 * pq.m / pq.s**2
@@ -93,8 +94,8 @@ class Test_transitDuration(unittest.TestCase):
     def test_works_gj1214(self):
 
         params = {
-            'R_p': 0.02 * pq.R_j,
-            'R_s': 0.21 * pq.R_s,
+            'R_p': 0.02 * aq.R_j,
+            'R_s': 0.21 * aq.R_s,
             'i': 88.17 * pq.deg,
             'a': 0.014 * pq.au,
             'P': 1.58040482 * pq.day

@@ -2,6 +2,7 @@
 """
 import equations as eq
 import quantities as pq
+import astroquantities as aq
 import assumptions as assum
 
 
@@ -238,9 +239,9 @@ class StarParameters(Parameters):
         Parameters.__init__(self)
 
         self._defaultUnits.update({
-            'mass': pq.M_s,
+            'mass': aq.M_s,
             'metallicity': 1,
-            'radius': pq.R_s,
+            'radius': aq.R_s,
             'magV': 1,
         })
 
@@ -252,8 +253,8 @@ class PlanetParameters(Parameters):
         Parameters.__init__(self)
 
         self._defaultUnits.update({
-            'mass': pq.M_j,
-            'radius': pq.R_j,
+            'mass': aq.M_j,
+            'radius': aq.R_j,
             'inclination': pq.deg,
             'eccentricity': 1,
             'period': pq.day,

@@ -2,22 +2,28 @@
 """
 
 import re
+import xml.etree.ElementTree as ET
+import glob
 
-compactString = lambda string: string.replace(' ','').replace('-','').lower()
+from astroclasses import System, Star, Planet, Parameters, StarParameters, PlanetParameters
+
+compactString = lambda string: string.replace(' ', '').replace('-', '').lower()
 
 
 class OECDatabase(object):
     """ This Class Handles the OEC database including search functions.
     """
 
-    def __init__(self, planets):
-        """ Initial implementation of DBclass. Will eventually take over a lot of the code in the exoplanetcatalogue.py
+    def __init__(self, databaseLocation):
+        """ Hold the Open Exoplanet Catalogue database in python
 
-        currently only takes the planet list as input as the class on handles search
+        :param databaseLocation: file path to the Open Exoplanet Catalogue systems folder ie
+            ~/git/open-exoplanet-catalogue-atmospheres/systems/
+            get the catalogue from https://github.com/hannorein/open_exoplanet_catalogue
         """
 
-        self.planets = planets
-        self.planetSearchDict = self._generatePlanetSearchDict(planets)
+        self._loadDatabase(databaseLocation)
+        self._planetSearchDict = self._generatePlanetSearchDict()
 
     def searchPlanet(self, name):
         """ Searches the database for a planet. Input can be complete ie GJ1214b, alternate name variations or even
@@ -30,12 +36,16 @@ class OECDatabase(object):
         searchName = compactString(name)
         returnDict = {}
 
-        for altname, planetObj in self.planetSearchDict.iteritems():
+        for altname, planetObj in self._planetSearchDict.iteritems():
             if re.search(searchName, altname):
                 returnDict[planetObj.name] = planetObj
 
         if returnDict:
-            return returnDict
+            if len(returnDict) == 1:
+                return returnDict.values()[0]
+            else:
+                return returnDict.values()
+
         else:
             return False
 
@@ -54,13 +64,13 @@ class OECDatabase(object):
 
         return transitingPlanets
 
-    def _generatePlanetSearchDict(self, planets):
+    def _generatePlanetSearchDict(self):
         """ Generates a search dictionary for planets by taking all names and 'flattening' them to the most compact form
         (lowercase, no spaces and dashes)
         """
 
         planetNameDict = {}
-        for planet in planets:
+        for planet in self.planets:
 
             name = planet.name
             altnames = planet.params['altnames']
@@ -71,3 +81,75 @@ class OECDatabase(object):
                 planetNameDict[reducedname] = planet
 
         return planetNameDict
+
+    def _loadDatabase(self, databaseLocation):
+        """ Loads the database from a given file path in the class
+        """
+
+        # Initialise Database
+        systems = []
+        stars = []
+        planets = []
+
+        for filename in glob.glob(databaseLocation + '*.xml'):
+            tree = ET.parse(open(filename, 'r'))
+            root = tree.getroot()
+
+            # Process the system
+            assert root.tag == 'system', '{} does not contain a valid system'  # TODO remove or upgrade to raise or try
+
+            systemParams = Parameters()
+            for systemXML in root:
+
+                tag = systemXML.tag
+                text = systemXML.text
+                attrib = systemXML.attrib
+
+                systemParams.addParam(tag, text, attrib)
+
+            system = System(systemParams.params)
+            systems.append(system)  # Add system to the index
+
+            # Now look for stars
+            starsXML = root.findall(".//star")
+
+            for starXML in starsXML:
+
+                starParams = StarParameters()
+
+                for value in starXML:
+
+                    tag = value.tag
+                    text = value.text
+                    attrib = value.attrib
+
+                    starParams.addParam(tag, text, attrib)
+
+                star = Star(starParams.params)
+                star.parent = system
+
+                system._addChild(star.name, star)  # Add star to the system
+                stars.append(star)  # Add star to the index
+
+                # And finally look for planets
+                planetsXML = root.findall(".//planet")
+
+                for planetXML in planetsXML:
+
+                    planetParams = PlanetParameters()
+
+                    for value in planetXML:
+
+                        tag = value.tag
+                        text = value.text
+                        attrib = value. attrib
+
+                        planetParams.addParam(tag, text, attrib)
+
+                    planet = Planet(planetParams.params)
+                    planet.parent = star
+
+                    star._addChild(planet.name, planet)  # Add planet to the star
+                    planets.append(planet)  # Add planet to the index
+
+        self.planets, self.stars, self.systems = planets, stars, systems
