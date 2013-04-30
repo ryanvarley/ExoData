@@ -1,3 +1,5 @@
+# Open Exoplanet Catalogue Python
+
 This python interface serves as a link between the raw XML of the [Open Exoplanet Catalogue](/hannorein/open_exoplanet_catalogue). It allows:
 * Searching of planets (including alternate names)
 * Easy reference of planet parameters ie GJ1214b.ra, GJ1214b.T, GJ1214b.R
@@ -15,11 +17,11 @@ This module depends on
 * numpy
 * [Open Exoplanet Catalogue](/hannorein/open_exoplanet_catalogue) (somewhere on your system)
 
-To install simply clone the repo and move into your python path.
+To install simply clone the repo and move into your python path. I have named the repo folder exoplanetcatalogue for ease. In future this package will be in a package manager which will avoid the naming issue.
 
 # Usage
 
-	import exoplanetcatalogue as oec
+	import exoplanetcatalogue as oec # Note: exoplanetcatalogue should be your folder name of the repo
 	databaseLocation = '/git/open-exoplanet-catalogue-atmospheres/systems/' # Your path here
 	oecDB = oec.OECDatabase(databaseLocation)
 
