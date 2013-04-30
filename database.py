@@ -49,6 +49,7 @@ class OECDatabase(object):
         else:
             return False
 
+    @property
     def transitingPlanets(self):
         """ Returns a list of transiting planet objects
         """

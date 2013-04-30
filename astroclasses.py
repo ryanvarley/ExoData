@@ -51,6 +51,10 @@ class System(baseObject):
     def __repr__(self):
         return 'System({!r})'.format(self.name)
 
+    @property
+    def stars(self):
+        return self.children
+
 
 class StarAndPlanetCommon(baseObject):
 
@@ -81,6 +85,10 @@ class StarAndPlanetCommon(baseObject):
     def __repr__(self):
         return 'StarAndPlanetCommon({!r})'.format(self.name)
 
+    @property
+    def system(self):
+        return self.parent
+
 
 class Star(StarAndPlanetCommon):
 
@@ -100,6 +108,10 @@ class Star(StarAndPlanetCommon):
     def spectralType(self):
         return self.params['spectraltype']
 
+    @property
+    def planets(self):
+        return self.children
+
     def __repr__(self):
         return 'Star({!r})'.format(self.name)
 
@@ -115,7 +127,7 @@ class Planet(StarAndPlanetCommon):
         else:
             return False
 
-    def calcTansitDuration(self):
+    def calcTransitDuration(self):
         """ Estimation of the primary transit time assuming a circular orbit (see :py:func:`equations.transitDuration`)
         """
 
@@ -167,6 +179,10 @@ class Planet(StarAndPlanetCommon):
     @property
     def a(self):
         return self.params['semimajoraxis']
+
+    @property
+    def star(self):
+        return self.parent
 
     def __repr__(self):
         return 'Planet({!r})'.format(self.name)

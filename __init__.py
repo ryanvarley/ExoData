@@ -6,3 +6,4 @@ default xml.etree.ElementTree you will probably find that faster for basic queri
 from database import OECDatabase
 import equations
 import assumptions
+from astroquantities import *
