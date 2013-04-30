@@ -43,8 +43,8 @@ To choose a planet
 	kepler60 = kepler60b.star #to het the star kepler-60
 
 	kepler60b.R # get planet radius
-
 	>>> array(0.207777) * jupiter_radius # this works like an array in most functions
+
 	kepler60b.R.rescale(oec.R_e) # See Units section for more
 	>>> array(2.280002801287082) * earth_radius
 
@@ -65,7 +65,7 @@ units are handled by the quantities package
 
 You can then access most units and constants such as meters pq.m, astronomical units pq.au etc!
 
-Some astronomy units such as R_e, R_j, R_s (where e is Earth, j is Jupiter and s in the Sun) arent inlcuded (yet) in quantities so you need to refer to them as oec.R_e (or whatever you called this module on import)
+Some astronomy units such as R_e, R_j, R_s (where e is Earth, j is Jupiter and s in the Sun) arent included (yet) in quantities so you need to refer to them as oec.R_e (or whatever you called this module on import)
 
 There are also M_e, M_s, M_j.
 
