@@ -32,6 +32,9 @@ You can then access the lists
 	oecDB.planets
 	oecDB.transitingPlanets
 
+And perform more advanced queries such as fetching all planets whose radius is less than 10 Earth Radii
+	
+	superEarths = [planet for planet in oecDB.planets if planet.R < (10 * oec.R_e)]
 
 To choose a planet
 
