@@ -9,7 +9,7 @@ This python interface serves as a link between the raw XML of the [Open Exoplane
 * Easily navigate hierarchy (ie from planet to star or star to planets)
 * Availability of system parameters in planets (ie ra, dec, d (distance))
 
-Please note that this package is currently in Beta. The Docs are incomplete, it is not fully unit tested andany and all methods and variables are subjected the change in the development process
+Please note that this package is currently in Beta. The Docs are incomplete, it is not fully unit tested and any and all methods and variables are subjected to change in the development process
 
 # Installation
 This module depends on
@@ -99,7 +99,7 @@ Please see assumptions.py for how to do this.
 
 Copyright (C) 2013 Ryan Varley
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this package to deal with the package without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Database, and to permit persons to whom the package is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this package to deal with the package without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the package, and to permit persons to whom the package is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the package. A reference to the package shall be included in all scientific publications that make use of the package.
 

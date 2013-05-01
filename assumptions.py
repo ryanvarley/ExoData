@@ -54,7 +54,7 @@ planetAssumptions = {
             'Warm': 0.3,
             'Hot': 0.1
         }
-    
+
 }
 
 
