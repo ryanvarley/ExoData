@@ -9,7 +9,7 @@ This python interface serves as a link between the raw XML of the [Open Exoplane
 * Easily navigate hierarchy (ie from planet to star or star to planets)
 * Availability of system parameters in planets (ie ra, dec, d (distance))
 
-Please note that this package is currently in Beta. The Docs are incomplete, it is not fully unit tested andany and all methods and variables are subjected the change in the development process
+Please note that this package is currently in Beta. The Docs are incomplete, it is not fully unit tested and any and all methods and variables are subjected to change in the development process
 
 # Installation
 This module depends on
@@ -43,8 +43,8 @@ To choose a planet
 	kepler60 = kepler60b.star #to het the star kepler-60
 
 	kepler60b.R # get planet radius
-
 	>>> array(0.207777) * jupiter_radius # this works like an array in most functions
+
 	kepler60b.R.rescale(oec.R_e) # See Units section for more
 	>>> array(2.280002801287082) * earth_radius
 
@@ -65,7 +65,7 @@ units are handled by the quantities package
 
 You can then access most units and constants such as meters pq.m, astronomical units pq.au etc!
 
-Some astronomy units such as R_e, R_j, R_s (where e is Earth, j is Jupiter and s in the Sun) arent inlcuded (yet) in quantities so you need to refer to them as oec.R_e (or whatever you called this module on import)
+Some astronomy units such as R_e, R_j, R_s (where e is Earth, j is Jupiter and s in the Sun) arent included (yet) in quantities so you need to refer to them as oec.R_e (or whatever you called this module on import)
 
 There are also M_e, M_s, M_j.
 
@@ -99,7 +99,7 @@ Please see assumptions.py for how to do this.
 
 Copyright (C) 2013 Ryan Varley
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this package to deal with the package without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Database, and to permit persons to whom the package is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this package to deal with the package without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the package, and to permit persons to whom the package is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the package. A reference to the package shall be included in all scientific publications that make use of the package.
 
