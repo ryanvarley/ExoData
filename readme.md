@@ -1,6 +1,6 @@
 # Open Exoplanet Catalogue Python
 
-This python interface serves as a link between the raw XML of the [Open Exoplanet Catalogue](/hannorein/open_exoplanet_catalogue). It allows:
+This python interface serves as a link between the raw XML of the [Open Exoplanet Catalogue](https://github.com/hannorein/open_exoplanet_catalogue). It allows:
 * Searching of planets (including alternate names)
 * Easy reference of planet parameters ie GJ1214b.ra, GJ1214b.T, GJ1214b.R
 * Calculation of values like the transit duration.
@@ -13,9 +13,9 @@ Please note that this package is currently in Beta. The Docs are incomplete, it 
 
 # Installation
 This module depends on
-* [Quantities](/python-quantities/python-quantities)
+* [Quantities](https://github.com/python-quantities/python-quantities)
 * numpy
-* [Open Exoplanet Catalogue](/hannorein/open_exoplanet_catalogue) (somewhere on your system)
+* [Open Exoplanet Catalogue](https://github.com/hannorein/open_exoplanet_catalogue) (somewhere on your system)
 
 To install simply clone the repo and move into your python path. I have named the repo folder exoplanetcatalogue for ease. In future this package will be in a package manager which will avoid the naming issue.
 
@@ -57,7 +57,7 @@ To choose a planet
 	gj1214.type()
 	>>> 'Warm Super-Earth' # Note: This depends on your asumptions, see later
 
-For a full list of planet, star and system parameters see [this wiki page](wiki/Planet,-Star-and-Systems-parameters-and-Methods)
+For a full list of planet, star and system parameters see [this wiki page](https://github.com/ryanvarley/open-exoplanet-catalogue-python/wiki/Planet,-Star-and-Systems-parameters-and-Methods)
 
 # Units
 units are handled by the quantities package
@@ -69,7 +69,7 @@ Some astronomy units such as R_e, R_j, R_s (where e is Earth, j is Jupiter and s
 
 There are also M_e, M_s, M_j.
 
-Please read more about [Quantities](/python-quantities/python-quantities)
+Please read more about [Quantities](https://github.com/python-quantities/python-quantities)
 
 # Equations
 
@@ -85,7 +85,7 @@ The module contains several equations at the moment and i plan to add many more.
 	gj1214.calcTansitDuration()
 	array(54.73064331158644) * min
 
-see [the docs](wiki/Planet,-Star-and-Systems-parameters-and-Methods) for a full list
+see [the docs](https://github.com/ryanvarley/open-exoplanet-catalogue-python/wiki/Planet,-Star-and-Systems-parameters-and-Methods) for a full list
 
 # Assumptions
 
