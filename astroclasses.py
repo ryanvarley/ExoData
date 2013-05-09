@@ -104,6 +104,14 @@ class StarAndPlanetCommon(baseObject):
     def system(self):
         return self.parent
 
+    def calcSurfaceGravity(self):
+
+        return eq.surfaceGravity(self.M, self.R)
+
+    def calcLogg(self):
+
+        return eq.logg(self.M, self.R)
+
 
 class Star(StarAndPlanetCommon):
 
@@ -113,15 +121,15 @@ class Star(StarAndPlanetCommon):
 
     @property
     def Z(self):
-        return self.getParam(['metallicity'])
+        return self.getParam('metallicity')
 
     @property
     def magV(self):
-        return self.getParam(['magV'])
+        return self.getParam('magV')
 
     @property
     def spectralType(self):
-        return self.getParam(['spectraltype'])
+        return self.getParam('spectraltype')
 
     @property
     def planets(self):
@@ -147,14 +155,6 @@ class Planet(StarAndPlanetCommon):
         """
 
         return eq.transitDuration(self.P, self.parent.R, self.R, self.a, self.i)
-
-    def calcSurfaceGravity(self):
-
-        return eq.surfaceGravity(self.M, self.R)
-
-    def calcLogg(self):
-
-        return eq.logg(self.M, self.R)
 
     def calcMeanTemp(self):
         raise NotImplementedError
