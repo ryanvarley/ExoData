@@ -23,22 +23,21 @@ planetAssumptions = {
             # in order. If you append a value run .sort() after.
             (5 * aq.M_e, 'Super-Earth'),
             (15 * aq.M_e, 'Neptune'),
-            (300 * aq.M_e, 'Jupiter')  # 'possible' off the scale. can use float('inf') to avoid
+            (float('inf'), 'Jupiter')
         ],
 
     'radiusType': # TODO interface with rest of module
         [
             (1.8 * aq.R_e, 'Super-Earth'),
             (4 * aq.R_e, 'Neptune'),
-            (10 * aq.R_e, 'Jupiter')  # 'possible' off the scale. can use float('inf') to avoid
+            (float('inf'), 'Jupiter')
         ],
 
     'tempType':
         [
             (320 * pq.K, 'Temperate'),
             (600 * pq.K, 'Warm'),
-            (1500 * pq.K, 'Hot'),
-            (float('inf'), 'Very Hot'),
+            (float('inf'), 'Hot'),
         ],
 
     'mu':  # depends on masstype so takes the masstype as the key, and mu as the value
