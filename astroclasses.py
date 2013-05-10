@@ -181,19 +181,19 @@ class Planet(StarAndPlanetCommon):
 
     @property
     def e(self):
-        return self.params['eccentricity']
+        return self.getParam('eccentricity')
 
     @property
     def i(self):
-        return self.params['inclination']
+        return self.getParam('inclination')
 
     @property
     def P(self):
-        return self.params['period']
+        return self.getParam('period')
 
     @property
     def a(self):
-        return self.params['semimajoraxis']
+        return self.getParam('semimajoraxis')
 
     @property
     def star(self):

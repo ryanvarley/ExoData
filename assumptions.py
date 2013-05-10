@@ -30,15 +30,14 @@ planetAssumptions = {
         [
             (1.8 * aq.R_e, 'Super-Earth'),
             (4 * aq.R_e, 'Neptune'),
-            (10 * aq.R_e, 'Jupiter')  # 'possible' off the scale. can use float('inf') to avoid
+            (float('inf'), 'Jupiter')  # 'possible' off the scale. can use float('inf') to avoid
         ],
 
     'tempType':
         [
             (320 * pq.K, 'Temperate'),
             (600 * pq.K, 'Warm'),
-            (1500 * pq.K, 'Hot'),
-            (float('inf'), 'Very Hot'),
+            (float('inf'), 'Hot'),
         ],
 
     'mu':  # depends on masstype so takes the masstype as the key, and mu as the value
