@@ -21,22 +21,22 @@ planetAssumptions = {
             # Planet types are defined by their Mass, using inf as an absolute upper limit
             # the format of the tuples are (mass upperlimit, name). The current format dosn't allow overlaps and must be
             # in order. If you append a value run .sort() after.
-            (5 * aq.M_e, 'Super-Earth'),
-            (15 * aq.M_e, 'Neptune'),
+            (15 * aq.M_e, 'Super-Earth'),
+            (300 * aq.M_e, 'Neptune'),
             (float('inf'), 'Jupiter')
         ],
 
-    'radiusType': # TODO interface with rest of module
+    'radiusType':  # TODO interface with rest of module
         [
-            (1.8 * aq.R_e, 'Super-Earth'),
-            (4 * aq.R_e, 'Neptune'),
+            (4 * aq.R_e, 'Super-Earth'),
+            (10 * aq.R_e, 'Neptune'),
             (float('inf'), 'Jupiter')
         ],
 
     'tempType':
         [
-            (320 * pq.K, 'Temperate'),
-            (600 * pq.K, 'Warm'),
+            (600 * pq.K, 'Temperate'),
+            (1500 * pq.K, 'Warm'),
             (float('inf'), 'Hot'),
         ],
 
@@ -65,6 +65,16 @@ def planetMassType(mass):
 
         if mass < massLimit:
             return massType
+
+
+def planetRadiusType(radius):
+    """ Returns the planet radiustype given the mass and using planetAssumptions['radiusType']
+    """
+
+    for radiusLimit, radiusType in planetAssumptions['radiusType']:
+
+        if radius < radiusLimit:
+            return radiusType
 
 
 def planetTempType(temperature):

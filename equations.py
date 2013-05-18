@@ -20,6 +20,7 @@ from numpy import sqrt, arcsin, sin, cos, log
 
 import quantities as pq
 import quantities.constants as const
+import astroquantities as aq
 
 pi = const.pi
 sigma = const.Stefan_Boltzmann_constant
@@ -207,9 +208,16 @@ def logg(M_p, R_p):
     """
 
     g = surfaceGravity(M_p, R_p)
-    logg = log(float(g.rescale(pq.cm / pq.s**2))) # the float wrapper is needed to remove dimensionality
+    logg = log(float(g.rescale(pq.cm / pq.s**2)))  # the float wrapper is needed to remove dimensionality
 
     return logg
+
+
+def starTemperature(M_s):
+    """ Estimates stellar temperature using the main sequence relationship T ~ 5800*M^0.65
+    """
+    return (5800*pq.K * float(M_s.rescale(aq.M_s)**0.65)).rescale(pq.K)
+
 
 
 # TODO more orbital equations like transit depth

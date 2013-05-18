@@ -91,11 +91,23 @@ class StarAndPlanetCommon(baseObject):
 
     @property
     def T(self):
-        return self.getParam('temperature')
+        """ Looks for the planet temperature in the catalogue, if absent it calculates it using meanPlanetTemp()
+
+        :return: planet temperature
+        """
+        paramTemp = self.getParam('temperature')
+
+        if not paramTemp is np.nan:
+            return paramTemp
+        else:
+            return self.calcTemperature()
 
     @property
     def M(self):
         return self.getParam('mass')
+
+    def calcTemperature(self):
+        raise NotImplementedError('Only implmented for Stars and Planet child classes')
 
     def __repr__(self):
         return 'StarAndPlanetCommon({!r})'.format(self.name)
@@ -118,6 +130,11 @@ class Star(StarAndPlanetCommon):
     def calcLuminosity(self):
 
         return eq.starLuminosity(self.R, self.T)
+
+    def calcTemperature(self):
+        """ uses equations.starTemperature to estimate temperature based on main sequence relationship
+        """
+        return eq.starTemperature(self.M)
 
     @property
     def Z(self):
@@ -170,6 +187,9 @@ class Planet(StarAndPlanetCommon):
     def massType(self):
         return assum.planetMassType(self.M)
 
+    def radiusType(self):
+        return assum.planetRadiusType(self.R)
+
     def tempType(self):
         return assum.planetTempType(self.T)
 
@@ -178,6 +198,18 @@ class Planet(StarAndPlanetCommon):
 
     def albedo(self):
         return assum.planetAlbedo(self.tempType())
+
+    def calcTemperature(self):  # TODO - better way of doing this part
+        """ Calculates the temperature using which uses equations.meanPlanetTemp, albedo assumption and potentially
+        equations.starTemperature.
+
+        issues
+        - you cant get the albedo assumption without temp but you need it to calculate the temp. Assumes 0.3 for now
+        """
+        try:
+            return eq.meanPlanetTemp(0.3, self.star.calcLuminosity(), self.a)
+        except ValueError:  # ie missing value (.a) returning nan
+            return np.nan
 
     @property
     def e(self):
