@@ -187,6 +187,9 @@ class Planet(StarAndPlanetCommon):
     def massType(self):
         return assum.planetMassType(self.M)
 
+    def radiusType(self):
+        return assum.planetRadiusType(self.R)
+
     def tempType(self):
         return assum.planetTempType(self.T)
 
