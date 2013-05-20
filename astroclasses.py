@@ -181,6 +181,9 @@ class Planet(StarAndPlanetCommon):
         raise NotImplementedError
         # return eq.scaleHeight(self.T, , self.g)  # TODO mu based on assumptions
 
+    def calcTransitDepth(self):
+        return eq.transitDepth(self.star.R, self.R)
+
     def type(self):
         return assum.planetType(self.T, self.M)
 

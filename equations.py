@@ -219,5 +219,13 @@ def starTemperature(M_s):
     return (5800*pq.K * float(M_s.rescale(aq.M_s)**0.65)).rescale(pq.K)
 
 
+def transitDepth(R_s, R_p):
+    """ Calculates the transit depth
+    """
 
-# TODO more orbital equations like transit depth
+    depth = (R_p / R_s)**2
+
+    return depth.rescale(pq.dimensionless)
+
+
+# TODO more orbital equations
