@@ -197,7 +197,12 @@ class Planet(StarAndPlanetCommon):
         return assum.planetTempType(self.T)
 
     def mu(self):  # TODO make getter look in params first calc if not
-        return assum.planetMu(self.massType())
+        if self.M is not np.nan:
+            return assum.planetMu(self.massType())
+        elif self.R is not np.nan:
+            return assum.planetMu(self.radiusType())
+        else:
+            return np.nan
 
     def albedo(self):
         return assum.planetAlbedo(self.tempType())

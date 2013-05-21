@@ -6,6 +6,7 @@ this module and defining or changing the variables.
 
 If anyone has a good solution to this issue, please create it in a fork or email me!
 """
+import numpy as np
 
 import quantities as pq
 import astroquantities as aq
@@ -61,6 +62,9 @@ def planetMassType(mass):
     """ Returns the planet masstype given the mass and using planetAssumptions['massType']
     """
 
+    if mass is np.nan:
+        return None
+
     for massLimit, massType in planetAssumptions['massType']:
 
         if mass < massLimit:
@@ -70,6 +74,9 @@ def planetMassType(mass):
 def planetRadiusType(radius):
     """ Returns the planet radiustype given the mass and using planetAssumptions['radiusType']
     """
+
+    if radius is np.nan:
+        return None
 
     for radiusLimit, radiusType in planetAssumptions['radiusType']:
 
