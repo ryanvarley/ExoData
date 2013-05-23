@@ -87,7 +87,7 @@ def starLuminosity(R_s, T_eff):
     return L_s.rescale(pq.W)
 
 
-def ratioTerminatorToStar(H_p, R_p, R_s):
+def ratioTerminatorToStar(H_p, R_p, R_s):  # TODO use this in code with scale height calc
     """ Calculates the ratio of the terminator to the star assuming 5 scale heights large. If you dont know all of the
     input try :py:func:`calcRatioTerminatorToStar`
 
