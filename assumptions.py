@@ -94,15 +94,22 @@ def planetTempType(temperature):
             return tempType
 
 
-def planetType(temperature, mass):
+def planetType(temperature, mass, radius):
     """ Returns the planet type as 'temperatureType massType'
     """
 
-    return '{} {}'.format(planetTempType(temperature), planetMassType(mass))
+    if mass is not np.nan:
+        sizeType = planetMassType(mass)
+    elif radius is not np.nan:
+        sizeType = planetRadiusType(radius)
+    else:
+        return None
+
+    return '{} {}'.format(planetTempType(temperature), sizeType)
 
 
-def planetMu(massType):
-    return planetAssumptions['mu'][massType]
+def planetMu(sizeType):
+    return planetAssumptions['mu'][sizeType]
 
 
 def planetAlbedo(tempType):

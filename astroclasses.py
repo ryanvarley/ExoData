@@ -185,7 +185,7 @@ class Planet(StarAndPlanetCommon):
         return eq.transitDepth(self.star.R, self.R)
 
     def type(self):
-        return assum.planetType(self.T, self.M)
+        return assum.planetType(self.T, self.M, self.R)
 
     def massType(self):
         return assum.planetMassType(self.M)
