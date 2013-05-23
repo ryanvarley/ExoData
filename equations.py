@@ -16,7 +16,7 @@ from another private project and so contains a few equations i left in incase an
 * mu - mean molecular weight
 """
 
-from numpy import sqrt, arcsin, sin, cos, log
+from numpy import sqrt, arcsin, sin, cos, log, nan
 
 import quantities as pq
 import quantities.constants as const
@@ -192,6 +192,8 @@ def transitDuration(P, R_s, R_p, a, i):
     """
 
     # TODO use non circular orbit version?
+    if i is nan:
+        i = 90 * pq.deg
 
     i = i.rescale(pq.rad)
     k = R_p / R_s  # lit reference for eclipsing binaries
