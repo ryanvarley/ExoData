@@ -16,7 +16,7 @@ from another private project and so contains a few equations i left in incase an
 * mu - mean molecular weight
 """
 
-from numpy import sqrt, arcsin, sin, cos, log, nan
+from numpy import sqrt, arcsin, sin, cos, log10, nan
 
 import quantities as pq
 import quantities.constants as const
@@ -210,7 +210,7 @@ def logg(M_p, R_p):
     """
 
     g = surfaceGravity(M_p, R_p)
-    logg = log(float(g.rescale(pq.cm / pq.s**2)))  # the float wrapper is needed to remove dimensionality
+    logg = log10(float(g.rescale(pq.cm / pq.s**2)))  # the float wrapper is needed to remove dimensionality
 
     return logg
 
