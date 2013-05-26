@@ -22,8 +22,8 @@ planetAssumptions = {
             # Planet types are defined by their Mass, using inf as an absolute upper limit
             # the format of the tuples are (mass upperlimit, name). The current format dosn't allow overlaps and must be
             # in order. If you append a value run .sort() after.
-            (15 * aq.M_e, 'Super-Earth'),
-            (300 * aq.M_e, 'Neptune'),
+            (10 * aq.M_e, 'Super-Earth'),
+            (50 * aq.M_e, 'Neptune'),
             (float('inf'), 'Jupiter')
         ],
 
@@ -36,8 +36,8 @@ planetAssumptions = {
 
     'tempType':
         [
-            (600 * pq.K, 'Temperate'),
-            (1500 * pq.K, 'Warm'),
+            (350 * pq.K, 'Temperate'),
+            (700 * pq.K, 'Warm'),
             (float('inf'), 'Hot'),
         ],
 
