@@ -145,6 +145,10 @@ class Star(StarAndPlanetCommon):
         return self.getParam('magV')
 
     @property
+    def magK(self):
+        return self.getParam('magK')
+
+    @property
     def spectralType(self):
         return self.getParam('spectraltype')
 
