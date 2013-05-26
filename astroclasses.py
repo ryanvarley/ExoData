@@ -236,6 +236,10 @@ class Planet(StarAndPlanetCommon):
         return self.getParam('semimajoraxis')
 
     @property
+    def transittime(self):
+        return self.getParam('transittime')
+
+    @property
     def star(self):
         return self.parent
 
