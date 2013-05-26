@@ -181,8 +181,11 @@ class Planet(StarAndPlanetCommon):
         raise NotImplementedError
         # return eq.scaleHeight(self.T, , self.g)  # TODO mu based on assumptions
 
+    def calcTransitDepth(self):
+        return eq.transitDepth(self.star.R, self.R)
+
     def type(self):
-        return assum.planetType(self.T, self.M)
+        return assum.planetType(self.T, self.M, self.R)
 
     def massType(self):
         return assum.planetMassType(self.M)
@@ -194,7 +197,12 @@ class Planet(StarAndPlanetCommon):
         return assum.planetTempType(self.T)
 
     def mu(self):  # TODO make getter look in params first calc if not
-        return assum.planetMu(self.massType())
+        if self.M is not np.nan:
+            return assum.planetMu(self.massType())
+        elif self.R is not np.nan:
+            return assum.planetMu(self.radiusType())
+        else:
+            return np.nan
 
     def albedo(self):
         return assum.planetAlbedo(self.tempType())
@@ -226,6 +234,10 @@ class Planet(StarAndPlanetCommon):
     @property
     def a(self):
         return self.getParam('semimajoraxis')
+
+    @property
+    def transittime(self):
+        return self.getParam('transittime')
 
     @property
     def star(self):

@@ -24,6 +24,7 @@ class OECDatabase(object):
 
         self._loadDatabase(databaseLocation)
         self._planetSearchDict = self._generatePlanetSearchDict()
+        self.planetDict = {planet.name: planet for planet in self.planets}
 
     def searchPlanet(self, name):
         """ Searches the database for a planet. Input can be complete ie GJ1214b, alternate name variations or even

@@ -16,7 +16,7 @@ from another private project and so contains a few equations i left in incase an
 * mu - mean molecular weight
 """
 
-from numpy import sqrt, arcsin, sin, cos, log
+from numpy import sqrt, arcsin, sin, cos, log10, nan
 
 import quantities as pq
 import quantities.constants as const
@@ -87,7 +87,7 @@ def starLuminosity(R_s, T_eff):
     return L_s.rescale(pq.W)
 
 
-def ratioTerminatorToStar(H_p, R_p, R_s):
+def ratioTerminatorToStar(H_p, R_p, R_s):  # TODO use this in code with scale height calc
     """ Calculates the ratio of the terminator to the star assuming 5 scale heights large. If you dont know all of the
     input try :py:func:`calcRatioTerminatorToStar`
 
@@ -192,6 +192,8 @@ def transitDuration(P, R_s, R_p, a, i):
     """
 
     # TODO use non circular orbit version?
+    if i is nan:
+        i = 90 * pq.deg
 
     i = i.rescale(pq.rad)
     k = R_p / R_s  # lit reference for eclipsing binaries
@@ -208,7 +210,7 @@ def logg(M_p, R_p):
     """
 
     g = surfaceGravity(M_p, R_p)
-    logg = log(float(g.rescale(pq.cm / pq.s**2)))  # the float wrapper is needed to remove dimensionality
+    logg = log10(float(g.rescale(pq.cm / pq.s**2)))  # the float wrapper is needed to remove dimensionality
 
     return logg
 
@@ -219,5 +221,13 @@ def starTemperature(M_s):
     return (5800*pq.K * float(M_s.rescale(aq.M_s)**0.65)).rescale(pq.K)
 
 
+def transitDepth(R_s, R_p):
+    """ Calculates the transit depth
+    """
 
-# TODO more orbital equations like transit depth
+    depth = (R_p / R_s)**2
+
+    return depth.rescale(pq.dimensionless)
+
+
+# TODO more orbital equations

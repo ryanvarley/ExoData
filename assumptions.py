@@ -6,6 +6,7 @@ this module and defining or changing the variables.
 
 If anyone has a good solution to this issue, please create it in a fork or email me!
 """
+import numpy as np
 
 import quantities as pq
 import astroquantities as aq
@@ -21,8 +22,8 @@ planetAssumptions = {
             # Planet types are defined by their Mass, using inf as an absolute upper limit
             # the format of the tuples are (mass upperlimit, name). The current format dosn't allow overlaps and must be
             # in order. If you append a value run .sort() after.
-            (15 * aq.M_e, 'Super-Earth'),
-            (300 * aq.M_e, 'Neptune'),
+            (10 * aq.M_e, 'Super-Earth'),
+            (50 * aq.M_e, 'Neptune'),
             (float('inf'), 'Jupiter')
         ],
 
@@ -35,8 +36,8 @@ planetAssumptions = {
 
     'tempType':
         [
-            (600 * pq.K, 'Temperate'),
-            (1500 * pq.K, 'Warm'),
+            (350 * pq.K, 'Temperate'),
+            (700 * pq.K, 'Warm'),
             (float('inf'), 'Hot'),
         ],
 
@@ -61,6 +62,9 @@ def planetMassType(mass):
     """ Returns the planet masstype given the mass and using planetAssumptions['massType']
     """
 
+    if mass is np.nan:
+        return None
+
     for massLimit, massType in planetAssumptions['massType']:
 
         if mass < massLimit:
@@ -70,6 +74,9 @@ def planetMassType(mass):
 def planetRadiusType(radius):
     """ Returns the planet radiustype given the mass and using planetAssumptions['radiusType']
     """
+
+    if radius is np.nan:
+        return None
 
     for radiusLimit, radiusType in planetAssumptions['radiusType']:
 
@@ -87,15 +94,22 @@ def planetTempType(temperature):
             return tempType
 
 
-def planetType(temperature, mass):
+def planetType(temperature, mass, radius):
     """ Returns the planet type as 'temperatureType massType'
     """
 
-    return '{} {}'.format(planetTempType(temperature), planetMassType(mass))
+    if mass is not np.nan:
+        sizeType = planetMassType(mass)
+    elif radius is not np.nan:
+        sizeType = planetRadiusType(radius)
+    else:
+        return None
+
+    return '{} {}'.format(planetTempType(temperature), sizeType)
 
 
-def planetMu(massType):
-    return planetAssumptions['mu'][massType]
+def planetMu(sizeType):
+    return planetAssumptions['mu'][sizeType]
 
 
 def planetAlbedo(tempType):
