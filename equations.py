@@ -48,22 +48,13 @@ def scaleHeight(T_eff_p, mu_p, g_p):
     return H.rescale(pq.m)
 
 
-def meanPlanetTemp(A_p, L_s, a):
+def meanPlanetTemp(A_p, T_s, R_s, a):
     """ Calculate the equilibrium planet temperature
 
-    .. math::
-        T_p = \left[\\frac{(1-A)L_\star}{16 \\times \sigma\pi a^2}\\right]^{1/4}
-
-    Where :math:`T_p` is the equilibrium temperature of the planet, :math:`L_\star` is the stellar Luminosity,
-    A is the bond albedo of the planet, :math:`\sigma` is the Stefan-Boltzman constant, a is the semi-major axis.
-
-    :param A: planetary albedo
-    :param L_s: stellar luminosity
-    :param a: semi-major axis
-    :return: :math:`T_p` (mean temp of planet)
+    assumes epsilon = 0.7 http://arxiv.org/pdf/1111.1455v2.pdf
     """
 
-    T_p = (((1 - A_p) * L_s) / (16 * sigma * pi * a**2))**(1 / 4)
+    T_p = T_s * ((1-A_p)/0.7)**(1/4) * sqrt(R_s/(2*a))
 
     return T_p.rescale(pq.degK)
 

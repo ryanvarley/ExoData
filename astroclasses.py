@@ -184,10 +184,6 @@ class Planet(StarAndPlanetCommon):
 
         return eq.transitDuration(self.P, self.parent.R, self.R, self.a, self.i)
 
-    def calcMeanTemp(self):
-        raise NotImplementedError
-        # return eq.meanPlanetTemp()  # TODO implement albedo assumptions
-
     def calcScaleHeight(self):
         raise NotImplementedError
         # return eq.scaleHeight(self.T, , self.g)  # TODO mu based on assumptions
@@ -216,19 +212,26 @@ class Planet(StarAndPlanetCommon):
             return np.nan
 
     def albedo(self):
-        return assum.planetAlbedo(self.tempType())
+        if self.getParam('temperature') is not np.nan:
+            planetClass = self.tempType()
+        elif self.M is not np.nan:
+            planetClass = self.massType()
+        elif self.R is not np.nan:
+            planetClass = self.radiusType()
 
-    def calcTemperature(self):  # TODO - better way of doing this part
+        return assum.planetAlbedo(planetClass)
+
+    def calcTemperature(self):
         """ Calculates the temperature using which uses equations.meanPlanetTemp, albedo assumption and potentially
         equations.starTemperature.
 
         issues
-        - you cant get the albedo assumption without temp but you need it to calculate the temp. Assumes 0.3 for now
+        - you cant get the albedo assumption without temp but you need it to calculate the temp.
         """
-        try:
-            return eq.meanPlanetTemp(0.3, self.star.calcLuminosity(), self.a)
-        except ValueError:  # ie missing value (.a) returning nan
-            return np.nan
+        # try:
+        return eq.meanPlanetTemp(self.albedo(), self.star.T, self.star.R, self.a)
+        # except ValueError:  # ie missing value (.a) returning nan
+        #     return np.nan
 
     @property
     def e(self):

@@ -52,7 +52,10 @@ planetAssumptions = {
         {
             'Temperate': 0.3,
             'Warm': 0.3,
-            'Hot': 0.1
+            'Hot': 0.1,
+            'Super-Earth': 0.3,
+            'Neptune': 0.1,
+            'Jupiter': 0.1,
         }
 
 }
