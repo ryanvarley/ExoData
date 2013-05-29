@@ -230,4 +230,16 @@ def transitDepth(R_s, R_p):
     return depth.rescale(pq.dimensionless)
 
 
+def density(M, R):
+    """ Calculates the density in g/cm**3
+    :param R: radius
+    :param M: mass
+    :return:
+    """
+
+    volume = 4 / 3 * pi * R**3
+
+    return (M/volume).rescale(pq.g / pq.cm**3)
+
+
 # TODO more orbital equations

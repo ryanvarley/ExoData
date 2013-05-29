@@ -124,6 +124,13 @@ class StarAndPlanetCommon(baseObject):
 
         return eq.logg(self.M, self.R)
 
+    def calcDensity(self):
+
+        if self.M is np.nan or self.R is np.nan:
+            return np.nan
+        else:
+            return eq.density(self.M, self.R)
+
 
 class Star(StarAndPlanetCommon):
 
