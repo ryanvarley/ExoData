@@ -228,10 +228,10 @@ class Planet(StarAndPlanetCommon):
         issues
         - you cant get the albedo assumption without temp but you need it to calculate the temp.
         """
-        # try:
-        return eq.meanPlanetTemp(self.albedo(), self.star.T, self.star.R, self.a)
-        # except ValueError:  # ie missing value (.a) returning nan
-        #     return np.nan
+        try:
+            return eq.meanPlanetTemp(self.albedo(), self.star.T, self.star.R, self.a)
+        except ValueError:  # ie missing value (.a) returning nan
+            return np.nan
 
     @property
     def e(self):
