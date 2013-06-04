@@ -13,15 +13,16 @@ class baseObject(object):
 
     def __init__(self, params=None):
 
-        self.children = {}
+        self.children = []
         self.parent = None
+        self.classType = 'BaseObject'
 
         self.params = {}
         self._updateParams(params)  # TODO value validator?
 
-    def _addChild(self, name, child):
+    def _addChild(self, child):
 
-        self.children.update({name: child})
+        self.children.append(child)
 
     def _updateParams(self, params):
         """ This method updates parameters allowing for any validation / unit additions in the near future
@@ -31,10 +32,15 @@ class baseObject(object):
 
     @property
     def name(self):
-        return self.params['name']
+        try:
+            return self.params['name']
+        except KeyError:
+            return self.parent.name
+        except AttributeError:
+            return 'Un-named ' + self.classType
 
     def __repr__(self):
-        return 'baseObject({!r})'.format(self.name)
+        return '{}({!r})'.format(self.classType, self.name)
 
     def getParam(self, paramKey):
         """ Fetches a parameter from the params dictionary. If it's not there it will return NaN. This allows the use
@@ -51,6 +57,10 @@ class baseObject(object):
 
 class System(baseObject):
 
+    def __init__(self, *args, **kwargs):
+        baseObject.__init__(self, *args, **kwargs)
+        self.classType = 'System'
+
     @property
     def ra(self):
         return self.getParam('rightascension')
@@ -63,15 +73,16 @@ class System(baseObject):
     def d(self):
         return self.getParam('distance')
 
-    def __repr__(self):
-        return 'System({!r})'.format(self.name)
-
     @property
     def stars(self):
         return self.children
 
 
 class StarAndPlanetCommon(baseObject):
+
+    def __init__(self, *args, **kwargs):
+        baseObject.__init__(self, *args, **kwargs)
+        self.classType = 'StarAndPlanetCommon'
 
     @property  # allows stars and planets to access system values by propagating up
     def ra(self):
@@ -107,10 +118,7 @@ class StarAndPlanetCommon(baseObject):
         return self.getParam('mass')
 
     def calcTemperature(self):
-        raise NotImplementedError('Only implmented for Stars and Planet child classes')
-
-    def __repr__(self):
-        return 'StarAndPlanetCommon({!r})'.format(self.name)
+        raise NotImplementedError('Only implemented for Stars and Planet child classes')
 
     @property
     def system(self):
@@ -132,7 +140,22 @@ class StarAndPlanetCommon(baseObject):
             return eq.density(self.M, self.R)
 
 
+class Binary(StarAndPlanetCommon):
+
+    def __init__(self, *args, **kwargs):
+        StarAndPlanetCommon.__init__(self, *args, **kwargs)
+        self.classType = 'Binary'
+
+    @property
+    def stars(self):
+        return self.children
+
+
 class Star(StarAndPlanetCommon):
+
+    def __init__(self, *args, **kwargs):
+        StarAndPlanetCommon.__init__(self, *args, **kwargs)
+        self.classType = 'Star'
 
     def calcLuminosity(self):
 
@@ -163,11 +186,12 @@ class Star(StarAndPlanetCommon):
     def planets(self):
         return self.children
 
-    def __repr__(self):
-        return 'Star({!r})'.format(self.name)
-
 
 class Planet(StarAndPlanetCommon):
+
+    def __init__(self, *args, **kwargs):
+        StarAndPlanetCommon.__init__(self, *args, **kwargs)
+        self.classType = 'Planet'
 
     def isTransiting(self):
         """ Checks the discovery method to see if the planet transits
@@ -259,9 +283,6 @@ class Planet(StarAndPlanetCommon):
     def star(self):
         return self.parent
 
-    def __repr__(self):
-        return 'Planet({!r})'.format(self.name)
-
 
 class Parameters(object):  # TODO would this subclassing dict be more preferable?
     """ A class to hold parameter dictionaries, the input can be validated, units added and handling of multi valued
@@ -280,7 +301,7 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
             'distance': pq.pc,
         }
 
-        self.rejectTags = ('system', 'star', 'planet', 'moon')  # These are handled in their own classes
+        self.rejectTags = ('system', 'binary', 'star', 'planet', 'moon')  # These are handled in their own classes
 
     def addParam(self, key, value, attrib=None):
         """ Checks the key dosnt already exist, adds alternate names to a seperate list
@@ -300,7 +321,11 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
             elif key == 'list':
                 self.params['list'].append(value)
             else:
-                print 'rejected duplicate {}: {} in {}'.format(key, value, self.params['name'])  # TODO: log rejected value
+                try:
+                    name = self.params['name']
+                except KeyError:
+                    name = 'Unnamed'
+                print 'rejected duplicate {}: {} in {}'.format(key, value, name)  # TODO: log rejected value
                 return False  # TODO Replace with exception
 
         else:  # If the key dosnt already exist and isn't rejected
@@ -321,6 +346,17 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
                 except:
                     print 'caught an error with {} - {}'.format(key, value)
             self.params[key] = value
+
+
+class BinaryParameters(Parameters):
+
+    def __init__(self):
+
+        Parameters.__init__(self)
+
+        self._defaultUnits.update({
+         # TODO add binary parameters
+        })
 
 
 class StarParameters(Parameters):
