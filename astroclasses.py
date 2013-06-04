@@ -181,8 +181,10 @@ class Planet(StarAndPlanetCommon):
     def calcTransitDuration(self):
         """ Estimation of the primary transit time assuming a circular orbit (see :py:func:`equations.transitDuration`)
         """
-
-        return eq.transitDuration(self.P, self.parent.R, self.R, self.a, self.i)
+        try:
+            return eq.transitDuration(self.P, self.parent.R, self.R, self.a, self.i)
+        except ValueError:
+            return np.nan
 
     def calcScaleHeight(self):
         raise NotImplementedError
