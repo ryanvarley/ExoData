@@ -301,7 +301,7 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
             'distance': pq.pc,
         }
 
-        self.rejectTags = ('system', 'star', 'planet', 'moon')  # These are handled in their own classes
+        self.rejectTags = ('system', 'binary', 'star', 'planet', 'moon')  # These are handled in their own classes
 
     def addParam(self, key, value, attrib=None):
         """ Checks the key dosnt already exist, adds alternate names to a seperate list
