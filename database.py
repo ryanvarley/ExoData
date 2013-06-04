@@ -24,6 +24,7 @@ class OECDatabase(object):
 
         self._loadDatabase(databaseLocation)
         self._planetSearchDict = self._generatePlanetSearchDict()
+        self.systemDict = {system.name: system for system in self.systems}
         self.planetDict = {planet.name: planet for planet in self.planets}
 
     def searchPlanet(self, name):
@@ -95,7 +96,6 @@ class OECDatabase(object):
         self.planets = []
 
         for filename in glob.glob(databaseLocation + '*.xml'):
-        # for filename in glob.glob('/Users/ryanv/Documents/git/open-exoplanet-catalogue-atmospheres/systems/HD 80606.xml'):
             tree = ET.parse(open(filename, 'r'))
             root = tree.getroot()
 
