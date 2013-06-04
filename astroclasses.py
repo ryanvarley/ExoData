@@ -15,6 +15,7 @@ class baseObject(object):
 
         self.children = {}
         self.parent = None
+        self.classType = 'BaseObject'
 
         self.params = {}
         self._updateParams(params)  # TODO value validator?
@@ -34,7 +35,7 @@ class baseObject(object):
         return self.params['name']
 
     def __repr__(self):
-        return 'baseObject({!r})'.format(self.name)
+        return 'BaseObject({!r})'.format(self.classType, self.name)
 
     def getParam(self, paramKey):
         """ Fetches a parameter from the params dictionary. If it's not there it will return NaN. This allows the use
@@ -51,6 +52,10 @@ class baseObject(object):
 
 class System(baseObject):
 
+    def __init__(self):
+        baseObject.__init__(self)
+        self.classType = 'System'
+
     @property
     def ra(self):
         return self.getParam('rightascension')
@@ -63,15 +68,16 @@ class System(baseObject):
     def d(self):
         return self.getParam('distance')
 
-    def __repr__(self):
-        return 'System({!r})'.format(self.name)
-
     @property
     def stars(self):
         return self.children
 
 
 class StarAndPlanetCommon(baseObject):
+
+    def __init__(self):
+        baseObject.__init__(self)
+        self.classType = 'StarAndPlanetCommon'
 
     @property  # allows stars and planets to access system values by propagating up
     def ra(self):
@@ -109,9 +115,6 @@ class StarAndPlanetCommon(baseObject):
     def calcTemperature(self):
         raise NotImplementedError('Only implmented for Stars and Planet child classes')
 
-    def __repr__(self):
-        return 'StarAndPlanetCommon({!r})'.format(self.name)
-
     @property
     def system(self):
         return self.parent
@@ -134,6 +137,10 @@ class StarAndPlanetCommon(baseObject):
 
 class Binary(StarAndPlanetCommon):
 
+    def __init__(self):
+        StarAndPlanetCommon.__init__(self)
+        self.classType = 'Binary'
+
     @property
     def name(self):
         try:
@@ -145,11 +152,12 @@ class Binary(StarAndPlanetCommon):
     def stars(self):
         return self.children
 
-    def __repr__(self):
-        return 'Binary({!r})'.format(self.name)
-
 
 class Star(StarAndPlanetCommon):
+
+    def __init__(self):
+        StarAndPlanetCommon.__init__(self)
+        self.classType = 'Star'
 
     def calcLuminosity(self):
 
@@ -180,11 +188,12 @@ class Star(StarAndPlanetCommon):
     def planets(self):
         return self.children
 
-    def __repr__(self):
-        return 'Star({!r})'.format(self.name)
-
 
 class Planet(StarAndPlanetCommon):
+
+    def __init__(self):
+        StarAndPlanetCommon.__init__(self)
+        self.classType = 'Planet'
 
     def isTransiting(self):
         """ Checks the discovery method to see if the planet transits
@@ -275,9 +284,6 @@ class Planet(StarAndPlanetCommon):
     @property
     def star(self):
         return self.parent
-
-    def __repr__(self):
-        return 'Planet({!r})'.format(self.name)
 
 
 class Parameters(object):  # TODO would this subclassing dict be more preferable?
