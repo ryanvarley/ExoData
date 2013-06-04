@@ -95,6 +95,7 @@ class OECDatabase(object):
         self.planets = []
 
         for filename in glob.glob(databaseLocation + '*.xml'):
+        # for filename in glob.glob('/Users/ryanv/Documents/git/open-exoplanet-catalogue-atmospheres/systems/HD 80606.xml'):
             tree = ET.parse(open(filename, 'r'))
             root = tree.getroot()
 
@@ -103,6 +104,8 @@ class OECDatabase(object):
 
             systemParams = Parameters()
             for systemXML in root:
+
+                print systemXML
 
                 tag = systemXML.tag
                 text = systemXML.text
@@ -113,15 +116,19 @@ class OECDatabase(object):
             system = System(systemParams.params)
             self.systems.append(system)  # Add system to the index
 
-            self._loadBinarys(systemXML, system)
-            self._loadStars(systemXML, system)
+            self._loadBinarys(root, system)
+            self._loadStars(root, system)
 
     def _loadBinarys(self, parentXML, parent):
 
-        binarysXML = parentXML.findall(".//binary")
+        binarysXML = parentXML.findall("binary")
+
+        print 'binaryXML', binarysXML
 
         for binaryXML in binarysXML:
             binaryParams = BinaryParameters()
+
+            print binarysXML
 
             for value in binaryXML:
 
@@ -144,10 +151,12 @@ class OECDatabase(object):
 
     def _loadStars(self, parentXML, parent):
 
-        starsXML = parentXML.findall(".//star")
+        starsXML = parentXML.findall("star")
 
         for starXML in starsXML:
             starParams = StarParameters()
+
+            print starXML
 
             for value in starXML:
 
@@ -168,9 +177,11 @@ class OECDatabase(object):
 
     def _loadPlanets(self, parentXML, parent):
 
-        planetsXML = parentXML.findall(".//planet")
+        planetsXML = parentXML.findall("planet")
 
         for planetXML in planetsXML:
+
+            print planetXML
 
             planetParams = PlanetParameters()
 
