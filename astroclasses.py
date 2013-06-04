@@ -132,6 +132,23 @@ class StarAndPlanetCommon(baseObject):
             return eq.density(self.M, self.R)
 
 
+class Binary(StarAndPlanetCommon):
+
+    @property
+    def name(self):
+        try:
+            return self.params['name']
+        except KeyError:  # Most binaries arent currently named
+            return self.parent.name
+
+    @property
+    def stars(self):
+        return self.children
+
+    def __repr__(self):
+        return 'Binary({!r})'.format(self.name)
+
+
 class Star(StarAndPlanetCommon):
 
     def calcLuminosity(self):
@@ -321,6 +338,17 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
                 except:
                     print 'caught an error with {} - {}'.format(key, value)
             self.params[key] = value
+
+
+class BinaryParameters(Parameters):
+
+    def __init__(self):
+
+        Parameters.__init__(self)
+
+        self._defaultUnits.update({
+         # TODO add binary parameters
+        })
 
 
 class StarParameters(Parameters):
