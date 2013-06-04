@@ -135,7 +135,7 @@ class OECDatabase(object):
             binary = Binary(binaryParams.params)
             binary.parent = parent
 
-            parent._addChild(binary.name, binary)  # Add star to the system
+            parent._addChild(binary)  # Add star to the system
 
             self._loadBinarys(binaryXML, binary)
             self._loadStars(binaryXML, binary)
@@ -161,7 +161,7 @@ class OECDatabase(object):
             star = Star(starParams.params)
             star.parent = parent
 
-            parent._addChild(star.name, star)  # Add star to the system
+            parent._addChild(star)  # Add star to the system
 
             self._loadPlanets(starXML, star)  # Load planets
 
@@ -186,5 +186,5 @@ class OECDatabase(object):
             planet = Planet(planetParams.params)
             planet.parent = parent
 
-            parent._addChild(planet.name, planet)  # Add planet to the star
+            parent._addChild(planet)  # Add planet to the star
             self.planets.append(planet)  # Add planet to the index

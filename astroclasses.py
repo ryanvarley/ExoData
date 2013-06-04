@@ -13,16 +13,16 @@ class baseObject(object):
 
     def __init__(self, params=None):
 
-        self.children = {}
+        self.children = []
         self.parent = None
         self.classType = 'BaseObject'
 
         self.params = {}
         self._updateParams(params)  # TODO value validator?
 
-    def _addChild(self, name, child):
+    def _addChild(self, child):
 
-        self.children.update({name: child})
+        self.children.append(child)
 
     def _updateParams(self, params):
         """ This method updates parameters allowing for any validation / unit additions in the near future
@@ -118,7 +118,7 @@ class StarAndPlanetCommon(baseObject):
         return self.getParam('mass')
 
     def calcTemperature(self):
-        raise NotImplementedError('Only implmented for Stars and Planet child classes')
+        raise NotImplementedError('Only implemented for Stars and Planet child classes')
 
     @property
     def system(self):
