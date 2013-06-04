@@ -32,10 +32,15 @@ class baseObject(object):
 
     @property
     def name(self):
-        return self.params['name']
+        try:
+            return self.params['name']
+        except KeyError:
+            return self.parent.name
+        except AttributeError:
+            return 'Un-named ' + self.classType
 
     def __repr__(self):
-        return 'BaseObject({!r})'.format(self.classType, self.name)
+        return '{}({!r})'.format(self.classType, self.name)
 
     def getParam(self, paramKey):
         """ Fetches a parameter from the params dictionary. If it's not there it will return NaN. This allows the use
@@ -52,8 +57,8 @@ class baseObject(object):
 
 class System(baseObject):
 
-    def __init__(self):
-        baseObject.__init__(self)
+    def __init__(self, *args, **kwargs):
+        baseObject.__init__(self, *args, **kwargs)
         self.classType = 'System'
 
     @property
@@ -75,8 +80,8 @@ class System(baseObject):
 
 class StarAndPlanetCommon(baseObject):
 
-    def __init__(self):
-        baseObject.__init__(self)
+    def __init__(self, *args, **kwargs):
+        baseObject.__init__(self, *args, **kwargs)
         self.classType = 'StarAndPlanetCommon'
 
     @property  # allows stars and planets to access system values by propagating up
@@ -137,16 +142,9 @@ class StarAndPlanetCommon(baseObject):
 
 class Binary(StarAndPlanetCommon):
 
-    def __init__(self):
-        StarAndPlanetCommon.__init__(self)
+    def __init__(self, *args, **kwargs):
+        StarAndPlanetCommon.__init__(self, *args, **kwargs)
         self.classType = 'Binary'
-
-    @property
-    def name(self):
-        try:
-            return self.params['name']
-        except KeyError:  # Most binaries arent currently named
-            return self.parent.name
 
     @property
     def stars(self):
@@ -155,8 +153,8 @@ class Binary(StarAndPlanetCommon):
 
 class Star(StarAndPlanetCommon):
 
-    def __init__(self):
-        StarAndPlanetCommon.__init__(self)
+    def __init__(self, *args, **kwargs):
+        StarAndPlanetCommon.__init__(self, *args, **kwargs)
         self.classType = 'Star'
 
     def calcLuminosity(self):
@@ -191,8 +189,8 @@ class Star(StarAndPlanetCommon):
 
 class Planet(StarAndPlanetCommon):
 
-    def __init__(self):
-        StarAndPlanetCommon.__init__(self)
+    def __init__(self, *args, **kwargs):
+        StarAndPlanetCommon.__init__(self, *args, **kwargs)
         self.classType = 'Planet'
 
     def isTransiting(self):
@@ -323,7 +321,11 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
             elif key == 'list':
                 self.params['list'].append(value)
             else:
-                print 'rejected duplicate {}: {} in {}'.format(key, value, self.params['name'])  # TODO: log rejected value
+                try:
+                    name = self.params['name']
+                except KeyError:
+                    name = 'Unnamed'
+                print 'rejected duplicate {}: {} in {}'.format(key, value, name)  # TODO: log rejected value
                 return False  # TODO Replace with exception
 
         else:  # If the key dosnt already exist and isn't rejected

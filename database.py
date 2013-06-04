@@ -105,8 +105,6 @@ class OECDatabase(object):
             systemParams = Parameters()
             for systemXML in root:
 
-                print systemXML
-
                 tag = systemXML.tag
                 text = systemXML.text
                 attrib = systemXML.attrib
@@ -123,12 +121,8 @@ class OECDatabase(object):
 
         binarysXML = parentXML.findall("binary")
 
-        print 'binaryXML', binarysXML
-
         for binaryXML in binarysXML:
             binaryParams = BinaryParameters()
-
-            print binarysXML
 
             for value in binaryXML:
 
@@ -156,8 +150,6 @@ class OECDatabase(object):
         for starXML in starsXML:
             starParams = StarParameters()
 
-            print starXML
-
             for value in starXML:
 
                 tag = value.tag
@@ -180,8 +172,6 @@ class OECDatabase(object):
         planetsXML = parentXML.findall("planet")
 
         for planetXML in planetsXML:
-
-            print planetXML
 
             planetParams = PlanetParameters()
 
