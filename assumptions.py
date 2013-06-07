@@ -29,8 +29,8 @@ planetAssumptions = {
 
     'radiusType':  # TODO interface with rest of module
         [
-            (4 * aq.R_e, 'Super-Earth'),
-            (10 * aq.R_e, 'Neptune'),
+            (3 * aq.R_e, 'Super-Earth'),
+            (6 * aq.R_e, 'Neptune'),
             (float('inf'), 'Jupiter')
         ],
 
