@@ -268,6 +268,12 @@ class Planet(StarAndPlanetCommon):
 
         return eq.estimateMass(self.R, density)
 
+    def calcSMA(self):
+        """ Calculates the semi-major axis based on star mass and period
+        """
+
+        return eq.calcSemiMajorAxis(self.P, self.star.M)
+
     @property
     def e(self):
         return self.getParam('eccentricity')
@@ -282,7 +288,13 @@ class Planet(StarAndPlanetCommon):
 
     @property
     def a(self):
-        return self.getParam('semimajoraxis')
+
+        sma = self.getParam('semimajoraxis')
+        if sma is np.nan:
+            sma = self.calcSMA()
+            self.flags.addFlag('Calculated SMA')
+
+        return sma
 
     @property
     def transittime(self):
