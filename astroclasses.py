@@ -262,6 +262,12 @@ class Planet(StarAndPlanetCommon):
         except ValueError:  # ie missing value (.a) returning nan
             return np.nan
 
+    def estimateMass(self):
+
+        density = assum.planetDensity(self.radiusType())
+
+        return eq.estimateMass(self.R, density)
+
     @property
     def e(self):
         return self.getParam('eccentricity')

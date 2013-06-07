@@ -233,4 +233,17 @@ def density(M, R):
     return (M/volume).rescale(pq.g / pq.cm**3)
 
 
+def estimateMass(R, density):
+    """ Estimates mass based on radius and a density
+    :param R: Radius
+    :param density: density to calculate mass from
+    :return: mass
+    """
+
+    volume = 4 / 3 * pi * R**3
+
+    return (density * volume).rescale(aq.M_j)
+
+
+
 # TODO more orbital equations
