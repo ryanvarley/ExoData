@@ -4,7 +4,7 @@ import quantities as pq
 import astroquantities as aq
 
 from equations import scaleHeight, meanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
-    surfaceGravity, transitDuration, density, estimateMass
+    surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis
 
 
 class Test_scaleHeight(unittest.TestCase):
@@ -147,6 +147,19 @@ class Test_estimateMass(unittest.TestCase):
 
         result = estimateMass(R, d).rescale(pq.kg)
         answer = 1.89813*(10**27)*pq.kg
+
+        self.assertAlmostEqual(answer, result, 3)
+
+
+class Test_calcSemiMajorAxis(unittest.TestCase):
+    def test_works_earth(self):
+
+        M_s = aq.M_s
+        P = 1 * pq.year
+
+        result = calcSemiMajorAxis(P, M_s)
+        print result
+        answer = 1 * pq.au
 
         self.assertAlmostEqual(answer, result, 3)
 

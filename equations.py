@@ -16,6 +16,7 @@ from another private project and so contains a few equations i left in incase an
 * mu - mean molecular weight
 """
 
+from __future__ import division
 from numpy import sqrt, arcsin, sin, cos, log10, nan
 
 import quantities as pq
@@ -245,5 +246,14 @@ def estimateMass(R, density):
     return (density * volume).rescale(aq.M_j)
 
 
+def calcSemiMajorAxis(Period, M_s):
+    """ Calculates the semi-major axis of the orbit using the period and stellar mass
+
+    .. math::
+        a = \left( \frac{Period^2 G M_s}{4*\pi^2} \right))^{1/3}
+    """
+    a = ((Period**2 * G * M_s)/(4 * pi**2))**(1/3)
+
+    return a.rescale(pq.au)
 
 # TODO more orbital equations
