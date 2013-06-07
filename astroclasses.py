@@ -7,6 +7,7 @@ import quantities as pq
 import equations as eq
 import astroquantities as aq
 import assumptions as assum
+import flags
 
 
 class baseObject(object):
@@ -16,6 +17,7 @@ class baseObject(object):
         self.children = []
         self.parent = None
         self.classType = 'BaseObject'
+        self.flags = flags.Flag()
 
         self.params = {}
         self._updateParams(params)  # TODO value validator?
@@ -111,6 +113,7 @@ class StarAndPlanetCommon(baseObject):
         if not paramTemp is np.nan:
             return paramTemp
         else:
+            self.flags.addFlag('Calculated Temperature')
             return self.calcTemperature()
 
     @property
