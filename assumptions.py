@@ -56,8 +56,14 @@ planetAssumptions = {
             'Super-Earth': 0.3,
             'Neptune': 0.1,
             'Jupiter': 0.1,
-        }
+        },
 
+    'density':
+    {
+        'Super-Earth': 4 * pq.g / pq.cm**3,
+        'Neptune': 1.638 * pq.g / pq.cm**3,
+        'Jupiter': 1.326 * pq.g / pq.cm**3
+    }
 }
 
 
@@ -117,3 +123,7 @@ def planetMu(sizeType):
 
 def planetAlbedo(tempType):
     return planetAssumptions['albedo'][tempType]
+
+
+def planetDensity(radiusType):
+     return planetAssumptions['density'][radiusType]

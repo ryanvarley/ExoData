@@ -4,7 +4,7 @@ import quantities as pq
 import astroquantities as aq
 
 from equations import scaleHeight, meanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
-    surfaceGravity, transitDuration
+    surfaceGravity, transitDuration, density, estimateMass
 
 
 class Test_scaleHeight(unittest.TestCase):
@@ -118,13 +118,38 @@ class Test_transitDepth(unittest.TestCase):
 
 
 class Test_density(unittest.TestCase):
-    def test_works_gj1214(self):
-        assert False
+    def test_works_water(self):  # Doesnt work as its not a sphere
+
+        M = 1 * pq.kg
+        R = 1 * pq.m
+
+        answer = 1000 * pq.kg / pq.m**3
+        result = density(M, R).rescale(pq.kg / pq.m**3)
+
+        self.assertAlmostEqual(answer, result, 3)
+
+    def test_works_hd189(self):
+
+        M = 1.144 * aq.M_j
+        R = 1.138 * aq.R_j
+
+        answer = 0.963 * pq.g / pq.cm**3
+        result = density(M, R)
+
+        self.assertAlmostEqual(answer, result, 3)
 
 
 class Test_estimateMass(unittest.TestCase):
-    def test_works_gj1214(self):
-        assert False
+    def test_works_jupiter(self):
+
+        R = 6.9911 * (10**7) * pq.m
+        d = 1.326 * pq.g / pq.cm**3
+
+        result = estimateMass(R, d).rescale(pq.kg)
+        answer = 1.89813*(10**27)*pq.kg
+
+        self.assertAlmostEqual(answer, result, 3)
+
 
 if __name__ == '__main__':
     unittest.main()

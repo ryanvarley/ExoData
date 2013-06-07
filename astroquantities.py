@@ -32,7 +32,7 @@ M_s = solar_mass = UnitMass(
 )
 
 M_e = earth_mass = UnitMass(
-    'earth_mass', 5.9736*(10**24)*pq.kg,
+    'earth_mass', 5.97219*(10**24)*pq.kg,
     aliases=['earth_masses']
 )
 
