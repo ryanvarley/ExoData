@@ -24,6 +24,14 @@ class Flag(object):  # or tags? or lists?
 
         self.flags.remove(flag)
 
+    def __repr__(self):
+
+        return 'Flags({})'.format(self.__str__())
+
+    def __str__(self):
+
+        return str(self.flags)[4:-1]
+
 
 class InvalidFlag(BaseException):
     pass
