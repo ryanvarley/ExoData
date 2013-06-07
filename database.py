@@ -5,7 +5,7 @@ import re
 import xml.etree.ElementTree as ET
 import glob
 
-from astroclasses import System, Star, Planet, Parameters, StarParameters, PlanetParameters
+from astroclasses import System, Binary, Star, Planet, Parameters, BinaryParameters, StarParameters, PlanetParameters
 
 compactString = lambda string: string.replace(' ', '').replace('-', '').lower()
 
@@ -24,6 +24,7 @@ class OECDatabase(object):
 
         self._loadDatabase(databaseLocation)
         self._planetSearchDict = self._generatePlanetSearchDict()
+        self.systemDict = {system.name: system for system in self.systems}
         self.planetDict = {planet.name: planet for planet in self.planets}
 
     def searchPlanet(self, name):
@@ -89,9 +90,10 @@ class OECDatabase(object):
         """
 
         # Initialise Database
-        systems = []
-        stars = []
-        planets = []
+        self.systems = []
+        self.binaries = []
+        self.stars = []
+        self.planets = []
 
         for filename in glob.glob(databaseLocation + '*.xml'):
             tree = ET.parse(open(filename, 'r'))
@@ -110,48 +112,79 @@ class OECDatabase(object):
                 systemParams.addParam(tag, text, attrib)
 
             system = System(systemParams.params)
-            systems.append(system)  # Add system to the index
+            self.systems.append(system)  # Add system to the index
 
-            # Now look for stars
-            starsXML = root.findall(".//star")
+            self._loadBinarys(root, system)
+            self._loadStars(root, system)
 
-            for starXML in starsXML:
+    def _loadBinarys(self, parentXML, parent):
 
-                starParams = StarParameters()
+        binarysXML = parentXML.findall("binary")
 
-                for value in starXML:
+        for binaryXML in binarysXML:
+            binaryParams = BinaryParameters()
 
-                    tag = value.tag
-                    text = value.text
-                    attrib = value.attrib
+            for value in binaryXML:
 
-                    starParams.addParam(tag, text, attrib)
+                tag = value.tag
+                text = value.text
+                attrib = value.attrib
 
-                star = Star(starParams.params)
-                star.parent = system
+                binaryParams.addParam(tag, text, attrib)
 
-                system._addChild(star.name, star)  # Add star to the system
-                stars.append(star)  # Add star to the index
+            binary = Binary(binaryParams.params)
+            binary.parent = parent
 
-                # And finally look for planets
-                planetsXML = root.findall(".//planet")
+            parent._addChild(binary)  # Add star to the system
 
-                for planetXML in planetsXML:
+            self._loadBinarys(binaryXML, binary)
+            self._loadStars(binaryXML, binary)
+            self._loadPlanets(binaryXML, binary)  # Load planets
 
-                    planetParams = PlanetParameters()
+            self.binaries.append(binary)  # Add star to the index
 
-                    for value in planetXML:
+    def _loadStars(self, parentXML, parent):
 
-                        tag = value.tag
-                        text = value.text
-                        attrib = value. attrib
+        starsXML = parentXML.findall("star")
 
-                        planetParams.addParam(tag, text, attrib)
+        for starXML in starsXML:
+            starParams = StarParameters()
 
-                    planet = Planet(planetParams.params)
-                    planet.parent = star
+            for value in starXML:
 
-                    star._addChild(planet.name, planet)  # Add planet to the star
-                    planets.append(planet)  # Add planet to the index
+                tag = value.tag
+                text = value.text
+                attrib = value.attrib
 
-        self.planets, self.stars, self.systems = planets, stars, systems
+                starParams.addParam(tag, text, attrib)
+
+            star = Star(starParams.params)
+            star.parent = parent
+
+            parent._addChild(star)  # Add star to the system
+
+            self._loadPlanets(starXML, star)  # Load planets
+
+            self.stars.append(star)  # Add star to the index
+
+    def _loadPlanets(self, parentXML, parent):
+
+        planetsXML = parentXML.findall("planet")
+
+        for planetXML in planetsXML:
+
+            planetParams = PlanetParameters()
+
+            for value in planetXML:
+
+                tag = value.tag
+                text = value.text
+                attrib = value. attrib
+
+                planetParams.addParam(tag, text, attrib)
+
+            planet = Planet(planetParams.params)
+            planet.parent = parent
+
+            parent._addChild(planet)  # Add planet to the star
+            self.planets.append(planet)  # Add planet to the index

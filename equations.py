@@ -16,6 +16,7 @@ from another private project and so contains a few equations i left in incase an
 * mu - mean molecular weight
 """
 
+from __future__ import division
 from numpy import sqrt, arcsin, sin, cos, log10, nan
 
 import quantities as pq
@@ -48,22 +49,13 @@ def scaleHeight(T_eff_p, mu_p, g_p):
     return H.rescale(pq.m)
 
 
-def meanPlanetTemp(A_p, L_s, a):
+def meanPlanetTemp(A_p, T_s, R_s, a):
     """ Calculate the equilibrium planet temperature
 
-    .. math::
-        T_p = \left[\\frac{(1-A)L_\star}{16 \\times \sigma\pi a^2}\\right]^{1/4}
-
-    Where :math:`T_p` is the equilibrium temperature of the planet, :math:`L_\star` is the stellar Luminosity,
-    A is the bond albedo of the planet, :math:`\sigma` is the Stefan-Boltzman constant, a is the semi-major axis.
-
-    :param A: planetary albedo
-    :param L_s: stellar luminosity
-    :param a: semi-major axis
-    :return: :math:`T_p` (mean temp of planet)
+    assumes epsilon = 0.7 http://arxiv.org/pdf/1111.1455v2.pdf
     """
 
-    T_p = (((1 - A_p) * L_s) / (16 * sigma * pi * a**2))**(1 / 4)
+    T_p = T_s * ((1-A_p)/0.7)**(1/4) * sqrt(R_s/(2*a))
 
     return T_p.rescale(pq.degK)
 
@@ -241,5 +233,27 @@ def density(M, R):
 
     return (M/volume).rescale(pq.g / pq.cm**3)
 
+
+def estimateMass(R, density):
+    """ Estimates mass based on radius and a density
+    :param R: Radius
+    :param density: density to calculate mass from
+    :return: mass
+    """
+
+    volume = 4 / 3 * pi * R**3
+
+    return (density * volume).rescale(aq.M_j)
+
+
+def calcSemiMajorAxis(Period, M_s):
+    """ Calculates the semi-major axis of the orbit using the period and stellar mass
+
+    .. math::
+        a = \left( \frac{Period^2 G M_s}{4*\pi^2} \right))^{1/3}
+    """
+    a = ((Period**2 * G * M_s)/(4 * pi**2))**(1/3)
+
+    return a.rescale(pq.au)
 
 # TODO more orbital equations

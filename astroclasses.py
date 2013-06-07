@@ -7,21 +7,24 @@ import quantities as pq
 import equations as eq
 import astroquantities as aq
 import assumptions as assum
+import flags
 
 
 class baseObject(object):
 
     def __init__(self, params=None):
 
-        self.children = {}
+        self.children = []
         self.parent = None
+        self.classType = 'BaseObject'
+        self.flags = flags.Flag()
 
         self.params = {}
         self._updateParams(params)  # TODO value validator?
 
-    def _addChild(self, name, child):
+    def _addChild(self, child):
 
-        self.children.update({name: child})
+        self.children.append(child)
 
     def _updateParams(self, params):
         """ This method updates parameters allowing for any validation / unit additions in the near future
@@ -31,10 +34,15 @@ class baseObject(object):
 
     @property
     def name(self):
-        return self.params['name']
+        try:
+            return self.params['name']
+        except KeyError:
+            return self.parent.name
+        except AttributeError:
+            return 'Un-named ' + self.classType
 
     def __repr__(self):
-        return 'baseObject({!r})'.format(self.name)
+        return '{}({!r})'.format(self.classType, self.name)
 
     def getParam(self, paramKey):
         """ Fetches a parameter from the params dictionary. If it's not there it will return NaN. This allows the use
@@ -51,6 +59,10 @@ class baseObject(object):
 
 class System(baseObject):
 
+    def __init__(self, *args, **kwargs):
+        baseObject.__init__(self, *args, **kwargs)
+        self.classType = 'System'
+
     @property
     def ra(self):
         return self.getParam('rightascension')
@@ -63,15 +75,16 @@ class System(baseObject):
     def d(self):
         return self.getParam('distance')
 
-    def __repr__(self):
-        return 'System({!r})'.format(self.name)
-
     @property
     def stars(self):
         return self.children
 
 
 class StarAndPlanetCommon(baseObject):
+
+    def __init__(self, *args, **kwargs):
+        baseObject.__init__(self, *args, **kwargs)
+        self.classType = 'StarAndPlanetCommon'
 
     @property  # allows stars and planets to access system values by propagating up
     def ra(self):
@@ -100,6 +113,7 @@ class StarAndPlanetCommon(baseObject):
         if not paramTemp is np.nan:
             return paramTemp
         else:
+            self.flags.addFlag('Calculated Temperature')
             return self.calcTemperature()
 
     @property
@@ -107,10 +121,7 @@ class StarAndPlanetCommon(baseObject):
         return self.getParam('mass')
 
     def calcTemperature(self):
-        raise NotImplementedError('Only implmented for Stars and Planet child classes')
-
-    def __repr__(self):
-        return 'StarAndPlanetCommon({!r})'.format(self.name)
+        raise NotImplementedError('Only implemented for Stars and Planet child classes')
 
     @property
     def system(self):
@@ -132,7 +143,22 @@ class StarAndPlanetCommon(baseObject):
             return eq.density(self.M, self.R)
 
 
+class Binary(StarAndPlanetCommon):
+
+    def __init__(self, *args, **kwargs):
+        StarAndPlanetCommon.__init__(self, *args, **kwargs)
+        self.classType = 'Binary'
+
+    @property
+    def stars(self):
+        return self.children
+
+
 class Star(StarAndPlanetCommon):
+
+    def __init__(self, *args, **kwargs):
+        StarAndPlanetCommon.__init__(self, *args, **kwargs)
+        self.classType = 'Star'
 
     def calcLuminosity(self):
 
@@ -163,11 +189,12 @@ class Star(StarAndPlanetCommon):
     def planets(self):
         return self.children
 
-    def __repr__(self):
-        return 'Star({!r})'.format(self.name)
-
 
 class Planet(StarAndPlanetCommon):
+
+    def __init__(self, *args, **kwargs):
+        StarAndPlanetCommon.__init__(self, *args, **kwargs)
+        self.classType = 'Planet'
 
     def isTransiting(self):
         """ Checks the discovery method to see if the planet transits
@@ -181,12 +208,10 @@ class Planet(StarAndPlanetCommon):
     def calcTransitDuration(self):
         """ Estimation of the primary transit time assuming a circular orbit (see :py:func:`equations.transitDuration`)
         """
-
-        return eq.transitDuration(self.P, self.parent.R, self.R, self.a, self.i)
-
-    def calcMeanTemp(self):
-        raise NotImplementedError
-        # return eq.meanPlanetTemp()  # TODO implement albedo assumptions
+        try:
+            return eq.transitDuration(self.P, self.parent.R, self.R, self.a, self.i)
+        except ValueError:
+            return np.nan
 
     def calcScaleHeight(self):
         raise NotImplementedError
@@ -216,19 +241,38 @@ class Planet(StarAndPlanetCommon):
             return np.nan
 
     def albedo(self):
-        return assum.planetAlbedo(self.tempType())
+        if self.getParam('temperature') is not np.nan:
+            planetClass = self.tempType()
+        elif self.M is not np.nan:
+            planetClass = self.massType()
+        elif self.R is not np.nan:
+            planetClass = self.radiusType()
 
-    def calcTemperature(self):  # TODO - better way of doing this part
+        return assum.planetAlbedo(planetClass)
+
+    def calcTemperature(self):
         """ Calculates the temperature using which uses equations.meanPlanetTemp, albedo assumption and potentially
         equations.starTemperature.
 
         issues
-        - you cant get the albedo assumption without temp but you need it to calculate the temp. Assumes 0.3 for now
+        - you cant get the albedo assumption without temp but you need it to calculate the temp.
         """
         try:
-            return eq.meanPlanetTemp(0.3, self.star.calcLuminosity(), self.a)
+            return eq.meanPlanetTemp(self.albedo(), self.star.T, self.star.R, self.a)
         except ValueError:  # ie missing value (.a) returning nan
             return np.nan
+
+    def estimateMass(self):
+
+        density = assum.planetDensity(self.radiusType())
+
+        return eq.estimateMass(self.R, density)
+
+    def calcSMA(self):
+        """ Calculates the semi-major axis based on star mass and period
+        """
+
+        return eq.calcSemiMajorAxis(self.P, self.star.M)
 
     @property
     def e(self):
@@ -244,7 +288,13 @@ class Planet(StarAndPlanetCommon):
 
     @property
     def a(self):
-        return self.getParam('semimajoraxis')
+
+        sma = self.getParam('semimajoraxis')
+        if sma is np.nan:
+            sma = self.calcSMA()
+            self.flags.addFlag('Calculated SMA')
+
+        return sma
 
     @property
     def transittime(self):
@@ -253,9 +303,6 @@ class Planet(StarAndPlanetCommon):
     @property
     def star(self):
         return self.parent
-
-    def __repr__(self):
-        return 'Planet({!r})'.format(self.name)
 
 
 class Parameters(object):  # TODO would this subclassing dict be more preferable?
@@ -275,7 +322,7 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
             'distance': pq.pc,
         }
 
-        self.rejectTags = ('system', 'star', 'planet', 'moon')  # These are handled in their own classes
+        self.rejectTags = ('system', 'binary', 'star', 'planet', 'moon')  # These are handled in their own classes
 
     def addParam(self, key, value, attrib=None):
         """ Checks the key dosnt already exist, adds alternate names to a seperate list
@@ -295,7 +342,11 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
             elif key == 'list':
                 self.params['list'].append(value)
             else:
-                print 'rejected duplicate {}: {} in {}'.format(key, value, self.params['name'])  # TODO: log rejected value
+                try:
+                    name = self.params['name']
+                except KeyError:
+                    name = 'Unnamed'
+                print 'rejected duplicate {}: {} in {}'.format(key, value, name)  # TODO: log rejected value
                 return False  # TODO Replace with exception
 
         else:  # If the key dosnt already exist and isn't rejected
@@ -316,6 +367,17 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
                 except:
                     print 'caught an error with {} - {}'.format(key, value)
             self.params[key] = value
+
+
+class BinaryParameters(Parameters):
+
+    def __init__(self):
+
+        Parameters.__init__(self)
+
+        self._defaultUnits.update({
+         # TODO add binary parameters
+        })
 
 
 class StarParameters(Parameters):
