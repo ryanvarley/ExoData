@@ -20,7 +20,8 @@ class baseObject(object):
         self.flags = flags.Flag()
 
         self.params = {}
-        self._updateParams(params)  # TODO value validator?
+        if params is not None:
+            self._updateParams(params)  # TODO value validator?
 
     def _addChild(self, child):
 
@@ -37,7 +38,10 @@ class baseObject(object):
         try:
             return self.params['name']
         except KeyError:
-            return self.parent.name
+            try:
+                return self.parent.name
+            except AttributeError:
+                return 'Un-named ' + self.classType
         except AttributeError:
             return 'Un-named ' + self.classType
 
