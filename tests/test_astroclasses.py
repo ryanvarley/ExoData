@@ -1,5 +1,5 @@
 import unittest
-from astroclasses import Parameters
+from exoplanetcatalogue.astroclasses import Parameters, Star, Planet, Binary, System
 
 
 class TestListFiles(unittest.TestCase):
@@ -44,6 +44,18 @@ class TestListFiles(unittest.TestCase):
         self.assertEqual(paramObj.params['RA'], 111111)
 
         # TODO test to ensure the rejection is logged
+
+    def test_empty_Planet_init(self):
+        Planet().__repr__()
+
+    def test_empty_Star_init(self):
+        Star().__repr__()
+
+    def test_empty_System_init(self):
+        System().__repr__()
+
+    def test_empty_Binary_init(self):
+        Binary().__repr__()
 
 
 if __name__ == '__main__':
