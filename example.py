@@ -15,6 +15,8 @@ systemPar.addParam('distance', 58)
 systemPar.addParam('declination', '+04 05 06')
 systemPar.addParam('rightascension', '01 02 03')
 
+# TODO Binary
+
 starPar = StarParameters()
 starPar.addParam('age', '7.6')
 starPar.addParam('magB', '9.8')
@@ -31,8 +33,22 @@ starPar.addParam('radius', '0.95')
 starPar.addParam('spectraltype', 'G5')
 starPar.addParam('temperature', '5370')
 
+planetPar = PlanetParameters()
+planetPar.addParam('discoverymethod', 'transit')
+planetPar.addParam('discoveryyear', '2001')
+planetPar.addParam('eccentricity', '0.09')
+planetPar.addParam('inclination', '89.2')
+planetPar.addParam('lastupdate', '12/12/08')
+planetPar.addParam('mass', '3.9')
+planetPar.addParam('name', 'Example Star b')
+planetPar.addParam('period', '111.2')
+planetPar.addParam('radius', '0.92')
+planetPar.addParam('semimajoraxis', '0.449')
+planetPar.addParam('temperature', '339.6')
+planetPar.addParam('transittime', '2454876.344')
+
 exampleSystem = System(systemPar.params)
 exampleStar = Star(starPar.params)
-examplePlanet = Planet()
+examplePlanet = Planet(planetPar.params)
 
 # TODO add heirarchy

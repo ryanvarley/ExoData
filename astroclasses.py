@@ -90,6 +90,10 @@ class StarAndPlanetCommon(baseObject):
         baseObject.__init__(self, *args, **kwargs)
         self.classType = 'StarAndPlanetCommon'
 
+    @property
+    def age(self):
+        return self.getParam('age')
+
     @property  # allows stars and planets to access system values by propagating up
     def ra(self):
         return self.parent.ra
@@ -172,10 +176,6 @@ class Star(StarAndPlanetCommon):
         """ uses equations.starTemperature to estimate temperature based on main sequence relationship
         """
         return eq.starTemperature(self.M)
-
-    @property
-    def age(self):
-        return self.getParam('age')
 
     @property
     def Z(self):
@@ -303,8 +303,20 @@ class Planet(StarAndPlanetCommon):
         return eq.calcSemiMajorAxis(self.P, self.star.M)
 
     @property
+    def discoveryMethod(self):
+        return self.getParam('discoverymethod')
+
+    @property
+    def discoveryYear(self):
+        return self.getParam('discoveryyear')
+
+    @property
     def e(self):
         return self.getParam('eccentricity')
+
+    @property
+    def lastUpdate(self):
+        return self.getParam('lastupdate')
 
     @property
     def i(self):
@@ -435,10 +447,12 @@ class PlanetParameters(Parameters):
         Parameters.__init__(self)
 
         self._defaultUnits.update({
+            'discoveryyear': 1,
             'mass': aq.M_j,
             'radius': aq.R_j,
             'inclination': pq.deg,
             'eccentricity': 1,
             'period': pq.day,
-            'semimajoraxis': pq.au
+            'semimajoraxis': pq.au,
+            'transittime': pq.d
         })
