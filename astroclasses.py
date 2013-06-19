@@ -15,7 +15,7 @@ class baseObject(object):
     def __init__(self, params=None):
 
         self.children = []
-        self.parent = None
+        self.parent = None # TODO should be read only (use add method)
         self.classType = 'BaseObject'
         self.flags = flags.Flag()
 
@@ -89,6 +89,10 @@ class StarAndPlanetCommon(baseObject):
     def __init__(self, *args, **kwargs):
         baseObject.__init__(self, *args, **kwargs)
         self.classType = 'StarAndPlanetCommon'
+
+    @property
+    def age(self):
+        return self.getParam('age')
 
     @property  # allows stars and planets to access system values by propagating up
     def ra(self):
@@ -178,12 +182,32 @@ class Star(StarAndPlanetCommon):
         return self.getParam('metallicity')
 
     @property
-    def magV(self):
-        return self.getParam('magV')
+    def Z(self):
+        return self.getParam('metallicity')
+
+    @property
+    def magB(self):
+        return self.getParam('magB')
+
+    @property
+    def magH(self):
+        return self.getParam('magH')
+
+    @property
+    def magI(self):
+        return self.getParam('magI')
+
+    @property
+    def magJ(self):
+        return self.getParam('magJ')
 
     @property
     def magK(self):
         return self.getParam('magK')
+
+    @property
+    def magV(self):
+        return self.getParam('magV')
 
     @property
     def spectralType(self):
@@ -279,8 +303,20 @@ class Planet(StarAndPlanetCommon):
         return eq.calcSemiMajorAxis(self.P, self.star.M)
 
     @property
+    def discoveryMethod(self):
+        return self.getParam('discoverymethod')
+
+    @property
+    def discoveryYear(self):
+        return self.getParam('discoveryyear')
+
+    @property
     def e(self):
         return self.getParam('eccentricity')
+
+    @property
+    def lastUpdate(self):
+        return self.getParam('lastupdate')
 
     @property
     def i(self):
@@ -322,8 +358,15 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
         }
 
         self._defaultUnits = {
+            'age': aq.Gyear,
+            'distance': pq.pc, # TODO more specific unit handling here or in classes?
+            'magB': 1,
+            'magH': 1,
+            'magI': 1,
+            'magJ': 1,
+            'magK': 1,
+            'magV': 1,
             'temperature': pq.K,
-            'distance': pq.pc,
         }
 
         self.rejectTags = ('system', 'binary', 'star', 'planet', 'moon')  # These are handled in their own classes
@@ -394,7 +437,6 @@ class StarParameters(Parameters):
             'mass': aq.M_s,
             'metallicity': 1,
             'radius': aq.R_s,
-            'magV': 1,
         })
 
 
@@ -405,10 +447,12 @@ class PlanetParameters(Parameters):
         Parameters.__init__(self)
 
         self._defaultUnits.update({
+            'discoveryyear': 1,
             'mass': aq.M_j,
             'radius': aq.R_j,
             'inclination': pq.deg,
             'eccentricity': 1,
             'period': pq.day,
-            'semimajoraxis': pq.au
+            'semimajoraxis': pq.au,
+            'transittime': pq.d
         })
