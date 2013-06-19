@@ -51,4 +51,9 @@ exampleSystem = System(systemPar.params)
 exampleStar = Star(starPar.params)
 examplePlanet = Planet(planetPar.params)
 
+exampleSystem._addChild(exampleStar)
+exampleStar._addChild(examplePlanet)
+examplePlanet.parent = exampleStar
+exampleStar.parent = exampleSystem
+
 # TODO add heirarchy

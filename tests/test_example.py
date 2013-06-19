@@ -33,18 +33,6 @@ class TestExampleInstances(unittest.TestCase):
         self.assertEqual(exampleStar.T, 5370 * pq.K)
 
     def test_planet_object(self):
-        # planetPar.addParam('discoverymethod', 'transit')
-        # planetPar.addParam('discoveryyear', '2001')
-        # planetPar.addParam('eccentricity', '0.09')
-        # planetPar.addParam('inclination', '89.2')
-        # planetPar.addParam('lastupdate', '12/12/08')
-        # planetPar.addParam('mass', '3.9')
-        # planetPar.addParam('name', 'Example Star b')
-        # planetPar.addParam('period', '111.2')
-        # planetPar.addParam('radius', '0.92')
-        # planetPar.addParam('semimajoraxis', '0.449')
-        # planetPar.addParam('temperature', '339.6')
-        # planetPar.addParam('transittime', '2454876.344')
 
         self.assertEqual(examplePlanet.discoveryMethod, 'transit')
         self.assertEqual(examplePlanet.discoveryYear, 2001)
@@ -59,6 +47,11 @@ class TestExampleInstances(unittest.TestCase):
         self.assertEqual(examplePlanet.T, 339.6 * pq.K)
         self.assertEqual(examplePlanet.transittime, 2454876.344 * pq.d)
 
+    def test_system_heirarchy(self):
+        self.assertEqual(exampleSystem.stars[0], exampleStar)
+        self.assertEqual(exampleStar.planets[0], examplePlanet)
+        self.assertEqual(examplePlanet.parent, exampleStar)
+        self.assertEqual(exampleStar.parent, exampleSystem)
 
 
 if __name__ == '__main__':

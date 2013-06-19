@@ -15,7 +15,7 @@ class baseObject(object):
     def __init__(self, params=None):
 
         self.children = []
-        self.parent = None
+        self.parent = None # TODO should be read only (use add method)
         self.classType = 'BaseObject'
         self.flags = flags.Flag()
 
