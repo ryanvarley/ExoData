@@ -1,7 +1,7 @@
 """ Temp module until astro units are added to quantities
 """
 import quantities as pq
-from quantities.unitquantity import UnitConstant, UnitQuantity, UnitLength, UnitMass
+from quantities.unitquantity import UnitConstant, UnitQuantity, UnitLength, UnitMass, UnitTime
 
 L_s = solar_luminosity = UnitQuantity(
     'solar_luminosity',
@@ -39,4 +39,8 @@ M_e = earth_mass = UnitMass(
 M_j = jupiter_mass = UnitMass(
     'jupiter_mass', 1.8986*(10**27)*pq.kg,
     aliases=['jupiter_masses']
+)
+
+Gyear = giga_year = UnitTime(
+    'giga_year', 10**9*pq.year,
 )

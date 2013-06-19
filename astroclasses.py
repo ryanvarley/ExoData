@@ -174,16 +174,40 @@ class Star(StarAndPlanetCommon):
         return eq.starTemperature(self.M)
 
     @property
+    def age(self):
+        return self.getParam('age')
+
+    @property
     def Z(self):
         return self.getParam('metallicity')
 
     @property
-    def magV(self):
-        return self.getParam('magV')
+    def Z(self):
+        return self.getParam('metallicity')
+
+    @property
+    def magB(self):
+        return self.getParam('magB')
+
+    @property
+    def magH(self):
+        return self.getParam('magH')
+
+    @property
+    def magI(self):
+        return self.getParam('magI')
+
+    @property
+    def magJ(self):
+        return self.getParam('magJ')
 
     @property
     def magK(self):
         return self.getParam('magK')
+
+    @property
+    def magV(self):
+        return self.getParam('magV')
 
     @property
     def spectralType(self):
@@ -322,8 +346,15 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
         }
 
         self._defaultUnits = {
+            'age': aq.Gyear,
+            'distance': pq.pc, # TODO more specific unit handling here or in classes?
+            'magB': 1,
+            'magH': 1,
+            'magI': 1,
+            'magJ': 1,
+            'magK': 1,
+            'magV': 1,
             'temperature': pq.K,
-            'distance': pq.pc,
         }
 
         self.rejectTags = ('system', 'binary', 'star', 'planet', 'moon')  # These are handled in their own classes
@@ -394,7 +425,6 @@ class StarParameters(Parameters):
             'mass': aq.M_s,
             'metallicity': 1,
             'radius': aq.R_s,
-            'magV': 1,
         })
 
 
