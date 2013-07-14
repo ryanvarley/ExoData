@@ -5,16 +5,19 @@
 # Due to its wider applicability im putting these here
 
 from astroclasses import Planet, Star, System, Parameters, PlanetParameters, StarParameters
+import astroclasses as ac
 
 
 def genExampleSystem():
     systemPar = Parameters()
-    systemPar.addParam('name', 'Example System')
+    systemPar.addParam('name', 'Example System ' + str(ac._ExamplePlanetCount))
     systemPar.addParam('distance', 58)
     systemPar.addParam('declination', '+04 05 06')
     systemPar.addParam('rightascension', '01 02 03')
 
     exampleSystem = System(systemPar.params)
+
+    ac._ExamplePlanetCount += 1
 
     return exampleSystem
 
@@ -30,8 +33,8 @@ def genExampleStar():
     starPar.addParam('magV', '9.0')
     starPar.addParam('mass', '0.98')
     starPar.addParam('metallicity', '0.43')
-    starPar.addParam('name', 'Example Star')
-    starPar.addParam('name', 'HD Example Star')
+    starPar.addParam('name', 'Example Star ' + str(ac._ExamplePlanetCount))
+    starPar.addParam('name', 'HD ' + str(ac._ExamplePlanetCount))
     starPar.addParam('radius', '0.95')
     starPar.addParam('spectraltype', 'G5')
     starPar.addParam('temperature', '5370')
@@ -57,7 +60,7 @@ def genExamplePlanet():
     planetPar.addParam('inclination', '89.2')
     planetPar.addParam('lastupdate', '12/12/08')
     planetPar.addParam('mass', '3.9')
-    planetPar.addParam('name', 'Example Star b')
+    planetPar.addParam('name', 'Example Star {} b'.format(ac._ExamplePlanetCount))
     planetPar.addParam('period', '111.2')
     planetPar.addParam('radius', '0.92')
     planetPar.addParam('semimajoraxis', '0.449')
