@@ -456,3 +456,5 @@ class PlanetParameters(Parameters):
             'semimajoraxis': pq.au,
             'transittime': pq.d
         })
+
+_ExamplePlanetCount = 1  # Used by example.py - put here to enable global
