@@ -79,8 +79,12 @@ class TestExampleInstances(unittest.TestCase):
 
     def test_second_generation_is_unique(self):
 
-        pass
+        planet1 = self.examplePlanet
+        planet2 = secondExamplePlanet
 
+        planet2.params['radius'] = 12345
+        self.assertTrue(planet2.R, 12345)
+        self.assertEqual(planet1.R, 0.92 * aq.R_j)
 
 if __name__ == '__main__':
     unittest.main()
