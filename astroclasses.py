@@ -112,7 +112,7 @@ class StarAndPlanetCommon(baseObject):
 
     @property
     def T(self):
-        """ Looks for the planet temperature in the catalogue, if absent it calculates it using meanPlanetTemp()
+        """ Looks for the temperature in the catalogue, if absent it calculates it using calcTemperature()
 
         :return: planet temperature
         """
