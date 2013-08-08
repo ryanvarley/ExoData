@@ -14,7 +14,7 @@ Please note that this package is currently in Beta. The Docs are incomplete, it 
 # Installation
 This module depends on
 * [Quantities](https://github.com/python-quantities/python-quantities)
-* numpy
+* [numpy](http://www.numpy.org/)
 * [Open Exoplanet Catalogue](https://github.com/hannorein/open_exoplanet_catalogue) (somewhere on your system)
 
 To install simply clone the repo and move into your python path. I have named the repo folder exoplanetcatalogue for ease. In future this package will be in a package manager which will avoid the naming issue.
