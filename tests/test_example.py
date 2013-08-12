@@ -2,8 +2,11 @@
 right units.
 """
 import unittest
+import sys
+from os.path import join
+sys.path.append(join('..'))
 
-from exoplanetcatalogue.example import genExamplePlanet, examplePlanet
+from example import genExamplePlanet, examplePlanet
 
 import exoplanetcatalogue.astroquantities as aq
 import quantities as pq
