@@ -43,10 +43,10 @@ class Test_starLuminosity(unittest.TestCase):
         R_s = 1 * aq.R_s
         T_eff_s = 5780 * pq.degK
 
-        answer = 3.891440112409585e+26 * pq.W
+        answer = 3.89144e+26 * pq.W
         result = starLuminosity(R_s, T_eff_s)
 
-        self.assertEqual(answer, result)
+        self.assertAlmostEqual(answer, result, delta=0.0001e27)
 
 
 class Test_ratioTerminatorToStar(unittest.TestCase):
