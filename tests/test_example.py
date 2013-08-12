@@ -2,10 +2,11 @@
 right units.
 """
 import unittest
-import quantities as pq
 
-from ..example import genExamplePlanet, examplePlanet
-from .. import astroquantities as aq
+from exoplanetcatalogue.example import genExamplePlanet, examplePlanet
+
+import exoplanetcatalogue.astroquantities as aq
+import quantities as pq
 
 secondExamplePlanet = genExamplePlanet()
 

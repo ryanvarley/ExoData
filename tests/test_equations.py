@@ -1,9 +1,9 @@
 import unittest
 
 import quantities as pq
-
 import astroquantities as aq
-from ..equations import scaleHeight, meanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
+
+from equations import scaleHeight, meanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
     surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis
 
 
