@@ -1,4 +1,9 @@
 *.pyc
 .idea/
 run.py
-*.txt
+allPlanetTypeTempOutput.txt
+allPlanetTypeTempOutput_old.txt
+magKmissing.txt
+planet-ra-dec.txt
+planetTypeMissmatch.txt
+transitTimeMissing.txt
