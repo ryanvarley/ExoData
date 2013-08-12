@@ -8,7 +8,7 @@ sys.path.append(join('..'))
 
 from example import genExamplePlanet, examplePlanet
 
-import exoplanetcatalogue.astroquantities as aq
+import astroquantities as aq
 import quantities as pq
 
 secondExamplePlanet = genExamplePlanet()
