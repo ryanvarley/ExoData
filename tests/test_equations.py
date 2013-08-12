@@ -1,8 +1,11 @@
 import unittest
+import sys
+from os.path import join
+sys.path.append(join('..'))
 
 import quantities as pq
-import astroquantities as aq
 
+import astroquantities as aq
 from equations import scaleHeight, meanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
     surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis
 
