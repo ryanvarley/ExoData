@@ -1,5 +1,5 @@
 import unittest
-from exoplanetcatalogue.astroclasses import Parameters, Star, Planet, Binary, System
+from ..astroclasses import Parameters, Star, Planet, Binary, System
 
 
 class TestListFiles(unittest.TestCase):

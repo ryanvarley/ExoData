@@ -1,7 +1,8 @@
 import unittest
-from database import OECDatabase
 from tempfile import mkdtemp, mkstemp
 import shutil
+
+from ..database import OECDatabase
 
 
 class TestDataBaseLoading(unittest.TestCase):
