@@ -7,4 +7,4 @@ python:
 
 script:
     - cd tests/
-    - nosetests
+    - python -m unittest discover
