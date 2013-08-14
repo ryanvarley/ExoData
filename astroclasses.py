@@ -261,12 +261,18 @@ class Planet(StarAndPlanetCommon):
         return assum.planetTempType(self.T)
 
     def mu(self):  # TODO make getter look in params first calc if not
-        if self.M is not np.nan:
-            return assum.planetMu(self.massType())
-        elif self.R is not np.nan:
-            return assum.planetMu(self.radiusType())
+
+        molweight = self.getParam('molweight')
+
+        if molweight is np.nan:  # Use assumptions
+            if self.M is not np.nan:
+                return assum.planetMu(self.massType())
+            elif self.R is not np.nan:
+                return assum.planetMu(self.radiusType())
+            else:
+                return np.nan
         else:
-            return np.nan
+            return molweight
 
     def albedo(self):
         if self.getParam('temperature') is not np.nan:
@@ -454,7 +460,8 @@ class PlanetParameters(Parameters):
             'eccentricity': 1,
             'period': pq.day,
             'semimajoraxis': pq.au,
-            'transittime': pq.d
+            'transittime': pq.d,
+            'molweight': pq.atomic_mass_unit,
         })
 
 _ExamplePlanetCount = 1  # Used by example.py - put here to enable global
