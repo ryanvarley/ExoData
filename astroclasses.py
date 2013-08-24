@@ -1,6 +1,7 @@
 """ Contains structural classes ie binary, star, planet etc which mimic the xml structure with objects
 """
 import numpy as np
+import os
 
 import quantities as pq
 
@@ -9,7 +10,8 @@ import astroquantities as aq
 import assumptions as assum
 import flags
 
-_rootdir = os.path.dirname(os.path.split(__file__)[0])  # Get package directory
+
+_rootdir = os.path.dirname(__file__)  # Get package directory
 
 class baseObject(object):
 
@@ -218,7 +220,7 @@ class Star(StarAndPlanetCommon):
     def planets(self):
         return self.children
 
-    def getLimbdarkeningCoeff(self, wavelength=1):
+    def getLimbdarkeningCoeff(self, wavelength=1.0):
         """ Looks up quadratic limb darkening parameter from the star based on T, logg and metalicity.
 
         :param wavelength: microns
@@ -227,43 +229,44 @@ class Star(StarAndPlanetCommon):
         :return: limb darkening coefficients 1 and 2
         """
 
-        if self.prisec == 'pri':
-            tempind = [ 3500., 3750., 4000., 4250., 4500., 4750., 5000., 5250., 5500., 5750., 6000., 6250.,\
-                     6500., 6750., 7000., 7250., 7500., 7750., 8000., 8250., 8500., 8750., 9000., 9250.,\
-                     9500., 9750., 10000., 10250., 10500., 10750., 11000., 11250., 11500., 11750., 12000., 12250.,\
-                     12500., 12750., 13000., 14000., 15000., 16000., 17000., 19000., 20000., 21000., 22000., 23000.,\
-                     24000., 25000., 26000., 27000., 28000., 29000., 30000., 31000., 32000., 33000., 34000., 35000.,\
-                     36000., 37000., 38000., 39000., 40000., 41000., 42000., 43000., 44000., 45000., 46000., 47000.,\
-                     48000., 49000., 50000.]
+        tempind = [ 3500., 3750., 4000., 4250., 4500., 4750., 5000., 5250., 5500., 5750., 6000., 6250.,\
+                 6500., 6750., 7000., 7250., 7500., 7750., 8000., 8250., 8500., 8750., 9000., 9250.,\
+                 9500., 9750., 10000., 10250., 10500., 10750., 11000., 11250., 11500., 11750., 12000., 12250.,\
+                 12500., 12750., 13000., 14000., 15000., 16000., 17000., 19000., 20000., 21000., 22000., 23000.,\
+                 24000., 25000., 26000., 27000., 28000., 29000., 30000., 31000., 32000., 33000., 34000., 35000.,\
+                 36000., 37000., 38000., 39000., 40000., 41000., 42000., 43000., 44000., 45000., 46000., 47000.,\
+                 48000., 49000., 50000.]
 
-            lggind = [0., 0.5, 1., 1.5, 2., 2.5, 3., 3.5, 4., 4.5, 5.]
-            mhind = [-5., -4.5, -4., -3.5, -3., -2.5, -2., -1.5, -1., -0.5, -0.3, -0.2, -0.1, 0., 0.1, 0.2, 0.3, 0.5, 1.]
-            waveind = [0.365, 0.445, 0.551, 0.658, 0.806, 1.22, 1.63, 2.19, 3.45]
+        lggind = [0., 0.5, 1., 1.5, 2., 2.5, 3., 3.5, 4., 4.5, 5.]
+        mhind = [-5., -4.5, -4., -3.5, -3., -2.5, -2., -1.5, -1., -0.5, -0.3, -0.2, -0.1, 0., 0.1, 0.2, 0.3, 0.5, 1.]
+        waveind = [0.365, 0.445, 0.551, 0.658, 0.806, 1.22, 1.63, 2.19, 3.45]
 
-            [tempselect, ind1] = find_nearest(tempind, self.T)
-            [lgselect, ind2] = find_nearest(lggind, self.calcLogg())
-            [mhselect, ind3] = find_nearest(mhind, self.Z)
+        tempselect = find_nearest(tempind, float(self.T))
+        lgselect = find_nearest(lggind, float(self.calcLogg()))
+        mhselect = find_nearest(mhind, float(self.Z))
 
+        print tempselect, lgselect, mhselect
 
-            lddata = loadtxt(os.path.join(_rootdir, "data", "quadratic.dat"))
+        lddata = np.loadtxt(os.path.join(_rootdir, "data", "quadratic.dat"))
 
-            coeffarr = np.zeros((2, 17))
-            coeffarr2 = np.zeros((2, 9))
+        coeffarr = np.zeros((2, 17))
+        coeffarr2 = np.zeros((2, 9))
 
-            for i in range(len(lddata)):
-                if lddata[i, 2] == lgselect and lddata[i, 3] == tempselect and lddata[i, 4] == mhselect:
-                    if lddata[i, 0] == 1:
-                        coeffarr[0,:] = lddata[i,:]
-                    elif lddata[i, 0] == 2:
-                        coeffarr[1,:] = lddata[i,:]
+        for i in range(len(lddata)):
+            if lddata[i, 2] == lgselect and lddata[i, 3] == tempselect and lddata[i, 4] == mhselect:
+                if lddata[i, 0] == 1:
+                    coeffarr[0,:] = lddata[i,:]
+                elif lddata[i, 0] == 2:
+                    coeffarr[1,:] = lddata[i,:]
 
-            coeffarr2[0, 0:7] = coeffarr[0, 10:]
-            coeffarr2[1, 0:7] = coeffarr[1, 10:]
+        coeffarr2[0, 0:7] = coeffarr[0, 10:]
+        coeffarr2[1, 0:7] = coeffarr[1, 10:]
 
-            coeffinter1 = np.interp(wavelength, waveind, coeffarr2[0,:], left=0, right=0)
-            coeffinter2 = np.interp(wavelength, waveind, coeffarr2[1,:], left=0, right=0)
-        else:
-            coeffinter1 = coeffinter2 = 0
+        print coeffarr2[0,:]
+        print coeffarr2[1,:]
+
+        coeffinter1 = np.interp(wavelength, waveind, coeffarr2[0,:], left=0, right=0)
+        coeffinter2 = np.interp(wavelength, waveind, coeffarr2[1,:], left=0, right=0)
 
         return coeffinter1, coeffinter2
 
@@ -519,7 +522,7 @@ def find_nearest(arr, value):
     arr = np.array(arr)
     # find nearest value in array
     idx = (abs(arr-value)).argmin()
-    return [arr[idx], idx]
+    return arr[idx]
 
 
 _ExamplePlanetCount = 1  # Used by example.py - put here to enable global
