@@ -9,6 +9,7 @@ import astroquantities as aq
 import assumptions as assum
 import flags
 
+_rootdir = os.path.dirname(os.path.split(__file__)[0])  # Get package directory
 
 class baseObject(object):
 
@@ -217,7 +218,11 @@ class Star(StarAndPlanetCommon):
     def planets(self):
         return self.children
 
-    def get_limbdarkening(self):
+    def getLimbdarkeningCoeff(self):
+        """ Looks up quadratic limb darkening parameter from the star based on T, logg and metalicity.
+
+        :return: limb darkening coefficients 1 and 2
+        """
 
         if self.prisec == 'pri':
             tempind = [ 3500., 3750., 4000., 4250., 4500., 4750., 5000., 5250., 5500., 5750., 6000., 6250.,\
@@ -232,12 +237,12 @@ class Star(StarAndPlanetCommon):
             mhind = [-5., -4.5, -4., -3.5, -3., -2.5, -2., -1.5, -1., -0.5, -0.3, -0.2, -0.1, 0., 0.1, 0.2, 0.3, 0.5, 1.]
             waveind = [0.365, 0.445, 0.551, 0.658, 0.806, 1.22, 1.63, 2.19, 3.45]
 
-            [tempselect, ind1] = find_nearest(tempind, self.Tstar)
-            [lgselect, ind2] = find_nearest(lggind, self.logg)
-            [mhselect, ind3] = find_nearest(mhind, self.mh)
+            [tempselect, ind1] = find_nearest(tempind, self.T)
+            [lgselect, ind2] = find_nearest(lggind, self.calcLogg())
+            [mhselect, ind3] = find_nearest(mhind, self.Z)
 
 
-            lddata = loadtxt(os.path.join(self.params._rootdir, "data/stellar", "quadratic.dat"))
+            lddata = loadtxt(os.path.join(_rootdir, "data", "quadratic.dat"))
 
             coeffarr = zeros((2, 17))
             coeffarr2 = zeros((2, 9))
@@ -257,8 +262,7 @@ class Star(StarAndPlanetCommon):
         else:
             coeffinter1 = coeffinter2 = zeros_like(self.wl)
 
-        self.u1 = coeffinter1
-        self.u2 = coeffinter2
+        return coeffinter1, coeffinter2
 
 
 class Planet(StarAndPlanetCommon):

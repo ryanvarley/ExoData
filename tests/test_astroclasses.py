@@ -62,5 +62,10 @@ class TestListFiles(unittest.TestCase):
         Binary().__repr__()
 
 
+class TestStarParameters(unittest.TestCase):
+
+    pass
+
+
 if __name__ == '__main__':
     unittest.main()
