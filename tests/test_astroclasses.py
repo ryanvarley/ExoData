@@ -64,7 +64,8 @@ class TestListFiles(unittest.TestCase):
 
 class TestStarParameters(unittest.TestCase):
 
-    pass
+    def test_getLimbdarkeningCoeff_works(self):
+        pass  # This simple check covered by test_example
 
 
 if __name__ == '__main__':

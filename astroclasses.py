@@ -218,8 +218,11 @@ class Star(StarAndPlanetCommon):
     def planets(self):
         return self.children
 
-    def getLimbdarkeningCoeff(self):
+    def getLimbdarkeningCoeff(self, wavelength=1):
         """ Looks up quadratic limb darkening parameter from the star based on T, logg and metalicity.
+
+        :param wavelength: microns
+        :type wavelength: float
 
         :return: limb darkening coefficients 1 and 2
         """
@@ -257,10 +260,11 @@ class Star(StarAndPlanetCommon):
             coeffarr2[0, 0:7] = coeffarr[0, 10:]
             coeffarr2[1, 0:7] = coeffarr[1, 10:]
 
-            coeffinter1 = interp(self.wl, waveind, coeffarr2[0,:], left=0, right=0)
-            coeffinter2 = interp(self.wl, waveind, coeffarr2[1,:], left=0, right=0)
+            # TODO self.wl needs defining
+            coeffinter1 = interp(wavelength, waveind, coeffarr2[0,:], left=0, right=0)
+            coeffinter2 = interp(wavelength, waveind, coeffarr2[1,:], left=0, right=0)
         else:
-            coeffinter1 = coeffinter2 = zeros_like(self.wl)
+            coeffinter1 = coeffinter2 = 0
 
         return coeffinter1, coeffinter2
 
