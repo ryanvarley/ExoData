@@ -514,4 +514,12 @@ class PlanetParameters(Parameters):
             'molweight': pq.atomic_mass_unit,
         })
 
+
+def find_nearest(arr, value):
+    arr = np.array(arr)
+    # find nearest value in array
+    idx = (abs(arr-value)).argmin()
+    return [arr[idx], idx]
+
+
 _ExamplePlanetCount = 1  # Used by example.py - put here to enable global
