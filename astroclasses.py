@@ -247,8 +247,8 @@ class Star(StarAndPlanetCommon):
 
             lddata = loadtxt(os.path.join(_rootdir, "data", "quadratic.dat"))
 
-            coeffarr = zeros((2, 17))
-            coeffarr2 = zeros((2, 9))
+            coeffarr = np.zeros((2, 17))
+            coeffarr2 = np.zeros((2, 9))
 
             for i in range(len(lddata)):
                 if lddata[i, 2] == lgselect and lddata[i, 3] == tempselect and lddata[i, 4] == mhselect:
@@ -260,9 +260,8 @@ class Star(StarAndPlanetCommon):
             coeffarr2[0, 0:7] = coeffarr[0, 10:]
             coeffarr2[1, 0:7] = coeffarr[1, 10:]
 
-            # TODO self.wl needs defining
-            coeffinter1 = interp(wavelength, waveind, coeffarr2[0,:], left=0, right=0)
-            coeffinter2 = interp(wavelength, waveind, coeffarr2[1,:], left=0, right=0)
+            coeffinter1 = np.interp(wavelength, waveind, coeffarr2[0,:], left=0, right=0)
+            coeffinter2 = np.interp(wavelength, waveind, coeffarr2[1,:], left=0, right=0)
         else:
             coeffinter1 = coeffinter2 = 0
 
