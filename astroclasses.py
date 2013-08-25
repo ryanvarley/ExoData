@@ -229,42 +229,46 @@ class Star(StarAndPlanetCommon):
         :return: limb darkening coefficients 1 and 2
         """
 
-        tempind = [ 3500., 3750., 4000., 4250., 4500., 4750., 5000., 5250., 5500., 5750., 6000., 6250.,\
-                 6500., 6750., 7000., 7250., 7500., 7750., 8000., 8250., 8500., 8750., 9000., 9250.,\
-                 9500., 9750., 10000., 10250., 10500., 10750., 11000., 11250., 11500., 11750., 12000., 12250.,\
-                 12500., 12750., 13000., 14000., 15000., 16000., 17000., 19000., 20000., 21000., 22000., 23000.,\
-                 24000., 25000., 26000., 27000., 28000., 29000., 30000., 31000., 32000., 33000., 34000., 35000.,\
-                 36000., 37000., 38000., 39000., 40000., 41000., 42000., 43000., 44000., 45000., 46000., 47000.,\
+        # The intervals of values in the tables
+        tempind = [ 3500., 3750., 4000., 4250., 4500., 4750., 5000., 5250., 5500., 5750., 6000., 6250.,
+                 6500., 6750., 7000., 7250., 7500., 7750., 8000., 8250., 8500., 8750., 9000., 9250.,
+                 9500., 9750., 10000., 10250., 10500., 10750., 11000., 11250., 11500., 11750., 12000., 12250.,
+                 12500., 12750., 13000., 14000., 15000., 16000., 17000., 19000., 20000., 21000., 22000., 23000.,
+                 24000., 25000., 26000., 27000., 28000., 29000., 30000., 31000., 32000., 33000., 34000., 35000.,
+                 36000., 37000., 38000., 39000., 40000., 41000., 42000., 43000., 44000., 45000., 46000., 47000.,
                  48000., 49000., 50000.]
-
         lggind = [0., 0.5, 1., 1.5, 2., 2.5, 3., 3.5, 4., 4.5, 5.]
         mhind = [-5., -4.5, -4., -3.5, -3., -2.5, -2., -1.5, -1., -0.5, -0.3, -0.2, -0.1, 0., 0.1, 0.2, 0.3, 0.5, 1.]
-        waveind = [0.365, 0.445, 0.551, 0.658, 0.806, 1.22, 1.63, 2.19, 3.45]
 
-        tempselect = find_nearest(tempind, float(self.T))
-        lgselect = find_nearest(lggind, float(self.calcLogg()))
-        mhselect = find_nearest(mhind, float(self.Z))
+        # Choose the values in the table nearest our parameters
+        tempselect = _findNearest(tempind, float(self.T))
+        lgselect = _findNearest(lggind, float(self.calcLogg()))
+        mhselect = _findNearest(mhind, float(self.Z))
 
-        print tempselect, lgselect, mhselect
+        print tempselect, lgselect, mhselect  # temp
 
-        lddata = np.loadtxt(os.path.join(_rootdir, "data", "quadratic.dat"))
+        coeffTable = np.loadtxt(os.path.join(_rootdir, "data", "quadratic.dat"))
 
         coeffarr = np.zeros((2, 17))
         coeffarr2 = np.zeros((2, 9))
 
-        for i in range(len(lddata)):
-            if lddata[i, 2] == lgselect and lddata[i, 3] == tempselect and lddata[i, 4] == mhselect:
-                if lddata[i, 0] == 1:
-                    coeffarr[0,:] = lddata[i,:]
-                elif lddata[i, 0] == 2:
-                    coeffarr[1,:] = lddata[i,:]
+        for i in xrange(len(coeffTable)):
+            # If we find our row
+            if coeffTable[i, 2] == lgselect and coeffTable[i, 3] == tempselect and coeffTable[i, 4] == mhselect:
+                if coeffTable[i, 0] == 1:
+                    coeffarr[0,:] = coeffTable[i,:]
+                elif coeffTable[i, 0] == 2:
+                    coeffarr[1,:] = coeffTable[i,:]
 
         coeffarr2[0, 0:7] = coeffarr[0, 10:]
         coeffarr2[1, 0:7] = coeffarr[1, 10:]
 
-        print coeffarr2[0,:]
-        print coeffarr2[1,:]
+        print coeffarr  # temp
+        print coeffarr2  # temp
 
+        waveind = [0.365, 0.445, 0.551, 0.658, 0.806, 1.22, 1.63, 2.19, 3.45]  # Wavelengths available in table
+
+        # Interpolates the value at wavelength from values in the table (waveind)
         coeffinter1 = np.interp(wavelength, waveind, coeffarr2[0,:], left=0, right=0)
         coeffinter2 = np.interp(wavelength, waveind, coeffarr2[1,:], left=0, right=0)
 
@@ -518,7 +522,9 @@ class PlanetParameters(Parameters):
         })
 
 
-def find_nearest(arr, value):
+def _findNearest(arr, value):
+    """ Finds the value in arr that value is clostest to
+    """
     arr = np.array(arr)
     # find nearest value in array
     idx = (abs(arr-value)).argmin()
