@@ -261,8 +261,6 @@ class Star(StarAndPlanetCommon):
 
         waveind = [0.365, 0.445, 0.551, 0.658, 0.806, 1.22, 1.63, 2.19, 3.45]  # Wavelengths available in table
 
-        print len(u1array)
-
         # Interpolates the value at wavelength from values in the table (waveind)
         u1AtWavelength = np.interp(wavelength, waveind, u1array, left=0, right=0)
         u2AtWavelength = np.interp(wavelength, waveind, u2array, left=0, right=0)
