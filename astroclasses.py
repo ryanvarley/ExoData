@@ -220,7 +220,7 @@ class Star(StarAndPlanetCommon):
     def planets(self):
         return self.children
 
-    def getLimbdarkeningCoeff(self, wavelength=1.0):
+    def getLimbdarkeningCoeff(self, wavelength=1.22):
         """ Looks up quadratic limb darkening parameter from the star based on T, logg and metalicity.
 
         :param wavelength: microns
@@ -244,8 +244,6 @@ class Star(StarAndPlanetCommon):
         tempselect = _findNearest(tempind, float(self.T))
         lgselect = _findNearest(lggind, float(self.calcLogg()))
         mhselect = _findNearest(mhind, float(self.Z))
-
-        print tempselect, lgselect, mhselect  # temp
 
         coeffTable = np.loadtxt(os.path.join(_rootdir, "data", "quadratic.dat"))
 

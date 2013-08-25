@@ -46,7 +46,7 @@ class TestExampleInstances(unittest.TestCase):
         self.assertEqual(exampleStar.R, 0.95 * aq.R_s)
         self.assertEqual(exampleStar.spectralType, 'G5')
         self.assertEqual(exampleStar.T, 5370 * pq.K)
-        self.assertEqual(exampleStar.getLimbdarkeningCoeff(1.22), (1,1))
+        self.assertEqual(exampleStar.getLimbdarkeningCoeff(1.22), (0.3531, 0.2822))
 
     def test_planet_object(self):
         examplePlanet = self.examplePlanet
