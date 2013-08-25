@@ -249,30 +249,27 @@ class Star(StarAndPlanetCommon):
 
         coeffTable = np.loadtxt(os.path.join(_rootdir, "data", "quadratic.dat"))
 
-        coeffarr = np.zeros((2, 17))
-        coeffarr2 = np.zeros((2, 9))
-
+        foundValues = False
         for i in xrange(len(coeffTable)):
-            # If we find our row
             if coeffTable[i, 2] == lgselect and coeffTable[i, 3] == tempselect and coeffTable[i, 4] == mhselect:
                 if coeffTable[i, 0] == 1:
-                    coeffarr[0,:] = coeffTable[i,:]
-                elif coeffTable[i, 0] == 2:
-                    coeffarr[1,:] = coeffTable[i,:]
+                    u1array = coeffTable[i, 8:]  # Limb darkening parameter u1 for each wl in waveind
+                    u2array = coeffTable[i+1, 8:]
+                    foundValues = True
+                    break
 
-        coeffarr2[0, 0:7] = coeffarr[0, 10:]
-        coeffarr2[1, 0:7] = coeffarr[1, 10:]
-
-        print coeffarr  # temp
-        print coeffarr2  # temp
+        if not foundValues:
+            raise ValueError('No limb darkening values could be found')  # TODO replace with better exception
 
         waveind = [0.365, 0.445, 0.551, 0.658, 0.806, 1.22, 1.63, 2.19, 3.45]  # Wavelengths available in table
 
-        # Interpolates the value at wavelength from values in the table (waveind)
-        coeffinter1 = np.interp(wavelength, waveind, coeffarr2[0,:], left=0, right=0)
-        coeffinter2 = np.interp(wavelength, waveind, coeffarr2[1,:], left=0, right=0)
+        print len(u1array)
 
-        return coeffinter1, coeffinter2
+        # Interpolates the value at wavelength from values in the table (waveind)
+        u1AtWavelength = np.interp(wavelength, waveind, u1array, left=0, right=0)
+        u2AtWavelength = np.interp(wavelength, waveind, u2array, left=0, right=0)
+
+        return u1AtWavelength, u2AtWavelength
 
 
 class Planet(StarAndPlanetCommon):
