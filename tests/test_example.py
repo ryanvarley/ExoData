@@ -2,10 +2,13 @@
 right units.
 """
 import unittest
+import sys
+from os.path import join
+sys.path.append(join('..'))
 
-from exoplanetcatalogue.example import genExamplePlanet, examplePlanet
+from example import genExamplePlanet, examplePlanet
 
-import exoplanetcatalogue.astroquantities as aq
+import astroquantities as aq
 import quantities as pq
 
 secondExamplePlanet = genExamplePlanet()
@@ -43,6 +46,7 @@ class TestExampleInstances(unittest.TestCase):
         self.assertEqual(exampleStar.R, 0.95 * aq.R_s)
         self.assertEqual(exampleStar.spectralType, 'G5')
         self.assertEqual(exampleStar.T, 5370 * pq.K)
+        self.assertEqual(exampleStar.getLimbdarkeningCoeff(1.22), (0.3531, 0.2822))
 
     def test_planet_object(self):
         examplePlanet = self.examplePlanet

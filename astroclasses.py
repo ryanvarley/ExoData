@@ -1,6 +1,7 @@
 """ Contains structural classes ie binary, star, planet etc which mimic the xml structure with objects
 """
 import numpy as np
+import os
 
 import quantities as pq
 
@@ -9,6 +10,8 @@ import astroquantities as aq
 import assumptions as assum
 import flags
 
+
+_rootdir = os.path.dirname(__file__)  # Get package directory
 
 class baseObject(object):
 
@@ -112,7 +115,7 @@ class StarAndPlanetCommon(baseObject):
 
     @property
     def T(self):
-        """ Looks for the planet temperature in the catalogue, if absent it calculates it using meanPlanetTemp()
+        """ Looks for the temperature in the catalogue, if absent it calculates it using calcTemperature()
 
         :return: planet temperature
         """
@@ -217,6 +220,55 @@ class Star(StarAndPlanetCommon):
     def planets(self):
         return self.children
 
+    def getLimbdarkeningCoeff(self, wavelength=1.22):
+        """ Looks up quadratic limb darkening parameter from the star based on T, logg and metalicity.
+
+        :param wavelength: microns
+        :type wavelength: float
+
+        :return: limb darkening coefficients 1 and 2
+        """
+
+        # The intervals of values in the tables
+        tempind = [ 3500., 3750., 4000., 4250., 4500., 4750., 5000., 5250., 5500., 5750., 6000., 6250.,
+                 6500., 6750., 7000., 7250., 7500., 7750., 8000., 8250., 8500., 8750., 9000., 9250.,
+                 9500., 9750., 10000., 10250., 10500., 10750., 11000., 11250., 11500., 11750., 12000., 12250.,
+                 12500., 12750., 13000., 14000., 15000., 16000., 17000., 19000., 20000., 21000., 22000., 23000.,
+                 24000., 25000., 26000., 27000., 28000., 29000., 30000., 31000., 32000., 33000., 34000., 35000.,
+                 36000., 37000., 38000., 39000., 40000., 41000., 42000., 43000., 44000., 45000., 46000., 47000.,
+                 48000., 49000., 50000.]
+        lggind = [0., 0.5, 1., 1.5, 2., 2.5, 3., 3.5, 4., 4.5, 5.]
+        mhind = [-5., -4.5, -4., -3.5, -3., -2.5, -2., -1.5, -1., -0.5, -0.3, -0.2, -0.1, 0., 0.1, 0.2, 0.3, 0.5, 1.]
+
+        # Choose the values in the table nearest our parameters
+        tempselect = _findNearest(tempind, float(self.T))
+        lgselect = _findNearest(lggind, float(self.calcLogg()))
+        mhselect = _findNearest(mhind, float(self.Z))
+
+        coeffTable = np.loadtxt(os.path.join(_rootdir, "data", "quadratic.dat"))
+
+        foundValues = False
+        for i in xrange(len(coeffTable)):
+            if coeffTable[i, 2] == lgselect and coeffTable[i, 3] == tempselect and coeffTable[i, 4] == mhselect:
+                if coeffTable[i, 0] == 1:
+                    u1array = coeffTable[i, 8:]  # Limb darkening parameter u1 for each wl in waveind
+                    u2array = coeffTable[i+1, 8:]
+                    foundValues = True
+                    break
+
+        if not foundValues:
+            raise ValueError('No limb darkening values could be found')  # TODO replace with better exception
+
+        waveind = [0.365, 0.445, 0.551, 0.658, 0.806, 1.22, 1.63, 2.19, 3.45]  # Wavelengths available in table
+
+        print len(u1array)
+
+        # Interpolates the value at wavelength from values in the table (waveind)
+        u1AtWavelength = np.interp(wavelength, waveind, u1array, left=0, right=0)
+        u2AtWavelength = np.interp(wavelength, waveind, u2array, left=0, right=0)
+
+        return u1AtWavelength, u2AtWavelength
+
 
 class Planet(StarAndPlanetCommon):
 
@@ -261,12 +313,18 @@ class Planet(StarAndPlanetCommon):
         return assum.planetTempType(self.T)
 
     def mu(self):  # TODO make getter look in params first calc if not
-        if self.M is not np.nan:
-            return assum.planetMu(self.massType())
-        elif self.R is not np.nan:
-            return assum.planetMu(self.radiusType())
+
+        molweight = self.getParam('molweight')
+
+        if molweight is np.nan:  # Use assumptions
+            if self.M is not np.nan:
+                return assum.planetMu(self.massType())
+            elif self.R is not np.nan:
+                return assum.planetMu(self.radiusType())
+            else:
+                return np.nan
         else:
-            return np.nan
+            return molweight
 
     def albedo(self):
         if self.getParam('temperature') is not np.nan:
@@ -454,7 +512,18 @@ class PlanetParameters(Parameters):
             'eccentricity': 1,
             'period': pq.day,
             'semimajoraxis': pq.au,
-            'transittime': pq.d
+            'transittime': pq.d,
+            'molweight': pq.atomic_mass_unit,
         })
+
+
+def _findNearest(arr, value):
+    """ Finds the value in arr that value is clostest to
+    """
+    arr = np.array(arr)
+    # find nearest value in array
+    idx = (abs(arr-value)).argmin()
+    return arr[idx]
+
 
 _ExamplePlanetCount = 1  # Used by example.py - put here to enable global

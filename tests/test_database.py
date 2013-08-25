@@ -1,4 +1,7 @@
 import unittest
+import sys
+sys.path.append('..')
+
 from database import OECDatabase
 from tempfile import mkdtemp, mkstemp
 import shutil
