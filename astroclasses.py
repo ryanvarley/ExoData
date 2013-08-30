@@ -280,6 +280,8 @@ class Planet(StarAndPlanetCommon):
 
         if self.params['discoverymethod'] == 'transit':
             return True  # is this all or will it miss RV detected planets that transit?
+        elif self.R is not np.nan:
+            return True  # transit is the only method to give R
         else:
             return False
 
