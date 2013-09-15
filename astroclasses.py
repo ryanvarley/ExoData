@@ -13,6 +13,7 @@ import flags
 
 _rootdir = os.path.dirname(__file__)  # Get package directory
 
+
 class baseObject(object):
 
     def __init__(self, params=None):
@@ -359,6 +360,12 @@ class Planet(StarAndPlanetCommon):
         """
 
         return eq.calcSemiMajorAxis(self.P, self.star.M)
+
+    def calcSMAfromT(self):
+        """ Calculates the semi-major axis based on planet temperature
+        """
+
+        return eq.calcSemiMajorAxis2(self.T, self.star.T, self.albedo(), self.star.R)
 
     @property
     def discoveryMethod(self):

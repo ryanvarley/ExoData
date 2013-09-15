@@ -7,7 +7,7 @@ import quantities as pq
 
 import astroquantities as aq
 from equations import scaleHeight, meanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
-    surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis
+    surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis, calcSemiMajorAxis2, calcPeriod
 
 
 class Test_scaleHeight(unittest.TestCase):
@@ -163,11 +163,35 @@ class Test_calcSemiMajorAxis(unittest.TestCase):
         P = 1 * pq.year
 
         result = calcSemiMajorAxis(P, M_s)
-        print result
         answer = 1 * pq.au
 
         self.assertAlmostEqual(answer, result, 3)
 
+
+class Test_calcSemiMajorAxis2(unittest.TestCase):
+    def test_works_gj1214(self):
+
+        T_p = 520 * pq.K
+        T_s = 3026 * pq.K
+        R_s = 0.21 * aq.R_s
+        A_p = 0.3
+
+        result = calcSemiMajorAxis2(T_p, T_s, A_p, R_s)
+        answer = 0.01665 * pq.au
+
+        self.assertAlmostEqual(answer, result, 3)
+
+
+class Test_calcPeriod(unittest.TestCase):
+    def test_works_gj1214(self):
+
+        a = 0.014 * pq.au
+        M_s = 0.153 * aq.M_s
+
+        result = calcPeriod(a, M_s)
+        answer = 1.546 * pq.day
+
+        self.assertAlmostEqual(answer, result, 3)
 
 if __name__ == '__main__':
     unittest.main()

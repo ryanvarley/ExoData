@@ -256,4 +256,29 @@ def calcSemiMajorAxis(Period, M_s):
 
     return a.rescale(pq.au)
 
+
+def calcSemiMajorAxis2(T_p, T_s, A_p, R_s):
+    """ Calculates the semi-major axis of the orbit using the planet temperature
+
+    .. math::
+        a = \text{tbc}
+    """
+    a = sqrt((1-A_p)/0.7) * (R_s/2) * (T_s/T_p)**2
+
+    return a.rescale(pq.au)
+
+
+def calcPeriod(a, M_s):
+    """ Calculates the period of the orbit using the stellar mass and sma
+    :return:
+
+    .. math::
+        a = \text{tbc}
+    """
+
+    P = 2 * pi * sqrt(a**3 / (G * M_s))
+
+    return P.rescale(pq.day)
+
+
 # TODO more orbital equations
