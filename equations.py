@@ -257,13 +257,13 @@ def calcSemiMajorAxis(Period, M_s):
     return a.rescale(pq.au)
 
 
-def calcSemiMajorAxis2(T_p, T_s, A_p, R_s):
+def calcSemiMajorAxis2(T_p, T_s, A_p, R_s, epsilon=0.7):
     """ Calculates the semi-major axis of the orbit using the planet temperature
 
     .. math::
         a = \text{tbc}
     """
-    a = sqrt((1-A_p)/0.7) * (R_s/2) * (T_s/T_p)**2
+    a = sqrt((1-A_p)/epsilon) * (R_s/2) * (T_s/T_p)**2
 
     return a.rescale(pq.au)
 
