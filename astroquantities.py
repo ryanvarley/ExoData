@@ -44,3 +44,13 @@ M_j = jupiter_mass = UnitMass(
 Gyear = giga_year = UnitTime(
     'giga_year', 10**9*pq.year,
 )
+
+JulianDay = julian_day = JD = UnitTime(
+    'julian_day', pq.day,
+)
+""" Note while quantities doesnt directly support units with an offset in most cases Julian Days are treated like days.
+It is useful then to know if your working in Julian Days, MJD, BJD etc"""
+
+ModifiedJulianDate = modified_julian_day = MJD = UnitTime(
+    'modified_julian_day', pq.day,
+)

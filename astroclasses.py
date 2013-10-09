@@ -13,6 +13,7 @@ import flags
 
 _rootdir = os.path.dirname(__file__)  # Get package directory
 
+
 class baseObject(object):
 
     def __init__(self, params=None):
@@ -261,8 +262,6 @@ class Star(StarAndPlanetCommon):
 
         waveind = [0.365, 0.445, 0.551, 0.658, 0.806, 1.22, 1.63, 2.19, 3.45]  # Wavelengths available in table
 
-        print len(u1array)
-
         # Interpolates the value at wavelength from values in the table (waveind)
         u1AtWavelength = np.interp(wavelength, waveind, u1array, left=0, right=0)
         u2AtWavelength = np.interp(wavelength, waveind, u2array, left=0, right=0)
@@ -282,6 +281,8 @@ class Planet(StarAndPlanetCommon):
 
         if self.params['discoverymethod'] == 'transit':
             return True  # is this all or will it miss RV detected planets that transit?
+        elif self.R is not np.nan:
+            return True  # transit is the only method to give R
         else:
             return False
 
@@ -359,6 +360,12 @@ class Planet(StarAndPlanetCommon):
         """
 
         return eq.calcSemiMajorAxis(self.P, self.star.M)
+
+    def calcSMAfromT(self):
+        """ Calculates the semi-major axis based on planet temperature
+        """
+
+        return eq.calcSemiMajorAxis2(self.T, self.star.T, self.albedo(), self.star.R)
 
     @property
     def discoveryMethod(self):
