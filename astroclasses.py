@@ -367,6 +367,12 @@ class Planet(StarAndPlanetCommon):
 
         return eq.calcSemiMajorAxis2(self.T, self.star.T, self.albedo(), self.star.R)
 
+    def calcPeriod(self):
+        """ calculates period using a and stellar mass
+        """
+
+        return eq.calcPeriod(self.a, self.star.M)
+
     @property
     def discoveryMethod(self):
         return self.getParam('discoverymethod')
@@ -389,14 +395,21 @@ class Planet(StarAndPlanetCommon):
 
     @property
     def P(self):
-        return self.getParam('period')
+        period = self.getParam('period')
+        if period is not np.nan:
+            return period
+        else:
+            return self.calcPeriod()
 
     @property
     def a(self):
 
         sma = self.getParam('semimajoraxis')
         if sma is np.nan:
-            sma = self.calcSMA()
+            if self.getParam('period') is np.nan:
+                sma = self.calcSMAfromT()
+            else:
+                sma = self.calcSMA()  # calc using period
             self.flags.addFlag('Calculated SMA')
 
         return sma
