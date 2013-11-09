@@ -456,10 +456,18 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
         if key in self.rejectTags:
             return False  # TODO Replace with exception
 
-        if key in self.params:
+        if key in self.params:  # if already exists
 
             if key == 'name':
-                self.params['altnames'].append(value)
+                try:  # if flagged as a primary or popular name use this one, an option should be made to use either
+                    if attrib['type'] == 'pri':  # first names or popular names.
+                        oldname = self.params['name']
+                        self.params['altnames'].append(oldname)
+                        self.params['name'] = value
+                    else:
+                        self.params['altnames'].append(value)
+                except KeyError:
+                    self.params['altnames'].append(value)
             elif key == 'list':
                 self.params['list'].append(value)
             else:
