@@ -38,7 +38,7 @@ class baseObject(object):
         self.params.update(params)
 
     @property
-    def name(self):
+    def name(self):  # TODO variable for altnames
         try:
             return self.params['name']
         except KeyError:
@@ -83,7 +83,7 @@ class System(baseObject):
     def d(self):
         return self.getParam('distance')
 
-    @property
+    @property  # TODO could be binaries now, should differentiate
     def stars(self):
         return self.children
 
@@ -135,7 +135,7 @@ class StarAndPlanetCommon(baseObject):
     def calcTemperature(self):
         raise NotImplementedError('Only implemented for Stars and Planet child classes')
 
-    @property
+    @property  # TODO may return binary
     def system(self):
         return self.parent
 
@@ -155,7 +155,7 @@ class StarAndPlanetCommon(baseObject):
             return eq.density(self.M, self.R)
 
 
-class Binary(StarAndPlanetCommon):
+class Binary(StarAndPlanetCommon):  # TODO add binary methods and variables, remove unused one from starcommon
 
     def __init__(self, *args, **kwargs):
         StarAndPlanetCommon.__init__(self, *args, **kwargs)
@@ -180,10 +180,6 @@ class Star(StarAndPlanetCommon):
         """ uses equations.starTemperature to estimate temperature based on main sequence relationship
         """
         return eq.starTemperature(self.M)
-
-    @property
-    def Z(self):
-        return self.getParam('metallicity')
 
     @property
     def Z(self):
