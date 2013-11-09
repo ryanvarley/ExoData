@@ -51,6 +51,17 @@ class TestListFiles(unittest.TestCase):
 
         # TODO test to ensure the rejection is logged
 
+    def test_addParam_name_type_pri_overwrites(self):  # a unknown duplicate to delete (and log)
+
+        paramObj = self.create_Parameter_object()
+
+        paramObj.addParam('name', 'first')
+        paramObj.addParam('name', 'popular', {'type': 'pri'})
+        paramObj.addParam('name', 'last')
+
+        self.assertEqual(paramObj.params['name'], 'popular')
+        self.assertItemsEqual(paramObj.params['altnames'], ('first', 'last', 'monty'))
+
     def test_empty_Planet_init(self):
         Planet().__repr__()
 

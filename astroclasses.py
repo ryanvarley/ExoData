@@ -466,7 +466,7 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
                         self.params['name'] = value
                     else:
                         self.params['altnames'].append(value)
-                except KeyError:
+                except (KeyError, TypeError):  # KeyError = no type key in attrib dict, TypeError = not a dict
                     self.params['altnames'].append(value)
             elif key == 'list':
                 self.params['list'].append(value)
