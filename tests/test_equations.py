@@ -4,11 +4,12 @@ from os.path import join
 sys.path.append(join('..'))
 
 import quantities as pq
+import numpy as np
 
 import astroquantities as aq
 from equations import scaleHeight, meanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
     surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis, calcSemiMajorAxis2, calcPeriod, \
-    estimateDistance
+    estimateDistance, estimateAbsoluteMagnitude
 
 
 class Test_scaleHeight(unittest.TestCase):
@@ -205,6 +206,27 @@ class Test_estimateDistance(unittest.TestCase):
         answer = 6309.6 * pq.pc
 
         self.assertAlmostEqual(answer, result, 1)
+
+
+class Test_estimateAbsoluteMagnitude(unittest.TestCase):
+
+    def test_works_no_interp(self):
+        self.assertEqual(estimateAbsoluteMagnitude('O9'), -3.6)
+        self.assertEqual(estimateAbsoluteMagnitude('B5'), -0.4)
+        self.assertEqual(estimateAbsoluteMagnitude('A4'), 2.1)
+        self.assertEqual(estimateAbsoluteMagnitude('F7'), 4.3)
+        self.assertEqual(estimateAbsoluteMagnitude('G0'), 4.7)
+        self.assertEqual(estimateAbsoluteMagnitude('K4'), 7.1)
+        self.assertEqual(estimateAbsoluteMagnitude('M6'), 13.4)
+
+    def test_works_interp(self):
+        self.assertEqual(estimateAbsoluteMagnitude('A6'), 2.3)
+        self.assertAlmostEqual(estimateAbsoluteMagnitude('G7'), 5.467, 3)
+
+    def test_nan_on_invalid_types(self):
+        self.assertTrue(estimateAbsoluteMagnitude('L1') is np.nan)
+        self.assertTrue(estimateAbsoluteMagnitude('OIV9') is np.nan)
+
 
 if __name__ == '__main__':
     unittest.main()

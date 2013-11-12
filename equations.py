@@ -19,6 +19,9 @@ from another private project and so contains a few equations i left in incase an
 from __future__ import division
 from numpy import sqrt, arcsin, sin, cos, log10, nan
 
+import numpy as np
+import os
+
 import quantities as pq
 import quantities.constants as const
 import astroquantities as aq
@@ -26,6 +29,8 @@ import astroquantities as aq
 pi = const.pi
 sigma = const.Stefan_Boltzmann_constant
 G = const.Newtonian_constant_of_gravitation
+
+_rootdir = os.path.dirname(__file__)
 
 
 def scaleHeight(T_eff_p, mu_p, g_p):
@@ -296,5 +301,39 @@ def estimateDistance(m, M, Av=0):
 
     return d * pq.pc
 
+
+def estimateAbsoluteMagnitude(spectralType):
+    """ Uses the spectral type to lookup an aproximate absolute magnitude for the star.
+    """
+    from data.magnitude_lookup import mag_lookup_dict
+
+    starClass = spectralType[0]
+
+    try:
+        classNum = int(spectralType[1])  # except if not main sequence
+    except ValueError:
+        return np.nan
+
+    try:
+        return mag_lookup_dict[starClass][classNum]
+    except KeyError:
+        try:
+            classLookup = mag_lookup_dict[starClass]
+            return np.interp(classNum, classLookup.keys(), classLookup.values())
+        except KeyError:
+            return np.nan  # class not covered
+
+    # TODO seperation of groups (gIV5 or g5IV)
+
+    # TODO detection of multiple classes
+
+
+
+
+def magKtoMagV(magK):
+    """ Converts k magnitude to V magnitude
+    """
+
+    # TODO conversion - if you covert many maybe a class is needed where you give a mag and can do .K etc
 
 # TODO more orbital equations
