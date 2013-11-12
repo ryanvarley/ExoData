@@ -172,6 +172,19 @@ class Star(StarAndPlanetCommon):
         StarAndPlanetCommon.__init__(self, *args, **kwargs)
         self.classType = 'Star'
 
+    @property
+    def d(self):
+        """ Note this should work from child parents as .d propergates, calculates using the star estimation method
+        estimateDistance and estimateAbsoluteMagnitude
+        """
+
+        d = self.getParam('distance')
+        if d is np.nan:
+            d = self.estimateDistance()
+            if d is not np.nan:
+                self.flags.addFlag('Estimated Distance')
+        return d
+
     def calcLuminosity(self):
 
         return eq.starLuminosity(self.R, self.T)
