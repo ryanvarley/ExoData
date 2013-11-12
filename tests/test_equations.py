@@ -7,7 +7,8 @@ import quantities as pq
 
 import astroquantities as aq
 from equations import scaleHeight, meanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
-    surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis, calcSemiMajorAxis2, calcPeriod
+    surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis, calcSemiMajorAxis2, calcPeriod, \
+    estimateDistance
 
 
 class Test_scaleHeight(unittest.TestCase):
@@ -192,6 +193,18 @@ class Test_calcPeriod(unittest.TestCase):
         answer = 1.546 * pq.day
 
         self.assertAlmostEqual(answer, result, 3)
+
+
+class Test_estimateDistance(unittest.TestCase):
+    def test_works_online_example(self):
+
+        m = 14
+        M = 0
+
+        result = estimateDistance(m, M, 0)
+        answer = 6309.6 * pq.pc
+
+        self.assertAlmostEqual(answer, result, 1)
 
 if __name__ == '__main__':
     unittest.main()

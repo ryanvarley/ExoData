@@ -281,4 +281,20 @@ def calcPeriod(a, M_s):
     return P.rescale(pq.day)
 
 
+def estimateDistance(m, M, Av=0):
+    """ estimate the distance to star based on the absolute magnitude, apparent magnitude and the
+    absorbtion / extinction
+
+    :param m: apparent magnitude
+    :param M: absolute magnitude
+    :param Av: absorbtion / extinction
+
+    :return: d (distance to object) in parsecs
+    """
+
+    d = 10**((m-M+5-Av)/5)
+
+    return d * pq.pc
+
+
 # TODO more orbital equations
