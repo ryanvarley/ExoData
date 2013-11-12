@@ -264,6 +264,16 @@ class Star(StarAndPlanetCommon):
 
         return u1AtWavelength, u2AtWavelength
 
+    def estimateAbsoluteMagnitude(self):
+        return eq.estimateAbsoluteMagnitude(self.spectralType)
+
+    def estimateDistance(self):
+        # TODO handle other mags than V
+        if self.magV is not np.nan:
+            return eq.estimateDistance(self.magV, self.estimateAbsoluteMagnitude())
+        else:
+            return np.nan
+
 
 class Planet(StarAndPlanetCommon):
 
