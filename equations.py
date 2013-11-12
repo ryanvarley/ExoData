@@ -307,6 +307,12 @@ def estimateAbsoluteMagnitude(spectralType):
     """
     from data.magnitude_lookup import mag_lookup_dict
 
+    if not isinstance(spectralType, str):
+        return np.nan
+
+    if len(spectralType) == 1:
+        spectralType += '0'
+
     starClass = spectralType[0]
 
     try:
