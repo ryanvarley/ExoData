@@ -112,6 +112,21 @@ class TestStarParameters(unittest.TestCase):
         self.assertEqual(star.d, 10 * pq.pc)
         self.assertFalse('Estimated Distance' in star.flags.flags)
 
+    def test_magV_when_present(self):
+        planet = genExamplePlanet()
+        star = planet.star
+
+        self.assertEqual(star.magV, 9.0)
+        self.assertFalse('Estimated magV' in star.flags.flags)
+
+    def test_magV_when_absent_converts_k(self):
+        planet = genExamplePlanet()
+        star = planet.star
+        star.params.pop('magV')
+
+        self.assertAlmostEqual(star.magV, 8.88, 2)
+        self.assertTrue('Estimated magV' in star.flags.flags)
+
 
 class TestFindNearest(unittest.TestCase):
 

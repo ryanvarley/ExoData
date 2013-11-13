@@ -2,6 +2,7 @@
 """
 import numpy as np
 import os
+import math
 
 import quantities as pq
 
@@ -220,7 +221,13 @@ class Star(StarAndPlanetCommon):
 
     @property
     def magV(self):
-        return self.getParam('magV')
+        magV = self.getParam('magV')
+        if math.isnan(magV):
+            if not math.isnan(self.magK):
+                self.flags.addFlag('Estimated magV')
+                return eq.magKtoMagV(self.spectralType, self.magK)
+        else:
+            return magV
 
     @property
     def spectralType(self):
