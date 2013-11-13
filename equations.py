@@ -297,10 +297,12 @@ def estimateDistance(m, M, Av=0.0):
 
     :return: d (distance to object) in parsecs
     """
-
-    m = float(m)  # basic value checking as there is no units
-    M = float(M)
-    Av = float(Av)
+    try:
+        m = float(m)  # basic value checking as there is no units
+        M = float(M)
+        Av = float(Av)
+    except TypeError:
+        return np.nan
 
     d = 10**((m-M+5-Av)/5)
 
