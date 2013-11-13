@@ -4,10 +4,14 @@ from os.path import join
 sys.path.append(join('..'))
 
 import quantities as pq
+import numpy as np
 
 import astroquantities as aq
 from equations import scaleHeight, meanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
-    surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis, calcSemiMajorAxis2, calcPeriod
+    surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis, calcSemiMajorAxis2, calcPeriod, \
+    estimateDistance, estimateAbsoluteMagnitude
+
+import equations as eq
 
 
 class Test_scaleHeight(unittest.TestCase):
@@ -192,6 +196,60 @@ class Test_calcPeriod(unittest.TestCase):
         answer = 1.546 * pq.day
 
         self.assertAlmostEqual(answer, result, 3)
+
+
+class Test_estimateDistance(unittest.TestCase):
+    def test_works_online_example(self):
+
+        m = 14
+        M = 0
+
+        result = estimateDistance(m, M, 0)
+        answer = 6309.6 * pq.pc
+
+        self.assertAlmostEqual(answer, result, 1)
+
+
+class Test_estimateAbsoluteMagnitude(unittest.TestCase):
+
+    def test_works_no_interp(self):
+        self.assertEqual(estimateAbsoluteMagnitude('O9'), -3.6)
+        self.assertEqual(estimateAbsoluteMagnitude('B5'), -0.4)
+        self.assertEqual(estimateAbsoluteMagnitude('A4'), 2.1)
+        self.assertEqual(estimateAbsoluteMagnitude('F7'), 4.3)
+        self.assertEqual(estimateAbsoluteMagnitude('G0'), 4.7)
+        self.assertEqual(estimateAbsoluteMagnitude('K4'), 7.1)
+        self.assertEqual(estimateAbsoluteMagnitude('M6'), 13.4)
+
+    def test_works_interp(self):
+        self.assertEqual(estimateAbsoluteMagnitude('A6'), 2.3)
+        self.assertAlmostEqual(estimateAbsoluteMagnitude('G7'), 5.467, 3)
+
+    def test_nan_on_invalid_types(self):
+        self.assertTrue(estimateAbsoluteMagnitude('L1') is np.nan)
+        self.assertTrue(estimateAbsoluteMagnitude('OIV9') is np.nan)
+        self.assertTrue(estimateAbsoluteMagnitude('FIV8') is np.nan)
+
+
+class Test_createMagConversionDict(unittest.TestCase):
+
+    def test_works(self):
+        magTable = eq._createMagConversionDict()
+
+        self.assertEqual(magTable['A6'][10], '0.44')
+        self.assertEqual(magTable['B0'][0], '30000')
+        self.assertEqual(magTable['M6'][14], 'nan')
+
+
+class Test_MagConversion(unittest.TestCase):
+
+    def test_magKtoMagV_works(self):
+        self.assertAlmostEqual(eq.magKtoMagV('F2', 8.66), 9.48, 2)
+
+    def test_bad_spectraltypes(self):
+        self.assertAlmostEqual(eq.magKtoMagV('F2V', 8.66), 9.48, 2)
+        self.assertAlmostEqual(eq.magKtoMagV('F', 8.66), 9.36, 2)
+
 
 if __name__ == '__main__':
     unittest.main()

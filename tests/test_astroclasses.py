@@ -4,8 +4,10 @@ from os.path import join
 sys.path.append(join('..'))
 
 import numpy as np
+import quantities as pq
 
 from astroclasses import Parameters, Star, Planet, Binary, System, _findNearest
+from example import genExamplePlanet, examplePlanet
 
 
 class TestListFiles(unittest.TestCase):
@@ -80,6 +82,51 @@ class TestStarParameters(unittest.TestCase):
     def test_getLimbdarkeningCoeff_works(self):
         pass  # This simple check covered by test_example
 
+    def test_distance_estimation_fails_invalid_spectral_type(self):
+        """ If theres no distance, will try to calculate based on spectral type
+        """
+        planet = genExamplePlanet()
+        star = planet.star
+
+        star.params['spectraltype'] = 'FIV8'  # should currently fail as its not main sequence
+        star.parent.params.pop('distance')
+
+        self.assertTrue(star.d is np.nan)
+        self.assertTrue(planet.d is np.nan)
+
+    def test_distance_estimation_works(self):
+        planet = genExamplePlanet()
+        star = planet.star
+        star.params['spectraltype'] = 'A4'
+        star.params['magV'] = 5
+        star.parent.params.pop('distance')
+
+        self.assertAlmostEqual(star.d, 38.02 * pq.pc, 2)
+        self.assertTrue('Estimated Distance' in star.flags.flags)
+
+    def test_distance_estimation_not_called_if_d_present(self):
+        planet = genExamplePlanet()
+        star = planet.star
+        star.parent.params['distance'] = 10
+
+        self.assertEqual(star.d, 10 * pq.pc)
+        self.assertFalse('Estimated Distance' in star.flags.flags)
+
+    def test_magV_when_present(self):
+        planet = genExamplePlanet()
+        star = planet.star
+
+        self.assertEqual(star.magV, 9.0)
+        self.assertFalse('Estimated magV' in star.flags.flags)
+
+    def test_magV_when_absent_converts_k(self):
+        planet = genExamplePlanet()
+        star = planet.star
+        star.params.pop('magV')
+
+        self.assertAlmostEqual(star.magV, 8.88, 2)
+        self.assertTrue('Estimated magV' in star.flags.flags)
+
 
 class TestFindNearest(unittest.TestCase):
 
@@ -97,7 +144,7 @@ class TestFindNearest(unittest.TestCase):
 
     @unittest.skip("TestFindNearest.test_mid_value_rounded_up skipped as it rounds down but it is not an issue atm")
     def test_mid_value_rounded_up(self):  # It isnt, but this isn't a large issue
-        self.assertEqual(_findNearest(self.arr, 10.5),11)
+        self.assertEqual(_findNearest(self.arr, 10.5), 11)
 
     def test_low_value_rounded_down(self):
         self.assertEqual(_findNearest(self.arr, 10.4), 10)

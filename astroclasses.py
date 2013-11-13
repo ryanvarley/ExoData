@@ -2,6 +2,7 @@
 """
 import numpy as np
 import os
+import math
 
 import quantities as pq
 
@@ -172,6 +173,19 @@ class Star(StarAndPlanetCommon):
         StarAndPlanetCommon.__init__(self, *args, **kwargs)
         self.classType = 'Star'
 
+    @property
+    def d(self):
+        """ Note this should work from child parents as .d propergates, calculates using the star estimation method
+        estimateDistance and estimateAbsoluteMagnitude
+        """
+
+        d = self.parent.d
+        if d is np.nan:
+            d = self.estimateDistance()
+            if d is not np.nan:
+                self.flags.addFlag('Estimated Distance')
+        return d
+
     def calcLuminosity(self):
 
         return eq.starLuminosity(self.R, self.T)
@@ -207,7 +221,13 @@ class Star(StarAndPlanetCommon):
 
     @property
     def magV(self):
-        return self.getParam('magV')
+        magV = self.getParam('magV')
+        if math.isnan(magV):
+            if not math.isnan(self.magK):
+                self.flags.addFlag('Estimated magV')
+                return eq.magKtoMagV(self.spectralType, self.magK)
+        else:
+            return magV
 
     @property
     def spectralType(self):
@@ -263,6 +283,16 @@ class Star(StarAndPlanetCommon):
         u2AtWavelength = np.interp(wavelength, waveind, u2array, left=0, right=0)
 
         return u1AtWavelength, u2AtWavelength
+
+    def estimateAbsoluteMagnitude(self):
+        return eq.estimateAbsoluteMagnitude(self.spectralType)
+
+    def estimateDistance(self):
+        # TODO handle other mags than V
+        if self.magV is not np.nan:
+            return eq.estimateDistance(self.magV, self.estimateAbsoluteMagnitude())
+        else:
+            return np.nan
 
 
 class Planet(StarAndPlanetCommon):

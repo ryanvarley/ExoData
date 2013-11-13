@@ -4,7 +4,8 @@ entered by the catalogue when assuming values such as 'Temperature calculated' o
 These are designed to be attached to a planet, system, star or binary class in .flags
 """
 
-allowedFlags = ['Calculated Temperature', 'Estimated Mass', 'Calculated SMA', 'Fake Planet']
+allowedFlags = ['Calculated Temperature', 'Estimated Mass', 'Calculated SMA', 'Fake Planet', 'Estimated Distance',
+                'Estimated magV']
 
 
 class Flag(object):  # or tags? or lists?

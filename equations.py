@@ -19,13 +19,19 @@ from another private project and so contains a few equations i left in incase an
 from __future__ import division
 from numpy import sqrt, arcsin, sin, cos, log10, nan
 
+import numpy as np
+import os
+
 import quantities as pq
 import quantities.constants as const
 import astroquantities as aq
+import math
 
 pi = const.pi
 sigma = const.Stefan_Boltzmann_constant
 G = const.Newtonian_constant_of_gravitation
+
+_rootdir = os.path.dirname(__file__)
 
 
 def scaleHeight(T_eff_p, mu_p, g_p):
@@ -280,5 +286,93 @@ def calcPeriod(a, M_s):
 
     return P.rescale(pq.day)
 
+
+def estimateDistance(m, M, Av=0.0):
+    """ estimate the distance to star based on the absolute magnitude, apparent magnitude and the
+    absorbtion / extinction
+
+    :param m: apparent magnitude
+    :param M: absolute magnitude
+    :param Av: absorbtion / extinction
+
+    :return: d (distance to object) in parsecs
+    """
+
+    m = float(m)  # basic value checking as there is no units
+    M = float(M)
+    Av = float(Av)
+
+    d = 10**((m-M+5-Av)/5)
+
+    if math.isnan(d):
+        return np.nan
+    else:
+        return d * pq.pc
+
+
+def estimateAbsoluteMagnitude(spectralType):
+    """ Uses the spectral type to lookup an aproximate absolute magnitude for the star.
+    """
+    from data.magnitude_lookup import mag_lookup_dict
+
+    if not isinstance(spectralType, str):
+        return np.nan
+
+    if len(spectralType) == 1:
+        spectralType += '0'
+
+    starClass = spectralType[0]
+
+    try:
+        classNum = int(spectralType[1])  # except if not main sequence
+    except ValueError:
+        return np.nan
+
+    try:
+        return mag_lookup_dict[starClass][classNum]
+    except KeyError:
+        try:
+            classLookup = mag_lookup_dict[starClass]
+            return np.interp(classNum, classLookup.keys(), classLookup.values())
+        except KeyError:
+            return np.nan  # class not covered
+
+    # TODO seperation of groups (gIV5 or g5IV)
+
+    # TODO detection of multiple classes
+
+
+def _createMagConversionDict():
+    """ loads magnitude_conversion.dat which is table A% 1995ApJS..101..117K
+    """
+    raw_table = np.loadtxt(os.path.join(_rootdir, 'data', 'magnitude_conversion.dat'), 'string')
+
+    magDict = {}
+    for row in raw_table:
+        magDict[row[1]] = row[3:]
+
+    return magDict
+
+magDict = _createMagConversionDict()
+
+
+def magKtoMagV(spectralType, magK):
+    """ Converts K magnitude to V magnitude
+    """
+
+    # format key for spectral type can be F, F2, F2V
+    if len(spectralType) == 1:
+        spectralType += '0'
+    else:
+        spectralType = spectralType[:2]
+
+    try:
+        offset = float(magDict[spectralType][10])  # 10 is the V-K row
+        if math.isnan(offset):
+            return np.nan
+        else:
+            return magK + offset
+    except KeyError:
+        return np.nan
 
 # TODO more orbital equations
