@@ -11,6 +11,8 @@ from equations import scaleHeight, meanPlanetTemp, starLuminosity, ratioTerminat
     surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis, calcSemiMajorAxis2, calcPeriod, \
     estimateDistance, estimateAbsoluteMagnitude
 
+import equations as eq
+
 
 class Test_scaleHeight(unittest.TestCase):
     def test_works_earth(self):
@@ -227,6 +229,26 @@ class Test_estimateAbsoluteMagnitude(unittest.TestCase):
         self.assertTrue(estimateAbsoluteMagnitude('L1') is np.nan)
         self.assertTrue(estimateAbsoluteMagnitude('OIV9') is np.nan)
         self.assertTrue(estimateAbsoluteMagnitude('FIV8') is np.nan)
+
+
+class Test_createMagConversionDict(unittest.TestCase):
+
+    def test_works(self):
+        magTable = eq._createMagConversionDict()
+
+        self.assertEqual(magTable['A6'][10], '0.44')
+        self.assertEqual(magTable['B0'][0], '30000')
+        self.assertEqual(magTable['M6'][14], 'nan')
+
+
+class Test_MagConversion(unittest.TestCase):
+
+    def test_magKtoMagV_works(self):
+        self.assertAlmostEqual(eq.magKtoMagV('F2', 8.66), 9.48, 2)
+
+    def test_bad_spectraltypes(self):
+        self.assertAlmostEqual(eq.magKtoMagV('F2V', 8.66), 9.48, 2)
+        self.assertAlmostEqual(eq.magKtoMagV('F', 8.66), 9.36, 2)
 
 
 if __name__ == '__main__':

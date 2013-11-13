@@ -342,12 +342,37 @@ def estimateAbsoluteMagnitude(spectralType):
     # TODO detection of multiple classes
 
 
+def _createMagConversionDict():
+    """ loads magnitude_conversion.dat which is table A% 1995ApJS..101..117K
+    """
+    raw_table = np.loadtxt(os.path.join(_rootdir, 'data', 'magnitude_conversion.dat'), 'string')
+
+    magDict = {}
+    for row in raw_table:
+        magDict[row[1]] = row[3:]
+
+    return magDict
+
+magDict = _createMagConversionDict()
 
 
-def magKtoMagV(magK):
-    """ Converts k magnitude to V magnitude
+def magKtoMagV(spectralType, magK):
+    """ Converts K magnitude to V magnitude
     """
 
-    # TODO conversion - if you covert many maybe a class is needed where you give a mag and can do .K etc
+    # format key for spectral type can be F, F2, F2V
+    if len(spectralType) == 1:
+        spectralType += '0'
+    else:
+        spectralType = spectralType[:2]
+
+    try:
+        offset = float(magDict[spectralType][10])  # 10 is the V-K row
+        if math.isnan(offset):
+            return np.nan
+        else:
+            return magK + offset
+    except KeyError:
+        return np.nan
 
 # TODO more orbital equations
