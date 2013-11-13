@@ -178,7 +178,7 @@ class Star(StarAndPlanetCommon):
         estimateDistance and estimateAbsoluteMagnitude
         """
 
-        d = self.getParam('distance')
+        d = self.parent.d
         if d is np.nan:
             d = self.estimateDistance()
             if d is not np.nan:

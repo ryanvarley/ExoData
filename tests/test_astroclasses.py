@@ -4,6 +4,7 @@ from os.path import join
 sys.path.append(join('..'))
 
 import numpy as np
+import quantities as pq
 
 from astroclasses import Parameters, Star, Planet, Binary, System, _findNearest
 from example import genExamplePlanet, examplePlanet
@@ -93,6 +94,24 @@ class TestStarParameters(unittest.TestCase):
         self.assertTrue(star.d is np.nan)
         self.assertTrue(planet.d is np.nan)
 
+    def test_distance_estimation_works(self):
+        planet = genExamplePlanet()
+        star = planet.star
+        star.params['spectraltype'] = 'A4'
+        star.params['magV'] = 5
+        star.parent.params.pop('distance')
+
+        self.assertAlmostEqual(star.d, 38.02 * pq.pc, 2)
+        self.assertTrue('Estimated Distance' in star.flags.flags)
+
+    def test_distance_estimation_not_called_if_d_present(self):
+        planet = genExamplePlanet()
+        star = planet.star
+        star.parent.params['distance'] = 10
+
+        self.assertEqual(star.d, 10 * pq.pc)
+        self.assertFalse('Estimated Distance' in star.flags.flags)
+
 
 class TestFindNearest(unittest.TestCase):
 
@@ -110,7 +129,7 @@ class TestFindNearest(unittest.TestCase):
 
     @unittest.skip("TestFindNearest.test_mid_value_rounded_up skipped as it rounds down but it is not an issue atm")
     def test_mid_value_rounded_up(self):  # It isnt, but this isn't a large issue
-        self.assertEqual(_findNearest(self.arr, 10.5),11)
+        self.assertEqual(_findNearest(self.arr, 10.5), 11)
 
     def test_low_value_rounded_down(self):
         self.assertEqual(_findNearest(self.arr, 10.4), 10)
