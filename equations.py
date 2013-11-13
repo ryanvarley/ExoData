@@ -25,6 +25,7 @@ import os
 import quantities as pq
 import quantities.constants as const
 import astroquantities as aq
+import math
 
 pi = const.pi
 sigma = const.Stefan_Boltzmann_constant
@@ -299,7 +300,10 @@ def estimateDistance(m, M, Av=0):
 
     d = 10**((m-M+5-Av)/5)
 
-    return d * pq.pc
+    if d is np.nan or math.isnan(d):
+        return np.nan
+    else:
+        return d * pq.pc
 
 
 def estimateAbsoluteMagnitude(spectralType):

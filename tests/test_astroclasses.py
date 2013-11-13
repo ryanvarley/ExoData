@@ -6,6 +6,7 @@ sys.path.append(join('..'))
 import numpy as np
 
 from astroclasses import Parameters, Star, Planet, Binary, System, _findNearest
+from example import genExamplePlanet, examplePlanet
 
 
 class TestListFiles(unittest.TestCase):
@@ -79,6 +80,18 @@ class TestStarParameters(unittest.TestCase):
 
     def test_getLimbdarkeningCoeff_works(self):
         pass  # This simple check covered by test_example
+
+    def test_distance_estimation_fails_invalid_spectral_type(self):
+        """ If theres no distance, will try to calculate based on spectral type
+        """
+        planet = genExamplePlanet()
+        star = planet.star
+
+        star.params['spectraltype'] = 'FIV8'  # should currently fail as its not main sequence
+        star.parent.params.pop('distance')
+
+        self.assertTrue(star.d is np.nan)
+        self.assertTrue(planet.d is np.nan)
 
 
 class TestFindNearest(unittest.TestCase):

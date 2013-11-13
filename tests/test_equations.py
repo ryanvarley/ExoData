@@ -226,6 +226,7 @@ class Test_estimateAbsoluteMagnitude(unittest.TestCase):
     def test_nan_on_invalid_types(self):
         self.assertTrue(estimateAbsoluteMagnitude('L1') is np.nan)
         self.assertTrue(estimateAbsoluteMagnitude('OIV9') is np.nan)
+        self.assertTrue(estimateAbsoluteMagnitude('FIV8') is np.nan)
 
 
 if __name__ == '__main__':
