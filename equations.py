@@ -359,6 +359,8 @@ magDict = _createMagConversionDict()
 def magKtoMagV(spectralType, magK):
     """ Converts K magnitude to V magnitude
     """
+    if not isinstance(spectralType, str):
+        return np.nan
 
     # format key for spectral type can be F, F2, F2V
     if len(spectralType) == 1:
