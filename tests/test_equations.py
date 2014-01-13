@@ -160,6 +160,12 @@ class Test_estimateMass(unittest.TestCase):
         self.assertAlmostEqual(answer, result, delta=1e24)
 
 
+@unittest.skip("Not written")
+class Test_estimateStellarMass(unittest.TestCase):
+    def test_works_gj1214(self):
+        assert False
+
+
 class Test_calcSemiMajorAxis(unittest.TestCase):
     def test_works_earth(self):
 
@@ -196,6 +202,12 @@ class Test_calcPeriod(unittest.TestCase):
         answer = 1.546 * pq.day
 
         self.assertAlmostEqual(answer, result, 3)
+
+
+@unittest.skip("Not written")
+class Test_impactParameter(unittest.TestCase):
+    def test_works_gj1214(self):
+        assert False
 
 
 class Test_estimateDistance(unittest.TestCase):

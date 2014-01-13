@@ -183,7 +183,7 @@ def transitDuration(P, R_s, R_p, a, i):
         T_\\text{dur} = \\frac{P}{\pi}\sin^{-1} \left[\\frac{R_\star}{a}\\frac{\sqrt{(1+k)^2 + b^2}}{\sin{a}} \\right]
 
     Where :math:`T_\\text{dur}` transit duration, P orbital period, :math:`R_\star` radius of the star,
-    a is the semi-major axis, k is :math:`\\frac{R_p}{R_s}`
+    a is the semi-major axis, k is :math:`\\frac{R_p}{R_s}` (Seager & Mallen-Ornelas 2003)
 
     :param i: orbital inclination
     :return:
@@ -252,11 +252,28 @@ def estimateMass(R, density):
     return (density * volume).rescale(aq.M_j)
 
 
+def estimateStellarMass(M_s):
+    """ Estimates radius from mass based on stellar type
+    .. math::
+        R_* = k M^x_*
+    where k is a constant coefficient for each stellar sequence anad x describes the power law of the sequence
+    (Seager & Mallen-Ornelas 2003).
+    """
+
+    x = 0.8
+    k = False
+
+    R = k * M_s^x
+
+    return NotImplementedError
+
+
 def calcSemiMajorAxis(Period, M_s):
     """ Calculates the semi-major axis of the orbit using the period and stellar mass
 
     .. math::
-        a = \left( \frac{Period^2 G M_s}{4*\pi^2} \right))^{1/3}
+        a = \left( \frac{P^2 G M_*}{4*\pi^2} \right))^{1/3}
+
     """
     a = ((Period**2 * G * M_s)/(4 * pi**2))**(1/3)
 
@@ -285,6 +302,18 @@ def calcPeriod(a, M_s):
     P = 2 * pi * sqrt(a**3 / (G * M_s))
 
     return P.rescale(pq.day)
+
+
+def impactParameter(a, R_s, i):
+    """ project distance between the planet and star centers during mid transit
+    .. math::
+        b \equiv \frac{a}{R_*} \cos{i}
+    (Seager & Mallen-Ornelas 2003).
+    """
+
+    b = (a/R_s) * cos(i)
+
+    return b.rescale(pq.dimensionless)
 
 
 def estimateDistance(m, M, Av=0.0):

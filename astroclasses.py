@@ -225,7 +225,11 @@ class Star(StarAndPlanetCommon):
         if math.isnan(magV):
             if not math.isnan(self.magK):
                 self.flags.addFlag('Estimated magV')
-                return eq.magKtoMagV(self.spectralType, self.magK)
+                magV = eq.magKtoMagV(self.spectralType, self.magK)
+                if magV is None:  # eq sometimes outputs this
+                    return np.nan
+                else:
+                    return magV
         else:
             return magV
 
