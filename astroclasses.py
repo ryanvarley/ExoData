@@ -230,6 +230,8 @@ class Star(StarAndPlanetCommon):
                     return np.nan
                 else:
                     return magV
+        if magV is None:  # if value is missing (particularly binaries) will return None for some reason
+            return np.nan
         else:
             return magV
 
