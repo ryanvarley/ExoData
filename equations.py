@@ -341,10 +341,27 @@ def estimateDistance(m, M, Av=0.0):
         return d * pq.pc
 
 
+def _createAbsMagEstimationDict():
+    """ loads absolute_magnitude.dat which is from http://xoomer.virgilio.it/hrtrace/Sk.htm on 24/01/2014 and
+    based on Schmid-Kaler (1982)
+    """
+    raw_table = np.loadtxt(os.path.join(_rootdir, 'data', 'magnitude_estimation.csv'), 'string', delimiter=',')
+
+    absMagDict = {}
+    for row in raw_table:
+        absMagDict[row[0]] = row[1:]  # dict of spectral type = {abs mag for each luminosity class}
+
+    # manually typed from table headers - used to match columns with the L class (header)
+    LClassRef = {'V': 0, 'IV': 1, 'III': 2, 'II': 3, 'Ib': 4, 'Iab': 5, 'Ia': 6, 'Ia0': 7}
+
+    return absMagDict, LClassRef
+
+absMagDict, LClassRef = _createAbsMagEstimationDict()
+
+
 def estimateAbsoluteMagnitude(spectralType):
     """ Uses the spectral type to lookup an aproximate absolute magnitude for the star.
     """
-    from data.magnitude_lookup import mag_lookup_dict
 
     if not isinstance(spectralType, str):
         return np.nan
@@ -360,7 +377,7 @@ def estimateAbsoluteMagnitude(spectralType):
         return np.nan
 
     try:
-        return mag_lookup_dict[starClass][classNum]
+        return absMagDict[starClass][classNum]
     except KeyError:
         try:
             classLookup = mag_lookup_dict[starClass]

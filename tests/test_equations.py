@@ -222,6 +222,16 @@ class Test_estimateDistance(unittest.TestCase):
         self.assertAlmostEqual(answer, result, 1)
 
 
+class Test_createAbsMagEstimationDict(unittest.TestCase):
+
+    def test_works(self):
+        magTable, LClassRef = eq._createAbsMagEstimationDict()
+
+        self.assertEqual(magTable['O8'][LClassRef['V']], '-4.9')
+        self.assertEqual(magTable['A1'][LClassRef['III']], '0.2')
+        self.assertEqual(magTable['A7'][LClassRef['Iab']], 'nan')
+
+
 class Test_estimateAbsoluteMagnitude(unittest.TestCase):
 
     def test_works_no_interp(self):
