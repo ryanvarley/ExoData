@@ -586,4 +586,118 @@ def _findNearest(arr, value):
     return arr[idx]
 
 
+class SpectralType(object):
+    """ Takes input of a spectral type as a string and interprets it into the luminosity class and stellar type.
+
+    .. usage :
+        self.lumType = Luminosity Class
+        self.classLetter = Stellar Class (ie O B A etc)
+        self.classNumber = Stellar Class number
+        self.specClass = ie A8V will be A8
+        self.specType = ie A*V will be A8V (default for calling the class)
+        self.original = the original string
+
+    This class ignores spaces, only considers the first class if given multiple options (ie K0/K1V, GIV/V, F8-G0)
+    ignores non-typical star classes (ie ) and ignores extra statements like G8 V+
+    """
+
+    def __init__(self, classString):
+        self.original = classString
+        self.lumType = ''
+        self.classLetter = ''
+        self.classNumber = ''
+
+        self._parseSpecType(classString)
+
+    @property
+    def specClass(self):
+        """ Spectral class ie A8V is A8 """
+        return self.classLetter + str(self.classNumber)
+
+    @property
+    def specType(self):
+        """ Spectral class ie A8V is A8V """
+        return self.classLetter + str(self.classNumber) + self.lumType
+
+    def __repr__(self):
+        return self.specType
+
+    def _parseSpecType(self, classString):
+
+        # some initial cases
+        if classString == '' or classString == 'nan':
+            return False
+
+        possClasses = ('O', 'B', 'A', 'F', 'G', 'K', 'M', 'L')
+        possNumbers = range(10)
+        possLType = ('III', 'II', 'Iab', 'Ia0', 'Ia', 'Ib', 'IV', 'V')  # in order of unique matches
+
+        # remove spaces, remove slashes
+        classString = classString.replace(' ', '')
+
+        classString = classString.replace('-', '/')
+        classString = classString.replace('\\', '/')
+        classString = classString.split('/')[0]
+
+        # first char should always be spectral type
+        stellarClass = classString[0]
+
+        if stellarClass not in possClasses:
+            return False  # assume a non standard class and fail
+        else:
+            self.classLetter = stellarClass
+
+        # get number
+        try:
+            classNum = int(classString[1])
+            if classNum in possNumbers:
+                self.classNumber = int(classNum)
+                typeString = classString[2:]
+            else:
+                return False  # invalid number received
+        except IndexError:  # reached the end of the string
+            return True
+        except ValueError:  # i.e its a letter - just continue
+            typeString = classString[1:]
+
+        if typeString == '':  # ie there is no more information as in 'A8'
+            return True
+
+        # Now check for a decimal and handle those cases
+        if typeString[0] == '.':
+            # handle decimal cases, we check each number in turn, add them as strings and then convert to float and add
+            # to original number
+            decimalNumbers = '.'
+            for number in typeString[1:]:
+                try:
+                    if int(number) in possNumbers:
+                        decimalNumbers += number
+                    else:
+                        print ('Something went wrong in decimal checking') # TODO replace with logging
+                        return False # somethings gone wrong
+                except (ValueError, IndexError) as error:
+                    try:
+                        self.classNumber += float(decimalNumbers)
+                    except ValueError: # probably trying to convert '.' to a float
+                        pass
+                    typeString = typeString[len(decimalNumbers):]
+
+                    if error is IndexError:
+                        print('Index Error')
+                        return True
+                    else:
+                        break
+
+        # Handle luminosity class
+        for possL in possLType:  # match each possible case in turn (in order of uniqueness)
+            Lcase = typeString[:len(possL)]  # match from front with length to minimise matching say IV in '<3 CIV'
+            if possL == Lcase:
+                self.lumType = possL
+                return True
+
+        # if we have got here then there was no L type selected but there was extra content - probably a bad class so
+        # reset and fail
+        self.classLetter = ''
+        return False
+
 _ExamplePlanetCount = 1  # Used by example.py - put here to enable global
