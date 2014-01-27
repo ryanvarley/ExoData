@@ -88,7 +88,7 @@ class TestStarParameters(unittest.TestCase):
         planet = genExamplePlanet()
         star = planet.star
 
-        star.params['spectraltype'] = 'FIV8'  # should currently fail as its not main sequence
+        star.params['spectraltype'] = 'C'  # should currently fail as its not main sequence
         star.parent.params.pop('distance')
 
         self.assertTrue(star.d is np.nan)
