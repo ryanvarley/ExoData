@@ -372,7 +372,7 @@ def estimateAbsoluteMagnitude(spectralType):
     if specType.classLetter == '':
         return np.nan
     elif specType.classNumber == '':
-        specType.classNumber == 5  # aproximation using mid magnitude value
+        specType.classNumber = 5  # aproximation using mid magnitude value
 
     if specType.lumType == '':
         specType.lumType = 'V'  # assume main sequence

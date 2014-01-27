@@ -240,6 +240,10 @@ class Test_estimateAbsoluteMagnitude(unittest.TestCase):
         self.assertEqual(estimateAbsoluteMagnitude('B5'), -1.2)
         self.assertEqual(estimateAbsoluteMagnitude('A5'), 1.95)
 
+    def test_works_no_classnum(self):
+        self.assertEqual(estimateAbsoluteMagnitude('G'), 5.1)
+        self.assertEqual(estimateAbsoluteMagnitude('A'), 1.95)
+
     def test_works_interp(self):
         self.assertEqual(estimateAbsoluteMagnitude('A6'), 2.075)
         self.assertEqual(estimateAbsoluteMagnitude('A0.5Iab'), -6.35)
