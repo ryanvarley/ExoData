@@ -249,8 +249,7 @@ class Test_estimateAbsoluteMagnitude(unittest.TestCase):
         self.assertEqual(estimateAbsoluteMagnitude('A0.5Iab'), -6.35)
 
     def test_nan_on_invalid_types(self):
-        self.assertTrue(estimateAbsoluteMagnitude('L1') is np.nan)
-        self.assertTrue(estimateAbsoluteMagnitude('FIV8') is np.nan)
+        self.assertTrue(math.isnan(estimateAbsoluteMagnitude('L1')))
 
     def test_works_on_other_L_types(self):
         self.assertEqual(estimateAbsoluteMagnitude('O9V'), -4.5)
