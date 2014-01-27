@@ -344,12 +344,14 @@ def estimateDistance(m, M, Av=0.0):
 def _createAbsMagEstimationDict():
     """ loads absolute_magnitude.dat which is from http://xoomer.virgilio.it/hrtrace/Sk.htm on 24/01/2014 and
     based on Schmid-Kaler (1982)
+
+    creates a dict in the form [Classletter][ClassNumber][List of values for each L Class]
     """
     raw_table = np.loadtxt(os.path.join(_rootdir, 'data', 'magnitude_estimation.csv'), 'string', delimiter=',')
 
-    absMagDict = {}
+    absMagDict = {'O': {}, 'B': {}, 'A': {}, 'F': {}, 'G': {}, 'K': {}, 'M': {}}
     for row in raw_table:
-        absMagDict[row[0]] = row[1:]  # dict of spectral type = {abs mag for each luminosity class}
+        absMagDict[row[0][0]][int(row[0][1])] = [float(x) for x in row[1:]]  # dict of spectral type = {abs mag for each luminosity class}
 
     # manually typed from table headers - used to match columns with the L class (header)
     LClassRef = {'V': 0, 'IV': 1, 'III': 2, 'II': 3, 'Ib': 4, 'Iab': 5, 'Ia': 6, 'Ia0': 7}
@@ -363,31 +365,33 @@ def estimateAbsoluteMagnitude(spectralType):
     """ Uses the spectral type to lookup an aproximate absolute magnitude for the star.
     """
 
-    if not isinstance(spectralType, str):
+    from astroclasses import SpectralType
+
+    specType = SpectralType(spectralType)
+
+    if specType.classLetter == '':
         return np.nan
+    elif specType.classNumber == '':
+        specType.classNumber = 5  # aproximation using mid magnitude value
 
-    if len(spectralType) == 1:
-        spectralType += '0'
+    if specType.lumType == '':
+        specType.lumType = 'V'  # assume main sequence
 
-    starClass = spectralType[0]
+    LNum = LClassRef[specType.lumType]
+    classNum = specType.classNumber
+    classLet = specType.classLetter
 
     try:
-        classNum = int(spectralType[1])  # except if not main sequence
-    except ValueError:
-        return np.nan
-
-    try:
-        return absMagDict[starClass][classNum]
-    except KeyError:
+        return absMagDict[classLet][classNum][LNum]
+    except KeyError:  # value not in table. Assume the number isn't there
         try:
-            classLookup = mag_lookup_dict[starClass]
-            return np.interp(classNum, classLookup.keys(), classLookup.values())
-        except KeyError:
-            return np.nan  # class not covered
+            classLookup = absMagDict[classLet]
+            values = np.array(classLookup.values())[:, LNum]  # only select the right L Type
+            return np.interp(classNum, classLookup.keys(), values)
+        except (KeyError, ValueError):
+            return np.nan  # class not covered in table
 
-    # TODO seperation of groups (gIV5 or g5IV)
 
-    # TODO detection of multiple classes
 
 
 def _createMagConversionDict():
