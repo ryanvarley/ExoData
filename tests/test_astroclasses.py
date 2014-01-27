@@ -6,7 +6,7 @@ sys.path.append(join('..'))
 import numpy as np
 import quantities as pq
 
-from astroclasses import Parameters, Star, Planet, Binary, System, _findNearest
+from astroclasses import Parameters, Star, Planet, Binary, System, _findNearest, SpectralType
 from example import genExamplePlanet, examplePlanet
 
 
@@ -101,7 +101,7 @@ class TestStarParameters(unittest.TestCase):
         star.params['magV'] = 5
         star.parent.params.pop('distance')
 
-        self.assertAlmostEqual(star.d, 38.02 * pq.pc, 2)
+        self.assertAlmostEqual(star.d, 45.19 * pq.pc, 2)
         self.assertTrue('Estimated Distance' in star.flags.flags)
 
     def test_distance_estimation_not_called_if_d_present(self):
@@ -152,6 +152,130 @@ class TestFindNearest(unittest.TestCase):
     def test_high_value_rounded_up(self):
         self.assertEqual(_findNearest(self.arr, 10.6), 11)
 
+
+class TestSpectralType(unittest.TestCase):
+
+    def test_classType_and_Type(self):
+        A8V = SpectralType('')
+        A8V.lumType = 'V'
+        A8V.classNumber = '8'
+        A8V.classLetter = 'A'
+        self.assertEqual(A8V.specClass, 'A8')
+        self.assertEqual(A8V.specType, 'A8V')
+
+    def test_works_normal_full_types(self):
+        A8V = SpectralType('A8V')
+        self.assertEqual(A8V.lumType, 'V')
+        self.assertEqual(A8V.classLetter, 'A')
+        self.assertEqual(A8V.classNumber, 8)
+
+        L0IV = SpectralType('L0IV')
+        self.assertEqual(L0IV.lumType, 'IV')
+        self.assertEqual(L0IV.classLetter, 'L')
+        self.assertEqual(L0IV.classNumber, 0)
+
+    def test_works_single_letter(self):
+        test1 = SpectralType('G')
+        self.assertEqual(test1.lumType, '')
+        self.assertEqual(test1.classLetter, 'G')
+        self.assertEqual(test1.classNumber, '')
+
+    def test_works_spec_class_only(self):
+        A8 = SpectralType('A8')
+        self.assertEqual(A8.lumType, '')
+        self.assertEqual(A8.classLetter, 'A')
+        self.assertEqual(A8.classNumber, 8)
+
+        L0 = SpectralType('L0')
+        self.assertEqual(L0.lumType, '')
+        self.assertEqual(L0.classLetter, 'L')
+        self.assertEqual(L0.classNumber, 0)
+
+    def test_works_multiple_classes(self):
+        test1 = SpectralType('K0/K1V')
+        self.assertEqual(test1.lumType, '')
+        self.assertEqual(test1.classLetter, 'K')
+        self.assertEqual(test1.classNumber, 0)
+
+        test2 = SpectralType('GIV/V')
+        self.assertEqual(test2.lumType, 'IV')
+        self.assertEqual(test2.classLetter, 'G')
+        self.assertEqual(test2.classNumber, '')
+
+        test3 = SpectralType('F8-G0')
+        self.assertEqual(test3.lumType, '')
+        self.assertEqual(test3.classLetter, 'F')
+        self.assertEqual(test3.classNumber, 8)
+
+    def test_works_spaces(self):
+        test1 = SpectralType('K1 III')
+        self.assertEqual(test1.lumType, 'III')
+        self.assertEqual(test1.classLetter, 'K')
+        self.assertEqual(test1.classNumber, 1)
+
+    def test_works_decimal(self):
+        test1 = SpectralType('K1.5III')
+        self.assertEqual(test1.classLetter, 'K')
+        self.assertEqual(test1.classNumber, 1.5)
+        self.assertEqual(test1.lumType, 'III')
+
+    def test_works_decmial_no_L_class(self):
+        test2 = SpectralType('M8.5')
+        self.assertEqual(test2.classLetter, 'M')
+        self.assertEqual(test2.classNumber, 8.5)
+        self.assertEqual(test2.lumType, '')
+
+    def test_works_2_decimal_places(self):
+        test2 = SpectralType('A9.67V')
+        self.assertEqual(test2.classLetter, 'A')
+        self.assertEqual(test2.classNumber, 9.67)
+        self.assertEqual(test2.lumType, 'V')
+
+    def test_works_no_number_after_decimal(self):
+        test2 = SpectralType('B5.IV')
+        self.assertEqual(test2.classLetter, 'B')
+        self.assertEqual(test2.classNumber, 5)
+        self.assertEqual(test2.lumType, 'IV')
+
+    @unittest.skip("Not coded yet")
+    def test_works_multi_letter_class(self):
+        test2 = SpectralType('DQ6')
+        self.assertEqual(test2.classLetter, 'DQ')
+        self.assertEqual(test2.classNumber, 6)
+        self.assertEqual(test2.lumType, '')
+
+    def test_works_unknown_lum_class(self):
+        test2 = SpectralType('G5D')
+        self.assertEqual(test2.classLetter, 'G')
+        self.assertEqual(test2.classNumber, 5)
+        self.assertEqual(test2.lumType, '')
+
+    def test_works_extra_info(self):
+        test1 = SpectralType('K2 IV a')
+        self.assertEqual(test1.lumType, 'IV')
+        self.assertEqual(test1.classLetter, 'K')
+        self.assertEqual(test1.classNumber, 2)
+
+        test2 = SpectralType('G8 V+')
+        self.assertEqual(test2.lumType, 'V')
+        self.assertEqual(test2.classLetter, 'G')
+        self.assertEqual(test2.classNumber, 8)
+
+        test3 = SpectralType('G0V pecul.')
+        self.assertEqual(test3.lumType, 'V')
+        self.assertEqual(test3.classLetter, 'G')
+        self.assertEqual(test3.classNumber, 0)
+
+    def test_rejects_non_standard(self):
+        # TODO rewrite with a list of cases to fail and for loop
+        testStrings = ('Catac. var.', 'AM Her', 'DAZ8+dM', 'nan', np.nan)
+
+        for testStr in testStrings:
+            test1 = SpectralType(testStr)
+            self.assertEqual(test1.lumType, '', 'lumType null test for {}'.format(testStr))
+            self.assertEqual(test1.classLetter, '', 'classLetter null test for {}'.format(testStr))
+            self.assertEqual(test1.classNumber, '', 'classNumber null test for {}'.format(testStr))
+            self.assertEqual(test1.specType, '', 'specType null test for {}'.format(testStr))
 
 if __name__ == '__main__':
     unittest.main()

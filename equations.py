@@ -183,7 +183,7 @@ def transitDuration(P, R_s, R_p, a, i):
         T_\\text{dur} = \\frac{P}{\pi}\sin^{-1} \left[\\frac{R_\star}{a}\\frac{\sqrt{(1+k)^2 + b^2}}{\sin{a}} \\right]
 
     Where :math:`T_\\text{dur}` transit duration, P orbital period, :math:`R_\star` radius of the star,
-    a is the semi-major axis, k is :math:`\\frac{R_p}{R_s}`
+    a is the semi-major axis, k is :math:`\\frac{R_p}{R_s}` (Seager & Mallen-Ornelas 2003)
 
     :param i: orbital inclination
     :return:
@@ -252,11 +252,28 @@ def estimateMass(R, density):
     return (density * volume).rescale(aq.M_j)
 
 
+def estimateStellarMass(M_s):
+    """ Estimates radius from mass based on stellar type
+    .. math::
+        R_* = k M^x_*
+    where k is a constant coefficient for each stellar sequence anad x describes the power law of the sequence
+    (Seager & Mallen-Ornelas 2003).
+    """
+
+    x = 0.8
+    k = False
+
+    R = k * M_s^x
+
+    return NotImplementedError
+
+
 def calcSemiMajorAxis(Period, M_s):
     """ Calculates the semi-major axis of the orbit using the period and stellar mass
 
     .. math::
-        a = \left( \frac{Period^2 G M_s}{4*\pi^2} \right))^{1/3}
+        a = \left( \frac{P^2 G M_*}{4*\pi^2} \right))^{1/3}
+
     """
     a = ((Period**2 * G * M_s)/(4 * pi**2))**(1/3)
 
@@ -287,6 +304,18 @@ def calcPeriod(a, M_s):
     return P.rescale(pq.day)
 
 
+def impactParameter(a, R_s, i):
+    """ project distance between the planet and star centers during mid transit
+    .. math::
+        b \equiv \frac{a}{R_*} \cos{i}
+    (Seager & Mallen-Ornelas 2003).
+    """
+
+    b = (a/R_s) * cos(i)
+
+    return b.rescale(pq.dimensionless)
+
+
 def estimateDistance(m, M, Av=0.0):
     """ estimate the distance to star based on the absolute magnitude, apparent magnitude and the
     absorbtion / extinction
@@ -297,10 +326,12 @@ def estimateDistance(m, M, Av=0.0):
 
     :return: d (distance to object) in parsecs
     """
-
-    m = float(m)  # basic value checking as there is no units
-    M = float(M)
-    Av = float(Av)
+    try:
+        m = float(m)  # basic value checking as there is no units
+        M = float(M)
+        Av = float(Av)
+    except TypeError:
+        return np.nan
 
     d = 10**((m-M+5-Av)/5)
 
@@ -310,36 +341,57 @@ def estimateDistance(m, M, Av=0.0):
         return d * pq.pc
 
 
+def _createAbsMagEstimationDict():
+    """ loads absolute_magnitude.dat which is from http://xoomer.virgilio.it/hrtrace/Sk.htm on 24/01/2014 and
+    based on Schmid-Kaler (1982)
+
+    creates a dict in the form [Classletter][ClassNumber][List of values for each L Class]
+    """
+    raw_table = np.loadtxt(os.path.join(_rootdir, 'data', 'magnitude_estimation.csv'), 'string', delimiter=',')
+
+    absMagDict = {'O': {}, 'B': {}, 'A': {}, 'F': {}, 'G': {}, 'K': {}, 'M': {}}
+    for row in raw_table:
+        absMagDict[row[0][0]][int(row[0][1])] = [float(x) for x in row[1:]]  # dict of spectral type = {abs mag for each luminosity class}
+
+    # manually typed from table headers - used to match columns with the L class (header)
+    LClassRef = {'V': 0, 'IV': 1, 'III': 2, 'II': 3, 'Ib': 4, 'Iab': 5, 'Ia': 6, 'Ia0': 7}
+
+    return absMagDict, LClassRef
+
+absMagDict, LClassRef = _createAbsMagEstimationDict()
+
+
 def estimateAbsoluteMagnitude(spectralType):
     """ Uses the spectral type to lookup an aproximate absolute magnitude for the star.
     """
-    from data.magnitude_lookup import mag_lookup_dict
 
-    if not isinstance(spectralType, str):
+    from astroclasses import SpectralType
+
+    specType = SpectralType(spectralType)
+
+    if specType.classLetter == '':
         return np.nan
+    elif specType.classNumber == '':
+        specType.classNumber = 5  # aproximation using mid magnitude value
 
-    if len(spectralType) == 1:
-        spectralType += '0'
+    if specType.lumType == '':
+        specType.lumType = 'V'  # assume main sequence
 
-    starClass = spectralType[0]
+    LNum = LClassRef[specType.lumType]
+    classNum = specType.classNumber
+    classLet = specType.classLetter
 
     try:
-        classNum = int(spectralType[1])  # except if not main sequence
-    except ValueError:
-        return np.nan
-
-    try:
-        return mag_lookup_dict[starClass][classNum]
-    except KeyError:
+        return absMagDict[classLet][classNum][LNum]
+    except KeyError:  # value not in table. Assume the number isn't there
         try:
-            classLookup = mag_lookup_dict[starClass]
-            return np.interp(classNum, classLookup.keys(), classLookup.values())
-        except KeyError:
-            return np.nan  # class not covered
+            classLookup = absMagDict[classLet]
+            values = np.array(classLookup.values())[:, LNum]  # only select the right L Type
+            return np.interp(classNum, classLookup.keys(), values)
+        except (KeyError, ValueError):
+            return np.nan  # class not covered in table
 
-    # TODO seperation of groups (gIV5 or g5IV)
 
-    # TODO detection of multiple classes
 
 
 def _createMagConversionDict():
@@ -359,6 +411,8 @@ magDict = _createMagConversionDict()
 def magKtoMagV(spectralType, magK):
     """ Converts K magnitude to V magnitude
     """
+    if not isinstance(spectralType, str):
+        return np.nan
 
     # format key for spectral type can be F, F2, F2V
     if len(spectralType) == 1:
