@@ -219,6 +219,12 @@ class TestSpectralType(unittest.TestCase):
         self.assertEqual(test1.classNumber, 1.5)
         self.assertEqual(test1.lumType, 'III')
 
+    def test_works_decmial_no_L_class(self):
+        test2 = SpectralType('M8.5')
+        self.assertEqual(test2.classLetter, 'M')
+        self.assertEqual(test2.classNumber, 8.5)
+        self.assertEqual(test2.lumType, '')
+
     def test_works_2_decimal_places(self):
         test2 = SpectralType('A9.67V')
         self.assertEqual(test2.classLetter, 'A')
@@ -230,6 +236,19 @@ class TestSpectralType(unittest.TestCase):
         self.assertEqual(test2.classLetter, 'B')
         self.assertEqual(test2.classNumber, 5)
         self.assertEqual(test2.lumType, 'IV')
+
+    @unittest.skip("Not coded yet")
+    def test_works_multi_letter_class(self):
+        test2 = SpectralType('DQ6')
+        self.assertEqual(test2.classLetter, 'DQ')
+        self.assertEqual(test2.classNumber, 6)
+        self.assertEqual(test2.lumType, '')
+
+    def test_works_unknown_lum_class(self):
+        test2 = SpectralType('G5D')
+        self.assertEqual(test2.classLetter, 'G')
+        self.assertEqual(test2.classNumber, 5)
+        self.assertEqual(test2.lumType, '')
 
     def test_works_extra_info(self):
         test1 = SpectralType('K2 IV a')
@@ -249,7 +268,7 @@ class TestSpectralType(unittest.TestCase):
 
     def test_rejects_non_standard(self):
         # TODO rewrite with a list of cases to fail and for loop
-        testStrings = ('Catac. var.', 'AM Her', 'DAZ8+dM', 'nan')
+        testStrings = ('Catac. var.', 'AM Her', 'DAZ8+dM', 'nan', np.nan)
 
         for testStr in testStrings:
             test1 = SpectralType(testStr)

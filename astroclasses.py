@@ -623,12 +623,15 @@ class SpectralType(object):
         return self.specType
 
     def _parseSpecType(self, classString):
-
+        classString = str(classString)
         # some initial cases
         if classString == '' or classString == 'nan':
             return False
-
-        possClasses = ('O', 'B', 'A', 'F', 'G', 'K', 'M', 'L')
+        #               main sequence
+        possClasses = ('O', 'B', 'A', 'F', 'G', 'K', 'M',
+                       'L', 'T', 'Y',  # dwarfs
+                       'C', 'S',  # 'MS', 'MC' carbon related classes TODO handle multi letter classes
+        )
         possNumbers = range(10)
         possLType = ('III', 'II', 'Iab', 'Ia0', 'Ia', 'Ib', 'IV', 'V')  # in order of unique matches
 
@@ -657,7 +660,7 @@ class SpectralType(object):
                 return False  # invalid number received
         except IndexError:  # reached the end of the string
             return True
-        except ValueError:  # i.e its a letter - just continue
+        except ValueError:  # i.e its a letter - fail # TODO multi letter checking
             typeString = classString[1:]
 
         if typeString == '':  # ie there is no more information as in 'A8'
@@ -675,18 +678,16 @@ class SpectralType(object):
                     else:
                         print ('Something went wrong in decimal checking') # TODO replace with logging
                         return False # somethings gone wrong
-                except (ValueError, IndexError) as error:
-                    try:
-                        self.classNumber += float(decimalNumbers)
-                    except ValueError: # probably trying to convert '.' to a float
-                        pass
-                    typeString = typeString[len(decimalNumbers):]
-
-                    if error is IndexError:
-                        print('Index Error')
-                        return True
-                    else:
-                        break
+                except ValueError:
+                    break  # recevied a non-number (probably L class)
+            #  add decimal to classNum
+            try:
+                self.classNumber += float(decimalNumbers)
+            except ValueError: # probably trying to convert '.' to a float
+                pass
+            typeString = typeString[len(decimalNumbers):]
+            if len(typeString) is 0:
+                return True
 
         # Handle luminosity class
         for possL in possLType:  # match each possible case in turn (in order of uniqueness)
@@ -695,9 +696,12 @@ class SpectralType(object):
                 self.lumType = possL
                 return True
 
-        # if we have got here then there was no L type selected but there was extra content - probably a bad class so
-        # reset and fail
-        self.classLetter = ''
-        return False
+        if not self.classNumber == '':
+            return True
+        else:  # if there no number asumme we have a name ie 'Catac. var.'
+            self.classLetter = ''
+            self.classNumber = ''
+            self.lumType = ''
+            return False
 
 _ExamplePlanetCount = 1  # Used by example.py - put here to enable global
