@@ -101,7 +101,7 @@ class TestStarParameters(unittest.TestCase):
         star.params['magV'] = 5
         star.parent.params.pop('distance')
 
-        self.assertAlmostEqual(star.d, 38.02 * pq.pc, 2)
+        self.assertAlmostEqual(star.d, 45.19 * pq.pc, 2)
         self.assertTrue('Estimated Distance' in star.flags.flags)
 
     def test_distance_estimation_not_called_if_d_present(self):

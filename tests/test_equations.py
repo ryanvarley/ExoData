@@ -5,6 +5,7 @@ sys.path.append(join('..'))
 
 import quantities as pq
 import numpy as np
+import math
 
 import astroquantities as aq
 from equations import scaleHeight, meanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
@@ -227,30 +228,30 @@ class Test_createAbsMagEstimationDict(unittest.TestCase):
     def test_works(self):
         magTable, LClassRef = eq._createAbsMagEstimationDict()
 
-        self.assertEqual(magTable['O8'][LClassRef['V']], '-4.9')
-        self.assertEqual(magTable['A1'][LClassRef['III']], '0.2')
-        self.assertEqual(magTable['A7'][LClassRef['Iab']], 'nan')
+        self.assertEqual(magTable['O'][8][LClassRef['V']], -4.9)
+        self.assertEqual(magTable['A'][1][LClassRef['III']], 0.2)
+        self.assertTrue(math.isnan(magTable['A'][7][LClassRef['Iab']]))
 
 
 class Test_estimateAbsoluteMagnitude(unittest.TestCase):
 
     def test_works_no_interp(self):
-        self.assertEqual(estimateAbsoluteMagnitude('O9'), -3.6)
-        self.assertEqual(estimateAbsoluteMagnitude('B5'), -0.4)
-        self.assertEqual(estimateAbsoluteMagnitude('A4'), 2.1)
-        self.assertEqual(estimateAbsoluteMagnitude('F7'), 4.3)
-        self.assertEqual(estimateAbsoluteMagnitude('G0'), 4.7)
-        self.assertEqual(estimateAbsoluteMagnitude('K4'), 7.1)
-        self.assertEqual(estimateAbsoluteMagnitude('M6'), 13.4)
+        self.assertEqual(estimateAbsoluteMagnitude('O9'), -4.5)
+        self.assertEqual(estimateAbsoluteMagnitude('B5'), -1.2)
+        self.assertEqual(estimateAbsoluteMagnitude('A5'), 1.95)
 
     def test_works_interp(self):
-        self.assertEqual(estimateAbsoluteMagnitude('A6'), 2.3)
-        self.assertAlmostEqual(estimateAbsoluteMagnitude('G7'), 5.467, 3)
+        self.assertEqual(estimateAbsoluteMagnitude('A6'), 2.075)
+        self.assertEqual(estimateAbsoluteMagnitude('A0.5Iab'), -6.35)
 
     def test_nan_on_invalid_types(self):
         self.assertTrue(estimateAbsoluteMagnitude('L1') is np.nan)
-        self.assertTrue(estimateAbsoluteMagnitude('OIV9') is np.nan)
         self.assertTrue(estimateAbsoluteMagnitude('FIV8') is np.nan)
+
+    def test_works_on_other_L_types(self):
+        self.assertEqual(estimateAbsoluteMagnitude('O9V'), -4.5)
+        self.assertEqual(estimateAbsoluteMagnitude('B5III'), -2.2)
+        self.assertEqual(estimateAbsoluteMagnitude('F2Ia'), -8.0)
 
 
 class Test_createMagConversionDict(unittest.TestCase):
