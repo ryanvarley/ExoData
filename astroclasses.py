@@ -345,6 +345,7 @@ class Planet(StarAndPlanetCommon):
     def tempType(self):
         return assum.planetTempType(self.T)
 
+    @property
     def mu(self):  # TODO make getter look in params first calc if not
 
         molweight = self.getParam('molweight')
