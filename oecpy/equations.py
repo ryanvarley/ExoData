@@ -21,7 +21,7 @@ from numpy import sqrt, arcsin, sin, cos, log10, nan
 
 import numpy as np
 import os
-from pkg_resources import resource_stream
+from pkg_resources import resource_stream, resource_filename
 
 import quantities as pq
 import quantities.constants as const
@@ -348,8 +348,8 @@ def _createAbsMagEstimationDict():
 
     creates a dict in the form [Classletter][ClassNumber][List of values for each L Class]
     """
-    magnitude_estimation_filepath = resource_stream(__name__, 'data/magnitude_estimation.dat')
-    raw_table = np.loadtxt(magnitude_estimation_filepath, 'string', delimiter=',')
+    magnitude_estimation_filepath = resource_filename(__name__, 'data/magnitude_estimation.dat')
+    raw_table = np.loadtxt(magnitude_estimation_filepath, 'string')
 
     absMagDict = {'O': {}, 'B': {}, 'A': {}, 'F': {}, 'G': {}, 'K': {}, 'M': {}}
     for row in raw_table:
