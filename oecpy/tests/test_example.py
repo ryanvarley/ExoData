@@ -2,13 +2,10 @@
 right units.
 """
 import unittest
-import sys
-from os.path import join
-sys.path.append(join('..'))
 
-from example import genExamplePlanet, examplePlanet
+from oecpy.example import genExamplePlanet, examplePlanet
 
-import astroquantities as aq
+import oecpy.astroquantities as aq
 import quantities as pq
 
 secondExamplePlanet = genExamplePlanet()

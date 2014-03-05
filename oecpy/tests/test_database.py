@@ -1,17 +1,14 @@
 import unittest
-import sys
-sys.path.append('..')
-
-from database import OECDatabase
 from tempfile import mkdtemp, mkstemp
 import shutil
+
+from ..database import OECDatabase
 
 
 class TestDataBaseLoading(unittest.TestCase):
 
     def setUp(self):
         # create temp dir
-
         self.tempDir = mkdtemp()
         self._createFakeXML()
         self.oecdb = OECDatabase(self.tempDir + '/')
