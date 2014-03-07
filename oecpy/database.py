@@ -95,12 +95,18 @@ class OECDatabase(object):
         self.stars = []
         self.planets = []
 
-        for filename in glob.glob(databaseLocation + '*.xml'):
+        databaseXML = glob.glob(databaseLocation + '*.xml')
+        if not len(databaseXML):
+            raise LoadDataBaseError('could not find the database xml files. Have you given the correct location to the open exoplanet catalouges /system folder?')
+
+        for filename in databaseXML:
             tree = ET.parse(open(filename, 'r'))
             root = tree.getroot()
 
             # Process the system
-            assert root.tag == 'system', '{} does not contain a valid system'  # TODO remove or upgrade to raise or try
+            if not root.tag == 'system':
+                raise LoadDataBaseError('system {} does not contain a valid system - could be an error with your version'
+                                        ' of the catalogue'.format(filename))
 
             systemParams = Parameters()
             for systemXML in root:
@@ -188,3 +194,7 @@ class OECDatabase(object):
 
             parent._addChild(planet)  # Add planet to the star
             self.planets.append(planet)  # Add planet to the index
+
+
+class LoadDataBaseError(IOError):
+    pass

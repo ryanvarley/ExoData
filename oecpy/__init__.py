@@ -1,4 +1,4 @@
-__version__ = '1.0b1.0.2'
+__version__ = '1.0b1.1'
 
 # Import package modules
 import assumptions, astroclasses, astroquantities, equations, example, flags
