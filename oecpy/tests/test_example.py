@@ -4,7 +4,7 @@ right units.
 import unittest
 import quantities as pq
 
-from ..example import genExamplePlanet, examplePlanet
+from ..example import genExamplePlanet, examplePlanet, exampleSystem, exampleStar
 from .. import astroquantities as aq
 from .. import astroclasses as ac
 
@@ -15,8 +15,8 @@ class TestExampleInstances(unittest.TestCase):
 
     def setUp(self):  # setup runs before each test!
         self.examplePlanet = examplePlanet
-        self.exampleStar = self.examplePlanet.parent
-        self.exampleSystem = self.exampleStar.parent
+        self.exampleStar = exampleStar
+        self.exampleSystem = exampleSystem
 
     def test_system_object(self):
         exampleSystem = self.exampleSystem
@@ -61,11 +61,32 @@ class TestExampleInstances(unittest.TestCase):
         self.assertEqual(examplePlanet.T, 339.6 * pq.K)
         self.assertEqual(examplePlanet.transittime, 2454876.344 * pq.d)
 
-    def test_system_heirarchy(self):
-        self.assertEqual(self.exampleSystem.stars[0], self.exampleStar)
-        self.assertEqual(self.exampleStar.planets[0], self.examplePlanet)
+    def test_hierarchy_for_planet(self):
+        print 'test ->', self.examplePlanet.system, '<-'
+        print 'answer ->', self.exampleSystem, '<-'
+        self.assertEqual(self.examplePlanet.star, self.exampleStar)
         self.assertEqual(self.examplePlanet.parent, self.exampleStar)
+        self.assertEqual(self.examplePlanet.system, self.exampleSystem)
+
+    def test_hierarchy_for_star(self):
+        self.assertEqual(self.exampleStar.planets[0], self.examplePlanet)
+        self.assertEqual(self.exampleStar.system, self.exampleSystem)
         self.assertEqual(self.exampleStar.parent, self.exampleSystem)
+
+    def test_hierarchy_for_system(self):
+        self.assertEqual(self.exampleSystem.stars[0], self.exampleStar)
+
+    def test_raises_HeirarchyError_on_planet_binary_call_with_no_binary(self):
+        with self.assertRaises(ac.HierarchyError):
+            planetBinary = self.examplePlanet.binary
+
+    def test_raises_HeirarchyError_on_star_binary_call_with_no_binary(self):
+        with self.assertRaises(ac.HierarchyError):
+            starBinary = self.exampleStar.binary
+
+    @unittest.skip("Not written")
+    def test_hierarchy_for_binary(self):
+        assert False
 
     def test_second_generation_is_number_2(self):
 

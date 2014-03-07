@@ -17,7 +17,7 @@ class baseObject(object):
     def __init__(self, params=None):
 
         self.children = []
-        self.parent = None # TODO should be read only (use add method)
+        self.parent = False
         self.classType = 'BaseObject'
         self.flags = flags.Flag()
 
@@ -34,6 +34,20 @@ class baseObject(object):
         """
 
         self.params.update(params)
+
+    def _getParentClass(self, startClass, parentClass):
+        """ gets the parent class by calling successive parent classes with .parent until parentclass is matched.
+        """
+        try:
+            if not startClass:  # reached system with no hits
+                raise AttributeError
+        except AttributeError:  # i.e calling binary on an object without one
+                raise HierarchyError('This object has no {} as a parent object'.format(parentClass))
+
+        if startClass.classType == parentClass:
+            return startClass
+        else:
+            return self._getParentClass(startClass.parent, parentClass)
 
     @property
     def name(self):  # TODO variable for altnames
@@ -133,9 +147,13 @@ class StarAndPlanetCommon(baseObject):
     def calcTemperature(self):
         raise NotImplementedError('Only implemented for Stars and Planet child classes')
 
-    @property  # TODO may return binary
+    @property
     def system(self):
-        return self.parent
+        return self._getParentClass(self.parent, 'System')
+
+    @property
+    def binary(self):
+        return self._getParentClass(self, 'Binary')
 
     def calcSurfaceGravity(self):
 
@@ -451,7 +469,7 @@ class Planet(StarAndPlanetCommon):
 
     @property
     def star(self):
-        return self.parent
+        return self._getParentClass(self.parent, 'Star')
 
 
 class Parameters(object):  # TODO would this subclassing dict be more preferable?
@@ -704,3 +722,7 @@ class SpectralType(object):
             return False
 
 _ExamplePlanetCount = 1  # Used by example.py - put here to enable global
+
+
+class HierarchyError(Exception):
+    pass
