@@ -13,9 +13,6 @@ import assumptions as assum
 import flags
 
 
-_rootdir = os.path.dirname(__file__)  # Get package directory
-
-
 class baseObject(object):
 
     def __init__(self, params=None):

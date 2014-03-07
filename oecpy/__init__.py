@@ -1,4 +1,6 @@
-__version__ = '1.0b1.0.1'
+__version__ = '1.0b1.0.2'
 
-from .import assumptions, astroclasses, astroquantities, equations, example, flags
-from .database import OECDatabase
+# Import package modules
+import assumptions, astroclasses, astroquantities, equations, example, flags
+# import OEC database
+from database import OECDatabase
