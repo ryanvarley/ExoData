@@ -139,9 +139,8 @@ class TestFindNearest(unittest.TestCase):
     def test_above_last_value_works(self):
         self.assertEqual(_findNearest(self.arr, 13), 12)
 
-    @unittest.skip("TestFindNearest.test_mid_value_rounded_up skipped as it rounds down but it is not an issue atm")
-    def test_mid_value_rounded_up(self):  # It isnt, but this isn't a large issue
-        self.assertEqual(_findNearest(self.arr, 10.5), 11)
+    def test_mid_value_rounded_down(self):  # Note this isn't what you may expect, but as long as we are aware of it
+        self.assertEqual(_findNearest(self.arr, 10.5), 10)
 
     def test_low_value_rounded_down(self):
         self.assertEqual(_findNearest(self.arr, 10.4), 10)

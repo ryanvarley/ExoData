@@ -208,7 +208,7 @@ class Star(StarAndPlanetCommon):
     def calcTemperature(self):
         """ uses equations.starTemperature to estimate temperature based on main sequence relationship
         """
-        return eq.starTemperature(self.M)
+        return eq.estimateStarTemperature(self.M)
 
     @property
     def Z(self):
@@ -595,7 +595,7 @@ class PlanetParameters(Parameters):
 
 
 def _findNearest(arr, value):
-    """ Finds the value in arr that value is clostest to
+    """ Finds the value in arr that value is closest to
     """
     arr = np.array(arr)
     # find nearest value in array
