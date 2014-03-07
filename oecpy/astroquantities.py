@@ -1,7 +1,7 @@
 """ Temp module until astro units are added to quantities
 """
 import quantities as pq
-from quantities.unitquantity import UnitConstant, UnitQuantity, UnitLength, UnitMass, UnitTime
+from quantities.unitquantity import UnitQuantity, UnitLength, UnitMass, UnitTime
 
 L_s = solar_luminosity = UnitQuantity(
     'solar_luminosity',

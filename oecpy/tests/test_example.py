@@ -2,14 +2,11 @@
 right units.
 """
 import unittest
-import sys
-from os.path import join
-sys.path.append(join('..'))
-
-from example import genExamplePlanet, examplePlanet
-
-import astroquantities as aq
 import quantities as pq
+
+from ..example import genExamplePlanet, examplePlanet
+from .. import astroquantities as aq
+from .. import astroclasses as ac
 
 secondExamplePlanet = genExamplePlanet()
 
@@ -72,6 +69,7 @@ class TestExampleInstances(unittest.TestCase):
 
     def test_second_generation_is_number_2(self):
 
+        ac._ExamplePlanetCount = 1  # reset incase other classes have already increased the count
         examplePlanet = secondExamplePlanet
         exampleStar = examplePlanet.parent
         exampleSystem = exampleStar.parent

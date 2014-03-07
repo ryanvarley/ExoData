@@ -1,18 +1,14 @@
 import unittest
-import sys
-from os.path import join
-sys.path.append(join('..'))
 
 import quantities as pq
-import numpy as np
 import math
 
-import astroquantities as aq
-from equations import scaleHeight, meanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
+from .. import astroquantities as aq
+from ..equations import scaleHeight, meanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
     surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis, calcSemiMajorAxis2, calcPeriod, \
     estimateDistance, estimateAbsoluteMagnitude
 
-import equations as eq
+from .. import equations as eq
 
 
 class Test_scaleHeight(unittest.TestCase):

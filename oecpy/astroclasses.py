@@ -1,8 +1,8 @@
 """ Contains structural classes ie binary, star, planet etc which mimic the xml structure with objects
 """
 import numpy as np
-import os
 import math
+from pkg_resources import resource_stream
 
 import quantities as pq
 
@@ -10,9 +10,6 @@ import equations as eq
 import astroquantities as aq
 import assumptions as assum
 import flags
-
-
-_rootdir = os.path.dirname(__file__)  # Get package directory
 
 
 class baseObject(object):
@@ -251,7 +248,7 @@ class Star(StarAndPlanetCommon):
 
         :return: limb darkening coefficients 1 and 2
         """
-
+        # TODO check this returns correct value - im not certain
         # The intervals of values in the tables
         tempind = [ 3500., 3750., 4000., 4250., 4500., 4750., 5000., 5250., 5500., 5750., 6000., 6250.,
                  6500., 6750., 7000., 7250., 7500., 7750., 8000., 8250., 8500., 8750., 9000., 9250.,
@@ -268,7 +265,8 @@ class Star(StarAndPlanetCommon):
         lgselect = _findNearest(lggind, float(self.calcLogg()))
         mhselect = _findNearest(mhind, float(self.Z))
 
-        coeffTable = np.loadtxt(os.path.join(_rootdir, "data", "quadratic.dat"))
+        quadratic_filepath = resource_stream(__name__, 'data/quadratic.dat')
+        coeffTable = np.loadtxt(quadratic_filepath)
 
         foundValues = False
         for i in xrange(len(coeffTable)):
@@ -345,6 +343,7 @@ class Planet(StarAndPlanetCommon):
     def tempType(self):
         return assum.planetTempType(self.T)
 
+    @property
     def mu(self):  # TODO make getter look in params first calc if not
 
         molweight = self.getParam('molweight')

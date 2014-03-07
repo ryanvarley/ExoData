@@ -1,0 +1,2 @@
+include oecpy/data/*.dat
+include readme.md

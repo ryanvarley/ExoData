@@ -21,6 +21,7 @@ from numpy import sqrt, arcsin, sin, cos, log10, nan
 
 import numpy as np
 import os
+from pkg_resources import resource_stream, resource_filename
 
 import quantities as pq
 import quantities.constants as const
@@ -342,12 +343,13 @@ def estimateDistance(m, M, Av=0.0):
 
 
 def _createAbsMagEstimationDict():
-    """ loads absolute_magnitude.dat which is from http://xoomer.virgilio.it/hrtrace/Sk.htm on 24/01/2014 and
+    """ loads magnitude_estimation.dat which is from http://xoomer.virgilio.it/hrtrace/Sk.htm on 24/01/2014 and
     based on Schmid-Kaler (1982)
 
     creates a dict in the form [Classletter][ClassNumber][List of values for each L Class]
     """
-    raw_table = np.loadtxt(os.path.join(_rootdir, 'data', 'magnitude_estimation.csv'), 'string', delimiter=',')
+    magnitude_estimation_filepath = resource_filename(__name__, 'data/magnitude_estimation.dat')
+    raw_table = np.loadtxt(magnitude_estimation_filepath, 'string')
 
     absMagDict = {'O': {}, 'B': {}, 'A': {}, 'F': {}, 'G': {}, 'K': {}, 'M': {}}
     for row in raw_table:
@@ -392,12 +394,11 @@ def estimateAbsoluteMagnitude(spectralType):
             return np.nan  # class not covered in table
 
 
-
-
 def _createMagConversionDict():
     """ loads magnitude_conversion.dat which is table A% 1995ApJS..101..117K
     """
-    raw_table = np.loadtxt(os.path.join(_rootdir, 'data', 'magnitude_conversion.dat'), 'string')
+    magnitude_conversion_filepath = resource_stream(__name__, 'data/magnitude_conversion.dat')
+    raw_table = np.loadtxt(magnitude_conversion_filepath, 'string')
 
     magDict = {}
     for row in raw_table:

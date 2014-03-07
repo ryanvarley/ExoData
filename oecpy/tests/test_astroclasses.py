@@ -1,13 +1,10 @@
 import unittest
-import sys
-from os.path import join
-sys.path.append(join('..'))
 
 import numpy as np
 import quantities as pq
 
-from astroclasses import Parameters, Star, Planet, Binary, System, _findNearest, SpectralType
-from example import genExamplePlanet, examplePlanet
+from ..astroclasses import Parameters, Star, Planet, Binary, System, _findNearest, SpectralType
+from ..example import genExamplePlanet, examplePlanet
 
 
 class TestListFiles(unittest.TestCase):

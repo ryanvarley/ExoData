@@ -1,9 +1,10 @@
+# Compiled python modules.
 *.pyc
-.idea/
-run.py
-allPlanetTypeTempOutput.txt
-allPlanetTypeTempOutput_old.txt
-magKmissing.txt
-planet-ra-dec.txt
-planetTypeMissmatch.txt
-transitTimeMissing.txt
+
+# Setuptools distribution folder.
+/dist/
+build/*
+MANIFEST
+
+# Python egg metadata, regenerated from source files by setuptools.
+/*.egg-info

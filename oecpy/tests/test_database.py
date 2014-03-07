@@ -1,17 +1,14 @@
 import unittest
-import sys
-sys.path.append('..')
-
-from database import OECDatabase
 from tempfile import mkdtemp, mkstemp
 import shutil
+
+from ..database import OECDatabase, LoadDataBaseError
 
 
 class TestDataBaseLoading(unittest.TestCase):
 
     def setUp(self):
         # create temp dir
-
         self.tempDir = mkdtemp()
         self._createFakeXML()
         self.oecdb = OECDatabase(self.tempDir + '/')
@@ -93,6 +90,34 @@ class TestDataBaseLoading(unittest.TestCase):
         self.assertEqual(str(system.children[0].children), "[Star('Star 6A'), Star('Star 6B'), Planet('Planet 6AB b')]")
         self.assertEqual(system.children[0].children[0].children, [])
         self.assertEqual(system.children[0].children[1].children, [])
+
+    def tearDown(self):
+        shutil.rmtree(self.tempDir)
+
+
+class TestDataBaseFailing(unittest.TestCase):
+
+    def setUp(self):
+        self.tempDir = mkdtemp()
+
+    def test_raises_LoadDataBaseError_in_empty_folder(self):
+
+        with self.assertRaises(LoadDataBaseError):
+            OECDatabase(self.tempDir)
+
+    def test_raises_LoadDataBaseError_without_system(self):
+        xmlCases = [
+            "<name>System 1</name><star><name>Star 1</name></star>",
+            "<star><name>Star 2</name>"  # system -> star -> planet
+            "<planet><name>Planet 2 b</name></planet></star>",
+        ]
+
+        for systems in xmlCases:
+            with open(mkstemp('.xml', dir=self.tempDir)[1], 'wb') as f:
+                f.write(systems)
+
+        with self.assertRaises(LoadDataBaseError):
+            OECDatabase(self.tempDir)
 
     def tearDown(self):
         shutil.rmtree(self.tempDir)
