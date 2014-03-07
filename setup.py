@@ -23,11 +23,11 @@ def find_version(*file_paths):
 
 
 # Get the long description from the relevant file
-with codecs.open('readme.md', encoding='utf-8') as f:
+with codecs.open(os.path.join(here, 'readme.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name="oecpy",
+    name="OECPy",
     version=find_version('oecpy', '__init__.py'),
     description="CURRENTLY WORKING ON THIS PACKAGE",
     long_description=long_description,
