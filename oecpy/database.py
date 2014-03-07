@@ -15,7 +15,7 @@ class OECDatabase(object):
     """
 
     def __init__(self, databaseLocation):
-        """ Hold the Open Exoplanet Catalogue database in python
+        """ Holds the Open Exoplanet Catalogue database in python
 
         :param databaseLocation: file path to the Open Exoplanet Catalogue systems folder ie
             ~/git/open-exoplanet-catalogue-atmospheres/systems/
