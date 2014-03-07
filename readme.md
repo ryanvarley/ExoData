@@ -23,7 +23,7 @@ Easiest way
 
 `pip install oecpy --pre` (currently in beta, --pre lets you grab it anyway)
 
-From this repo
+Or from this repo
 
     python setup.py install
 
@@ -34,6 +34,7 @@ Now if you want to work with planets you need the exoplanet catalogue. Move to t
 The catalogue should then download. If you want to update the catalogue, move to the open_exoplanet_catalogue folder and pull
 
     cd open_exoplanet_catalogue/
+    git pull origin master
 
 If you want to keep track of this repo in a GUI way, i recommend [sourcetree](http://www.sourcetreeapp.com/) or the [github client](https://help.github.com/articles/set-up-git).
 
