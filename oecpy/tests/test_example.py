@@ -2,11 +2,11 @@
 right units.
 """
 import unittest
-
-from oecpy.example import genExamplePlanet, examplePlanet
-
-import oecpy.astroquantities as aq
 import quantities as pq
+
+from ..example import genExamplePlanet, examplePlanet
+from .. import astroquantities as aq
+from .. import astroclasses as ac
 
 secondExamplePlanet = genExamplePlanet()
 
@@ -69,6 +69,7 @@ class TestExampleInstances(unittest.TestCase):
 
     def test_second_generation_is_number_2(self):
 
+        ac._ExamplePlanetCount = 1  # reset incase other classes have already increased the count
         examplePlanet = secondExamplePlanet
         exampleStar = examplePlanet.parent
         exampleSystem = exampleStar.parent

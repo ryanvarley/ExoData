@@ -1,7 +1,6 @@
 """ Contains structural classes ie binary, star, planet etc which mimic the xml structure with objects
 """
 import numpy as np
-import os
 import math
 from pkg_resources import resource_stream
 
