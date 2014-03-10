@@ -640,15 +640,13 @@ class SpectralType(object):
         return self.specType
 
     def _parseSpecType(self, classString):
+        """ This class attempts to parse the spectral type. It should probably use more advanced matching use regex
+        """
         classString = str(classString)
         # some initial cases
         if classString == '' or classString == 'nan':
             return False
-        #               main sequence
-        possClasses = ('O', 'B', 'A', 'F', 'G', 'K', 'M',
-                       'L', 'T', 'Y',  # dwarfs
-                       'C', 'S',  # 'MS', 'MC' carbon related classes TODO handle multi letter classes
-        )
+
         possNumbers = range(10)
         possLType = ('III', 'II', 'Iab', 'Ia0', 'Ia', 'Ib', 'IV', 'V')  # in order of unique matches
 
@@ -657,22 +655,26 @@ class SpectralType(object):
 
         classString = classString.replace('-', '/')
         classString = classString.replace('\\', '/')
-        classString = classString.split('/')[0]
+        classString = classString.split('/')[0]  # TODO we do not consider slashed classes yet (intemediates)
 
-        # first char should always be spectral type
-        stellarClass = classString[0]
-
-        if stellarClass not in possClasses:
-            return False  # assume a non standard class and fail
-        else:
+        # check first 3 chars for spectral types
+        stellarClass = classString[:3]
+        if stellarClass in _possSpectralClasses:
             self.classLetter = stellarClass
+        elif stellarClass[:2] in _possSpectralClasses:  # needed because A5V wouldnt match before
+            self.classLetter = stellarClass[:2]
+        elif stellarClass[0] in _possSpectralClasses:
+            self.classLetter = stellarClass[0]
+        else:
+            return False  # assume a non standard class and fail
 
         # get number
         try:
-            classNum = int(classString[1])
+            numIndex = len(self.classLetter)
+            classNum = int(classString[numIndex])
             if classNum in possNumbers:
-                self.classNumber = int(classNum)
-                typeString = classString[2:]
+                self.classNumber = int(classNum)  # don't consider decimals here, done at the type check
+                typeString = classString[numIndex+1:]
             else:
                 return False  # invalid number received
         except IndexError:  # reached the end of the string
@@ -722,6 +724,23 @@ class SpectralType(object):
             return False
 
 _ExamplePlanetCount = 1  # Used by example.py - put here to enable global
+
+#               main sequence
+_possSingleLetterClasses = ('O', 'B', 'A', 'F', 'G', 'K', 'M',
+               'L', 'T', 'Y',  # dwarfs
+               'C', 'S',
+               'W',  # Wolf-Rayet
+               'P', 'Q',  # Non-stellar spectral types
+)
+# skipped carbon stars with dashes ie C-R
+_possMultiLetterClasses = ('WNE', 'WNL', 'WCE', 'WCL', 'WO', 'WR', 'WN', 'WC',  # Wolf-Rayet stars, WN/C skipped
+                          'MS', 'MC',  # intermediary carbon-related classes
+                          'DAB', 'DAO', 'DAZ', 'DBZ',  # Extended white dwarf spectral types
+                          'DAV', 'DBV', 'DCV',  # Variable star designations, GW Vir (DOV and PNNV) skipped
+                          'DA', 'DB', 'DO', 'DQ', 'DZ', 'DC', 'DX',  # white dwarf spectral types
+                          )
+
+_possSpectralClasses = _possMultiLetterClasses + _possSingleLetterClasses  # multi first
 
 
 class HierarchyError(Exception):

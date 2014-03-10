@@ -233,11 +233,27 @@ class TestSpectralType(unittest.TestCase):
         self.assertEqual(test2.classNumber, 5)
         self.assertEqual(test2.lumType, 'IV')
 
-    @unittest.skip("Not coded yet")
-    def test_works_multi_letter_class(self):
+    def test_works_2_letter_class(self):
         test2 = SpectralType('DQ6')
         self.assertEqual(test2.classLetter, 'DQ')
         self.assertEqual(test2.classNumber, 6)
+        self.assertEqual(test2.lumType, '')
+
+    def test_works_3_letter_class(self):
+        test2 = SpectralType('DAV6')
+        self.assertEqual(test2.classLetter, 'DAV')
+        self.assertEqual(test2.classNumber, 6)
+        self.assertEqual(test2.lumType, '')
+
+        test3 = SpectralType('DA6')  # check two letter still works
+        self.assertEqual(test3.classLetter, 'DA')
+        self.assertEqual(test3.classNumber, 6)
+        self.assertEqual(test3.lumType, '')
+
+    def test_fake_3_letter_fails(self):
+        test2 = SpectralType('DAX6')
+        self.assertEqual(test2.classLetter, '')
+        self.assertEqual(test2.classNumber, '')
         self.assertEqual(test2.lumType, '')
 
     def test_works_unknown_lum_class(self):
@@ -264,7 +280,7 @@ class TestSpectralType(unittest.TestCase):
 
     def test_rejects_non_standard(self):
         # TODO rewrite with a list of cases to fail and for loop
-        testStrings = ('Catac. var.', 'AM Her', 'DAZ8+dM', 'nan', np.nan)
+        testStrings = ('Catac. var.', 'AM Her', 'nan', np.nan)
 
         for testStr in testStrings:
             test1 = SpectralType(testStr)
