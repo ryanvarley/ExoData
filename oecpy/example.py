@@ -4,25 +4,48 @@
 # I am making a make system so that unit tests in EASE can load fake targets that will stay constant for the tests
 # Due to its wider applicability im putting these here
 
-from astroclasses import Planet, Star, System, Parameters, PlanetParameters, StarParameters
+from astroclasses import Planet, Star, Binary, System, Parameters, PlanetParameters, StarParameters, BinaryParameters
 import astroclasses as ac
 
 
 def genExampleSystem():
     systemPar = Parameters()
-    systemPar.addParam('name', 'Example System ' + str(ac._ExamplePlanetCount))
+    systemPar.addParam('name', 'Example System ' + str(ac._ExampleSystemCount))
     systemPar.addParam('distance', 58)
     systemPar.addParam('declination', '+04 05 06')
     systemPar.addParam('rightascension', '01 02 03')
 
     exampleSystem = System(systemPar.params)
 
-    ac._ExamplePlanetCount += 1
+    ac._ExampleSystemCount += 1
 
     return exampleSystem
 
 
-def genExampleStar():
+def genExampleBinary():
+    binaryPar = BinaryParameters()
+    binaryPar.addParam('name', 'Example Binary {}AB'.format(ac._ExampleSystemCount))
+    # TODO add the rest of binary parameters
+
+    exampleBinary = Binary(binaryPar.params)
+
+    # generate other star
+    exampleStar2 = genExampleStar('B', False)
+    exampleStar2.parent = exampleBinary
+    exampleBinary._addChild(exampleStar2)
+
+    exampleSystem = genExampleSystem()
+    exampleSystem._addChild(exampleBinary)
+    exampleBinary.parent = exampleSystem
+
+    return exampleBinary
+
+
+def genExampleStar(binaryLetter='', heirarchy=True):
+    """ generates example star, if binaryLetter is true creates a parent binary object, if heirarchy is true will create a
+    system and link everything up
+    """
+
     starPar = StarParameters()
     starPar.addParam('age', '7.6')
     starPar.addParam('magB', '9.8')
@@ -33,23 +56,30 @@ def genExampleStar():
     starPar.addParam('magV', '9.0')
     starPar.addParam('mass', '0.98')
     starPar.addParam('metallicity', '0.43')
-    starPar.addParam('name', 'Example Star ' + str(ac._ExamplePlanetCount))
-    starPar.addParam('name', 'HD ' + str(ac._ExamplePlanetCount))
+    starPar.addParam('name', 'Example Star {}{}'.format(ac._ExampleSystemCount, binaryLetter))
+    starPar.addParam('name', 'HD {}{}'.format(ac._ExampleSystemCount, binaryLetter))
     starPar.addParam('radius', '0.95')
     starPar.addParam('spectraltype', 'G5')
     starPar.addParam('temperature', '5370')
 
     exampleStar = Star(starPar.params)
 
-    exampleSystem = genExampleSystem()
-    exampleSystem._addChild(exampleStar)
-    exampleStar.parent = exampleSystem
+    if heirarchy:
+        if binaryLetter:
+            exampleBinary = genExampleBinary()
+            exampleBinary._addChild(exampleStar)
+            exampleStar.parent = exampleBinary
+        else:
+            exampleSystem = genExampleSystem()
+            exampleSystem._addChild(exampleStar)
+            exampleStar.parent = exampleSystem
 
     return exampleStar
 
 
-def genExamplePlanet():
+def genExamplePlanet(binaryLetter=''):
     """ Creates a fake planet with some defaults
+    :param `binaryLetter`: host star is part of a binary with letter binaryletter
     :return:
     """
 
@@ -60,7 +90,7 @@ def genExamplePlanet():
     planetPar.addParam('inclination', '89.2')
     planetPar.addParam('lastupdate', '12/12/08')
     planetPar.addParam('mass', '3.9')
-    planetPar.addParam('name', 'Example Star {} b'.format(ac._ExamplePlanetCount))
+    planetPar.addParam('name', 'Example Star {}{} b'.format(ac._ExampleSystemCount, binaryLetter))
     planetPar.addParam('period', '111.2')
     planetPar.addParam('radius', '0.92')
     planetPar.addParam('semimajoraxis', '0.449')
@@ -69,13 +99,11 @@ def genExamplePlanet():
 
     examplePlanet = Planet(planetPar.params)
 
-    exampleStar = genExampleStar()
+    exampleStar = genExampleStar(binaryLetter=binaryLetter)
     exampleStar._addChild(examplePlanet)
     examplePlanet.parent = exampleStar
 
     return examplePlanet
-
-# TODO Binary
 
 
 examplePlanet = genExamplePlanet()

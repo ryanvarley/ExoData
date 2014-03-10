@@ -14,6 +14,7 @@ secondExamplePlanet = genExamplePlanet()
 class TestExampleInstances(unittest.TestCase):
 
     def setUp(self):  # setup runs before each test!
+        ac._ExampleSystemCount = 1
         self.examplePlanet = examplePlanet
         self.exampleStar = exampleStar
         self.exampleSystem = exampleSystem
@@ -62,8 +63,6 @@ class TestExampleInstances(unittest.TestCase):
         self.assertEqual(examplePlanet.transittime, 2454876.344 * pq.d)
 
     def test_hierarchy_for_planet(self):
-        print 'test ->', self.examplePlanet.system, '<-'
-        print 'answer ->', self.exampleSystem, '<-'
         self.assertEqual(self.examplePlanet.star, self.exampleStar)
         self.assertEqual(self.examplePlanet.parent, self.exampleStar)
         self.assertEqual(self.examplePlanet.system, self.exampleSystem)
@@ -84,13 +83,7 @@ class TestExampleInstances(unittest.TestCase):
         with self.assertRaises(ac.HierarchyError):
             starBinary = self.exampleStar.binary
 
-    @unittest.skip("Not written")
-    def test_hierarchy_for_binary(self):
-        assert False
-
     def test_second_generation_is_number_2(self):
-
-        ac._ExamplePlanetCount = 1  # reset incase other classes have already increased the count
         examplePlanet = secondExamplePlanet
         exampleStar = examplePlanet.parent
         exampleSystem = exampleStar.parent
@@ -108,6 +101,52 @@ class TestExampleInstances(unittest.TestCase):
         planet2.params['radius'] = 12345
         self.assertTrue(planet2.R, 12345)
         self.assertEqual(planet1.R, 0.92 * aq.R_j)
+
+
+class TestExampleInstancesWithBinary(unittest.TestCase):
+
+    def setUp(self):  # setup runs before each test!
+        ac._ExampleSystemCount = 2
+        self.examplePlanet = genExamplePlanet(binaryLetter='A')
+        self.exampleStarA = self.examplePlanet.star
+        self.exampleBinary = self.examplePlanet.binary
+        self.exampleStarB = self.exampleBinary.stars[0]  # second star (without planet) - but it gets added first
+        self.exampleSystem = self.examplePlanet.system
+
+    def test_binary_object(self):
+        exampleBinary = self.exampleBinary
+        self.assertEqual(exampleBinary.name, 'Example Binary 2AB')  # already generated the example system 1 on import
+
+    def test_hierarchy_for_planet(self):
+        self.assertIsInstance(self.examplePlanet, ac.Planet)
+        self.assertEqual(self.examplePlanet.name, 'Example Star 2A b')
+        self.assertEqual(self.examplePlanet.system, self.exampleSystem)
+        self.assertEqual(self.examplePlanet.star, self.exampleStarA)
+
+    def test_hierarchy_for_starA(self):
+        self.assertIsInstance(self.exampleStarA, ac.Star)
+        self.assertEqual(self.exampleStarA.name, 'Example Star 2A')
+        self.assertEqual(self.exampleStarA.system, self.exampleSystem)
+        self.assertEqual(self.exampleStarA.planets[0], self.examplePlanet)
+
+    def test_hierarchy_for_starB(self):
+        self.assertIsInstance(self.exampleStarB, ac.Star)
+        self.assertEqual(self.exampleStarB.name, 'Example Star 2B')
+        self.assertEqual(self.exampleStarB.system, self.exampleSystem)
+        self.assertFalse(self.exampleStarB.planets)
+
+    def test_hierarchy_for_Binary(self):
+        self.assertIsInstance(self.exampleBinary, ac.Binary)
+        self.assertEqual(self.exampleBinary.name, 'Example Binary 2AB')
+        self.assertEqual(self.exampleBinary.system, self.exampleSystem)
+        self.assertItemsEqual(self.exampleBinary.stars, [self.exampleStarA, self.exampleStarB])
+
+    def test_hierarchy_for_System(self):
+        self.assertIsInstance(self.exampleSystem, ac.System)
+        self.assertEqual(self.exampleSystem.name, 'Example System 2')
+        self.assertItemsEqual(self.exampleSystem.stars, [self.exampleBinary])
+
+
 
 if __name__ == '__main__':
     unittest.main()

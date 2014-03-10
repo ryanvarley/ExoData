@@ -723,7 +723,7 @@ class SpectralType(object):
             self.lumType = ''
             return False
 
-_ExamplePlanetCount = 1  # Used by example.py - put here to enable global
+_ExampleSystemCount = 1  # Used by example.py - put here to enable global
 
 #               main sequence
 _possSingleLetterClasses = ('O', 'B', 'A', 'F', 'G', 'K', 'M',
