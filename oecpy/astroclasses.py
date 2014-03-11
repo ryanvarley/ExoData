@@ -10,6 +10,7 @@ import equations as eq
 import astroquantities as aq
 import assumptions as assum
 import flags
+import params
 
 
 class baseObject(object):
@@ -118,21 +119,28 @@ class PlanetAndBinaryCommon(baseObject):
         period = self.getParam('period')
         if period is not np.nan:
             return period
-        else:
+        elif params.estimateMissingValues:
+            self.flags.addFlag('Calculated Period')
             return self.calcPeriod()
+        else:
+            return np.nan
+
+    def calcPeriod(self):
+        raise NotImplementedError('Only implemented for Binary and Planet child classes')
 
     @property
     def a(self):
-
         sma = self.getParam('semimajoraxis')
-        if sma is np.nan:
-            if self.getParam('period') is np.nan:
-                sma = self.calcSMAfromT()
-            else:
+        if sma is np.nan and params.estimateMissingValues:
+            if self.getParam('period') is not np.nan:
                 sma = self.calcSMA()  # calc using period
-            self.flags.addFlag('Calculated SMA')
-
+                self.flags.addFlag('Calculated SMA')
+            else:
+                return np.nan
         return sma
+
+    def calcSMA(self):
+        raise NotImplementedError('Only implemented for Binary and Planet child classes')
 
     @property
     def transittime(self):
@@ -144,11 +152,11 @@ class PlanetAndBinaryCommon(baseObject):
 
     @property
     def longitude(self):
-        return self.getParam('periastron')
+        return self.getParam('longitude')
 
     @property
     def ascendingnode(self):
-        return self.getParam('periastron')
+        return self.getParam('ascendingnode')
 
 
 class StarAndBinaryCommon(baseObject):
@@ -178,19 +186,7 @@ class StarAndBinaryCommon(baseObject):
 
     @property
     def magV(self):
-        magV = self.getParam('magV')
-        if math.isnan(magV):
-            if not math.isnan(self.magK):
-                self.flags.addFlag('Estimated magV')
-                magV = eq.magKtoMagV(self.spectralType, self.magK)
-                if magV is None:  # eq sometimes outputs this
-                    return np.nan
-                else:
-                    return magV
-        if magV is None:  # if value is missing (particularly binaries) will return None for some reason
-            return np.nan
-        else:
-            return magV
+        return self.getParam('magV')
 
 
 class StarAndPlanetCommon(baseObject):
@@ -228,9 +224,11 @@ class StarAndPlanetCommon(baseObject):
 
         if not paramTemp is np.nan:
             return paramTemp
-        else:
+        elif params.estimateMissingValues:
             self.flags.addFlag('Calculated Temperature')
             return self.calcTemperature()
+        else:
+            return np.nan
 
     @property
     def M(self):
@@ -289,17 +287,36 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
         self.classType = 'Star'
 
     @property
+    def magV(self):
+        magV = self.getParam('magV')
+        if math.isnan(magV) and params.estimateMissingValues:
+            if not math.isnan(self.magK):
+                self.flags.addFlag('Estimated magV')
+                magV = eq.magKtoMagV(self.spectralType, self.magK)
+                if magV is None:  # eq sometimes outputs this
+                    return np.nan
+                else:
+                    return magV
+        if magV is None:  # if value is missing (particularly binaries) will return None for some reason
+            return np.nan
+        else:
+            return magV
+
+    @property
     def d(self):
         """ Note this should work from child parents as .d propergates, calculates using the star estimation method
         estimateDistance and estimateAbsoluteMagnitude
         """
-
+        # TODO this will only work from star or below. good thing?
         d = self.parent.d
-        if d is np.nan:
-            d = self.estimateDistance()
-            if d is not np.nan:
-                self.flags.addFlag('Estimated Distance')
-        return d
+        if params.estimateMissingValues:
+            if d is np.nan:
+                d = self.estimateDistance()
+                if d is not np.nan:
+                    self.flags.addFlag('Estimated Distance')
+            return d
+        else:
+            return np.nan
 
     def calcLuminosity(self):
 

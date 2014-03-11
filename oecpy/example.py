@@ -25,6 +25,8 @@ def genExampleSystem():
 def genExampleBinary():
     binaryPar = BinaryParameters()
     binaryPar.addParam('name', 'Example Binary {}AB'.format(ac._ExampleSystemCount))
+    binaryPar.addParam('semimajoraxis', 10)  # TODO add realistic value
+    binaryPar.addParam('period', 10)  # TODO add realistic value
     # TODO add the rest of binary parameters
 
     exampleBinary = Binary(binaryPar.params)

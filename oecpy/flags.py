@@ -5,7 +5,7 @@ These are designed to be attached to a planet, system, star or binary class in .
 """
 
 allowedFlags = ['Calculated Temperature', 'Estimated Mass', 'Calculated SMA', 'Fake Planet', 'Estimated Distance',
-                'Estimated magV']
+                'Estimated magV', 'Calculated Period']
 
 
 class Flag(object):  # or tags? or lists?
