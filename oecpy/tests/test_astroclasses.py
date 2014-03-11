@@ -1,3 +1,7 @@
+""" Note that many tests for the astroclasses are actually done in example. This is because this file generates fake
+planets from which the tests can be ran. In future some xml could be included here for the same purpose.
+"""
+
 import unittest
 
 import numpy as np
@@ -288,6 +292,27 @@ class TestSpectralType(unittest.TestCase):
             self.assertEqual(test1.classLetter, '', 'classLetter null test for {}'.format(testStr))
             self.assertEqual(test1.classNumber, '', 'classNumber null test for {}'.format(testStr))
             self.assertEqual(test1.specType, '', 'specType null test for {}'.format(testStr))
+
+
+class TestPlanetClass(unittest.TestCase):
+
+    def test_isTransiting_is_true_if_tag_present(self):
+        planet = genExamplePlanet()
+        planet.params['istransiting'] = '1'
+        self.assertTrue(planet.isTransiting())
+
+    def test_isTransiting_fails_with_missing_tag_or_incorrect_value(self):
+        planet = genExamplePlanet()
+        planet.params['istransiting'] = '0'
+        self.assertFalse(planet.isTransiting())
+
+        planet = genExamplePlanet()
+        planet.params['istransiting'] = '2'
+        self.assertFalse(planet.isTransiting())
+
+        planet = genExamplePlanet()
+        self.assertFalse(planet.isTransiting())
+
 
 if __name__ == '__main__':
     unittest.main()

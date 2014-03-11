@@ -324,13 +324,16 @@ class Planet(StarAndPlanetCommon):
         self.classType = 'Planet'
 
     def isTransiting(self):
-        """ Checks the discovery method to see if the planet transits
+        """ Checks the the istransiting tag to see if the planet transits. Note that this only works as of catalogue
+        version  ee12343381ae4106fd2db908e25ffc537a2ee98c (11th March 2014) where the istransiting tag was implemented
         """
-
-        if self.params['discoverymethod'] == 'transit':
-            return True  # is this all or will it miss RV detected planets that transit?
-        elif self.R is not np.nan:
-            return True  # transit is the only method to give R
+        try:
+            isTransiting = self.params['istransiting']
+        except KeyError:
+            return False
+        
+        if isTransiting == '1':
+            return True
         else:
             return False
 
