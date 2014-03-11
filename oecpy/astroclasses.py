@@ -95,13 +95,105 @@ class System(baseObject):
     def d(self):
         return self.getParam('distance')
 
-    @property  # TODO could be binaries now, should differentiate
+    @property
     def stars(self):
-        return self.children
+        return self.children  # TODO child could be a binary or planet
+
+    @property
+    def epoch(self):
+        return self.getParam('epoch')
+
+
+class PlanetAndBinaryCommon(baseObject):
+    def __init__(self, *args, **kwargs):
+        baseObject.__init__(self, *args, **kwargs)
+        self.classType = 'PlanetAndBinaryCommon'
+
+    @property
+    def i(self):
+        return self.getParam('inclination')
+
+    @property
+    def P(self):
+        period = self.getParam('period')
+        if period is not np.nan:
+            return period
+        else:
+            return self.calcPeriod()
+
+    @property
+    def a(self):
+
+        sma = self.getParam('semimajoraxis')
+        if sma is np.nan:
+            if self.getParam('period') is np.nan:
+                sma = self.calcSMAfromT()
+            else:
+                sma = self.calcSMA()  # calc using period
+            self.flags.addFlag('Calculated SMA')
+
+        return sma
+
+    @property
+    def transittime(self):
+        return self.getParam('transittime')
+
+    @property
+    def periastron(self):
+        return self.getParam('periastron')
+
+    @property
+    def longitude(self):
+        return self.getParam('periastron')
+
+    @property
+    def ascendingnode(self):
+        return self.getParam('periastron')
+
+
+class StarAndBinaryCommon(baseObject):
+    def __init__(self, *args, **kwargs):
+        baseObject.__init__(self, *args, **kwargs)
+        self.classType = 'StarAndBinaryCommon'
+
+    @property
+    def magB(self):
+        return self.getParam('magB')
+
+    @property
+    def magH(self):
+        return self.getParam('magH')
+
+    @property
+    def magI(self):
+        return self.getParam('magI')
+
+    @property
+    def magJ(self):
+        return self.getParam('magJ')
+
+    @property
+    def magK(self):
+        return self.getParam('magK')
+
+    @property
+    def magV(self):
+        magV = self.getParam('magV')
+        if math.isnan(magV):
+            if not math.isnan(self.magK):
+                self.flags.addFlag('Estimated magV')
+                magV = eq.magKtoMagV(self.spectralType, self.magK)
+                if magV is None:  # eq sometimes outputs this
+                    return np.nan
+                else:
+                    return magV
+        if magV is None:  # if value is missing (particularly binaries) will return None for some reason
+            return np.nan
+        else:
+            return magV
 
 
 class StarAndPlanetCommon(baseObject):
-
     def __init__(self, *args, **kwargs):
         baseObject.__init__(self, *args, **kwargs)
         self.classType = 'StarAndPlanetCommon'
@@ -171,21 +263,29 @@ class StarAndPlanetCommon(baseObject):
             return eq.density(self.M, self.R)
 
 
-class Binary(StarAndPlanetCommon):  # TODO add binary methods and variables, remove unused one from starcommon
+class Binary(PlanetAndBinaryCommon, StarAndPlanetCommon):  # TODO add binary methods and variables, remove unused one from starcommon
 
     def __init__(self, *args, **kwargs):
         StarAndPlanetCommon.__init__(self, *args, **kwargs)
+        PlanetAndBinaryCommon.__init__(self, *args, **kwargs)
         self.classType = 'Binary'
 
     @property
     def stars(self):
         return self.children
 
+    def calcPeriod(self):
+        raise NotImplementedError  # TODO
 
-class Star(StarAndPlanetCommon):
+    def calcSMA(self):
+        raise NotImplementedError  # TODO
+
+
+class Star(StarAndPlanetCommon, StarAndBinaryCommon):
 
     def __init__(self, *args, **kwargs):
         StarAndPlanetCommon.__init__(self, *args, **kwargs)
+        StarAndBinaryCommon.__init__(self, *args, **kwargs)
         self.classType = 'Star'
 
     @property
@@ -213,42 +313,6 @@ class Star(StarAndPlanetCommon):
     @property
     def Z(self):
         return self.getParam('metallicity')
-
-    @property
-    def magB(self):
-        return self.getParam('magB')
-
-    @property
-    def magH(self):
-        return self.getParam('magH')
-
-    @property
-    def magI(self):
-        return self.getParam('magI')
-
-    @property
-    def magJ(self):
-        return self.getParam('magJ')
-
-    @property
-    def magK(self):
-        return self.getParam('magK')
-
-    @property
-    def magV(self):
-        magV = self.getParam('magV')
-        if math.isnan(magV):
-            if not math.isnan(self.magK):
-                self.flags.addFlag('Estimated magV')
-                magV = eq.magKtoMagV(self.spectralType, self.magK)
-                if magV is None:  # eq sometimes outputs this
-                    return np.nan
-                else:
-                    return magV
-        if magV is None:  # if value is missing (particularly binaries) will return None for some reason
-            return np.nan
-        else:
-            return magV
 
     @property
     def spectralType(self):
@@ -317,10 +381,11 @@ class Star(StarAndPlanetCommon):
             return np.nan
 
 
-class Planet(StarAndPlanetCommon):
+class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
 
     def __init__(self, *args, **kwargs):
         StarAndPlanetCommon.__init__(self, *args, **kwargs)
+        PlanetAndBinaryCommon.__init__(self, *args, **kwargs)
         self.classType = 'Planet'
 
     def isTransiting(self):
@@ -331,7 +396,7 @@ class Planet(StarAndPlanetCommon):
             isTransiting = self.params['istransiting']
         except KeyError:
             return False
-        
+
         if isTransiting == '1':
             return True
         else:
@@ -442,33 +507,8 @@ class Planet(StarAndPlanetCommon):
         return self.getParam('lastupdate')
 
     @property
-    def i(self):
-        return self.getParam('inclination')
-
-    @property
-    def P(self):
-        period = self.getParam('period')
-        if period is not np.nan:
-            return period
-        else:
-            return self.calcPeriod()
-
-    @property
-    def a(self):
-
-        sma = self.getParam('semimajoraxis')
-        if sma is np.nan:
-            if self.getParam('period') is np.nan:
-                sma = self.calcSMAfromT()
-            else:
-                sma = self.calcSMA()  # calc using period
-            self.flags.addFlag('Calculated SMA')
-
-        return sma
-
-    @property
-    def transittime(self):
-        return self.getParam('transittime')
+    def desdescription(self):
+        return self.getParam('description')
 
     @property
     def star(self):
