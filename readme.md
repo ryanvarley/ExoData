@@ -27,9 +27,9 @@ Or from this repo
 
     python setup.py install
 
-Now if you want to work with planets you need the exoplanet catalogue. Move to the folder on your system where you want to store it and clone the Open Exoplanet Catalogue
+Now if you want to work with planets you need the exoplanet catalogue. Move to the folder on your system where you want to store it and clone the Open Exoplanet Catalogue (this process will create a folder named open-exoplanet-catalogue within your working directory).
 
-    git clone git@github.com:hannorein/open_exoplanet_catalogue.git
+    git clone https://github.com/hannorein/open_exoplanet_catalogue.git
 
 The catalogue should then download. If you want to update the catalogue, move to the open_exoplanet_catalogue folder and pull
 
