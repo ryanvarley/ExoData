@@ -214,7 +214,7 @@ def logg(M_p, R_p):
     return logg
 
 
-def starTemperature(M_s):
+def estimateStarTemperature(M_s):
     """ Estimates stellar temperature using the main sequence relationship T ~ 5800*M^0.65
     """
     return (5800*pq.K * float(M_s.rescale(aq.M_s)**0.65)).rescale(pq.K)
@@ -253,7 +253,7 @@ def estimateMass(R, density):
     return (density * volume).rescale(aq.M_j)
 
 
-def estimateStellarMass(M_s):
+def estimateStellarRadius(M_s):
     """ Estimates radius from mass based on stellar type
     .. math::
         R_* = k M^x_*
@@ -311,8 +311,7 @@ def impactParameter(a, R_s, i):
         b \equiv \frac{a}{R_*} \cos{i}
     (Seager & Mallen-Ornelas 2003).
     """
-
-    b = (a/R_s) * cos(i)
+    b = (a/R_s) * cos(i.rescale(pq.rad))
 
     return b.rescale(pq.dimensionless)
 

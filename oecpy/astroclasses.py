@@ -10,6 +10,7 @@ import equations as eq
 import astroquantities as aq
 import assumptions as assum
 import flags
+import params
 
 
 class baseObject(object):
@@ -17,7 +18,7 @@ class baseObject(object):
     def __init__(self, params=None):
 
         self.children = []
-        self.parent = None # TODO should be read only (use add method)
+        self.parent = False
         self.classType = 'BaseObject'
         self.flags = flags.Flag()
 
@@ -34,6 +35,20 @@ class baseObject(object):
         """
 
         self.params.update(params)
+
+    def _getParentClass(self, startClass, parentClass):
+        """ gets the parent class by calling successive parent classes with .parent until parentclass is matched.
+        """
+        try:
+            if not startClass:  # reached system with no hits
+                raise AttributeError
+        except AttributeError:  # i.e calling binary on an object without one
+                raise HierarchyError('This object has no {} as a parent object'.format(parentClass))
+
+        if startClass.classType == parentClass:
+            return startClass
+        else:
+            return self._getParentClass(startClass.parent, parentClass)
 
     @property
     def name(self):  # TODO variable for altnames
@@ -81,13 +96,100 @@ class System(baseObject):
     def d(self):
         return self.getParam('distance')
 
-    @property  # TODO could be binaries now, should differentiate
+    @property
     def stars(self):
-        return self.children
+        return self.children  # TODO child could be a binary or planet
+
+    @property
+    def epoch(self):
+        return self.getParam('epoch')
+
+
+class PlanetAndBinaryCommon(baseObject):
+    def __init__(self, *args, **kwargs):
+        baseObject.__init__(self, *args, **kwargs)
+        self.classType = 'PlanetAndBinaryCommon'
+
+    @property
+    def i(self):
+        return self.getParam('inclination')
+
+    @property
+    def P(self):
+        period = self.getParam('period')
+        if period is not np.nan:
+            return period
+        elif params.estimateMissingValues:
+            self.flags.addFlag('Calculated Period')
+            return self.calcPeriod()
+        else:
+            return np.nan
+
+    def calcPeriod(self):
+        raise NotImplementedError('Only implemented for Binary and Planet child classes')
+
+    @property
+    def a(self):
+        sma = self.getParam('semimajoraxis')
+        if sma is np.nan and params.estimateMissingValues:
+            if self.getParam('period') is not np.nan:
+                sma = self.calcSMA()  # calc using period
+                self.flags.addFlag('Calculated SMA')
+            else:
+                return np.nan
+        return sma
+
+    def calcSMA(self):
+        raise NotImplementedError('Only implemented for Binary and Planet child classes')
+
+    @property
+    def transittime(self):
+        return self.getParam('transittime')
+
+    @property
+    def periastron(self):
+        return self.getParam('periastron')
+
+    @property
+    def longitude(self):
+        return self.getParam('longitude')
+
+    @property
+    def ascendingnode(self):
+        return self.getParam('ascendingnode')
+
+
+class StarAndBinaryCommon(baseObject):
+    def __init__(self, *args, **kwargs):
+        baseObject.__init__(self, *args, **kwargs)
+        self.classType = 'StarAndBinaryCommon'
+
+    @property
+    def magB(self):
+        return self.getParam('magB')
+
+    @property
+    def magH(self):
+        return self.getParam('magH')
+
+    @property
+    def magI(self):
+        return self.getParam('magI')
+
+    @property
+    def magJ(self):
+        return self.getParam('magJ')
+
+    @property
+    def magK(self):
+        return self.getParam('magK')
+
+    @property
+    def magV(self):
+        return self.getParam('magV')
 
 
 class StarAndPlanetCommon(baseObject):
-
     def __init__(self, *args, **kwargs):
         baseObject.__init__(self, *args, **kwargs)
         self.classType = 'StarAndPlanetCommon'
@@ -122,9 +224,11 @@ class StarAndPlanetCommon(baseObject):
 
         if not paramTemp is np.nan:
             return paramTemp
-        else:
+        elif params.estimateMissingValues:
             self.flags.addFlag('Calculated Temperature')
             return self.calcTemperature()
+        else:
+            return np.nan
 
     @property
     def M(self):
@@ -133,9 +237,13 @@ class StarAndPlanetCommon(baseObject):
     def calcTemperature(self):
         raise NotImplementedError('Only implemented for Stars and Planet child classes')
 
-    @property  # TODO may return binary
+    @property
     def system(self):
-        return self.parent
+        return self._getParentClass(self.parent, 'System')
+
+    @property
+    def binary(self):
+        return self._getParentClass(self, 'Binary')
 
     def calcSurfaceGravity(self):
 
@@ -153,73 +261,35 @@ class StarAndPlanetCommon(baseObject):
             return eq.density(self.M, self.R)
 
 
-class Binary(StarAndPlanetCommon):  # TODO add binary methods and variables, remove unused one from starcommon
+class Binary(PlanetAndBinaryCommon, StarAndPlanetCommon):  # TODO add binary methods and variables, remove unused one from starcommon
 
     def __init__(self, *args, **kwargs):
         StarAndPlanetCommon.__init__(self, *args, **kwargs)
+        PlanetAndBinaryCommon.__init__(self, *args, **kwargs)
         self.classType = 'Binary'
 
     @property
     def stars(self):
         return self.children
 
+    def calcPeriod(self):
+        raise NotImplementedError  # TODO
 
-class Star(StarAndPlanetCommon):
+    def calcSMA(self):
+        raise NotImplementedError  # TODO
+
+
+class Star(StarAndPlanetCommon, StarAndBinaryCommon):
 
     def __init__(self, *args, **kwargs):
         StarAndPlanetCommon.__init__(self, *args, **kwargs)
+        StarAndBinaryCommon.__init__(self, *args, **kwargs)
         self.classType = 'Star'
-
-    @property
-    def d(self):
-        """ Note this should work from child parents as .d propergates, calculates using the star estimation method
-        estimateDistance and estimateAbsoluteMagnitude
-        """
-
-        d = self.parent.d
-        if d is np.nan:
-            d = self.estimateDistance()
-            if d is not np.nan:
-                self.flags.addFlag('Estimated Distance')
-        return d
-
-    def calcLuminosity(self):
-
-        return eq.starLuminosity(self.R, self.T)
-
-    def calcTemperature(self):
-        """ uses equations.starTemperature to estimate temperature based on main sequence relationship
-        """
-        return eq.starTemperature(self.M)
-
-    @property
-    def Z(self):
-        return self.getParam('metallicity')
-
-    @property
-    def magB(self):
-        return self.getParam('magB')
-
-    @property
-    def magH(self):
-        return self.getParam('magH')
-
-    @property
-    def magI(self):
-        return self.getParam('magI')
-
-    @property
-    def magJ(self):
-        return self.getParam('magJ')
-
-    @property
-    def magK(self):
-        return self.getParam('magK')
 
     @property
     def magV(self):
         magV = self.getParam('magV')
-        if math.isnan(magV):
+        if math.isnan(magV) and params.estimateMissingValues:
             if not math.isnan(self.magK):
                 self.flags.addFlag('Estimated magV')
                 magV = eq.magKtoMagV(self.spectralType, self.magK)
@@ -231,6 +301,35 @@ class Star(StarAndPlanetCommon):
             return np.nan
         else:
             return magV
+
+    @property
+    def d(self):
+        """ Note this should work from child parents as .d propergates, calculates using the star estimation method
+        estimateDistance and estimateAbsoluteMagnitude
+        """
+        # TODO this will only work from star or below. good thing?
+        d = self.parent.d
+        if params.estimateMissingValues:
+            if d is np.nan:
+                d = self.estimateDistance()
+                if d is not np.nan:
+                    self.flags.addFlag('Estimated Distance')
+            return d
+        else:
+            return np.nan
+
+    def calcLuminosity(self):
+
+        return eq.starLuminosity(self.R, self.T)
+
+    def calcTemperature(self):
+        """ uses equations.starTemperature to estimate temperature based on main sequence relationship
+        """
+        return eq.estimateStarTemperature(self.M)
+
+    @property
+    def Z(self):
+        return self.getParam('metallicity')
 
     @property
     def spectralType(self):
@@ -299,20 +398,24 @@ class Star(StarAndPlanetCommon):
             return np.nan
 
 
-class Planet(StarAndPlanetCommon):
+class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
 
     def __init__(self, *args, **kwargs):
         StarAndPlanetCommon.__init__(self, *args, **kwargs)
+        PlanetAndBinaryCommon.__init__(self, *args, **kwargs)
         self.classType = 'Planet'
 
     def isTransiting(self):
-        """ Checks the discovery method to see if the planet transits
+        """ Checks the the istransiting tag to see if the planet transits. Note that this only works as of catalogue
+        version  ee12343381ae4106fd2db908e25ffc537a2ee98c (11th March 2014) where the istransiting tag was implemented
         """
+        try:
+            isTransiting = self.params['istransiting']
+        except KeyError:
+            return False
 
-        if self.params['discoverymethod'] == 'transit':
-            return True  # is this all or will it miss RV detected planets that transit?
-        elif self.R is not np.nan:
-            return True  # transit is the only method to give R
+        if isTransiting == '1':
+            return True
         else:
             return False
 
@@ -421,37 +524,12 @@ class Planet(StarAndPlanetCommon):
         return self.getParam('lastupdate')
 
     @property
-    def i(self):
-        return self.getParam('inclination')
-
-    @property
-    def P(self):
-        period = self.getParam('period')
-        if period is not np.nan:
-            return period
-        else:
-            return self.calcPeriod()
-
-    @property
-    def a(self):
-
-        sma = self.getParam('semimajoraxis')
-        if sma is np.nan:
-            if self.getParam('period') is np.nan:
-                sma = self.calcSMAfromT()
-            else:
-                sma = self.calcSMA()  # calc using period
-            self.flags.addFlag('Calculated SMA')
-
-        return sma
-
-    @property
-    def transittime(self):
-        return self.getParam('transittime')
+    def desdescription(self):
+        return self.getParam('description')
 
     @property
     def star(self):
-        return self.parent
+        return self._getParentClass(self.parent, 'Star')
 
 
 class Parameters(object):  # TODO would this subclassing dict be more preferable?
@@ -577,7 +655,7 @@ class PlanetParameters(Parameters):
 
 
 def _findNearest(arr, value):
-    """ Finds the value in arr that value is clostest to
+    """ Finds the value in arr that value is closest to
     """
     arr = np.array(arr)
     # find nearest value in array
@@ -622,15 +700,13 @@ class SpectralType(object):
         return self.specType
 
     def _parseSpecType(self, classString):
+        """ This class attempts to parse the spectral type. It should probably use more advanced matching use regex
+        """
         classString = str(classString)
         # some initial cases
         if classString == '' or classString == 'nan':
             return False
-        #               main sequence
-        possClasses = ('O', 'B', 'A', 'F', 'G', 'K', 'M',
-                       'L', 'T', 'Y',  # dwarfs
-                       'C', 'S',  # 'MS', 'MC' carbon related classes TODO handle multi letter classes
-        )
+
         possNumbers = range(10)
         possLType = ('III', 'II', 'Iab', 'Ia0', 'Ia', 'Ib', 'IV', 'V')  # in order of unique matches
 
@@ -639,22 +715,26 @@ class SpectralType(object):
 
         classString = classString.replace('-', '/')
         classString = classString.replace('\\', '/')
-        classString = classString.split('/')[0]
+        classString = classString.split('/')[0]  # TODO we do not consider slashed classes yet (intemediates)
 
-        # first char should always be spectral type
-        stellarClass = classString[0]
-
-        if stellarClass not in possClasses:
-            return False  # assume a non standard class and fail
-        else:
+        # check first 3 chars for spectral types
+        stellarClass = classString[:3]
+        if stellarClass in _possSpectralClasses:
             self.classLetter = stellarClass
+        elif stellarClass[:2] in _possSpectralClasses:  # needed because A5V wouldnt match before
+            self.classLetter = stellarClass[:2]
+        elif stellarClass[0] in _possSpectralClasses:
+            self.classLetter = stellarClass[0]
+        else:
+            return False  # assume a non standard class and fail
 
         # get number
         try:
-            classNum = int(classString[1])
+            numIndex = len(self.classLetter)
+            classNum = int(classString[numIndex])
             if classNum in possNumbers:
-                self.classNumber = int(classNum)
-                typeString = classString[2:]
+                self.classNumber = int(classNum)  # don't consider decimals here, done at the type check
+                typeString = classString[numIndex+1:]
             else:
                 return False  # invalid number received
         except IndexError:  # reached the end of the string
@@ -703,4 +783,25 @@ class SpectralType(object):
             self.lumType = ''
             return False
 
-_ExamplePlanetCount = 1  # Used by example.py - put here to enable global
+_ExampleSystemCount = 1  # Used by example.py - put here to enable global
+
+#               main sequence
+_possSingleLetterClasses = ('O', 'B', 'A', 'F', 'G', 'K', 'M',
+               'L', 'T', 'Y',  # dwarfs
+               'C', 'S',
+               'W',  # Wolf-Rayet
+               'P', 'Q',  # Non-stellar spectral types
+)
+# skipped carbon stars with dashes ie C-R
+_possMultiLetterClasses = ('WNE', 'WNL', 'WCE', 'WCL', 'WO', 'WR', 'WN', 'WC',  # Wolf-Rayet stars, WN/C skipped
+                          'MS', 'MC',  # intermediary carbon-related classes
+                          'DAB', 'DAO', 'DAZ', 'DBZ',  # Extended white dwarf spectral types
+                          'DAV', 'DBV', 'DCV',  # Variable star designations, GW Vir (DOV and PNNV) skipped
+                          'DA', 'DB', 'DO', 'DQ', 'DZ', 'DC', 'DX',  # white dwarf spectral types
+                          )
+
+_possSpectralClasses = _possMultiLetterClasses + _possSingleLetterClasses  # multi first
+
+
+class HierarchyError(Exception):
+    pass

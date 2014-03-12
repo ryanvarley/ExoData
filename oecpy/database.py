@@ -97,7 +97,7 @@ class OECDatabase(object):
 
         databaseXML = glob.glob(databaseLocation + '*.xml')
         if not len(databaseXML):
-            raise LoadDataBaseError('could not find the database xml files. Have you given the correct location to the open exoplanet catalouges /system folder?')
+            raise LoadDataBaseError('could not find the database xml files. Have you given the correct location to the open exoplanet catalogues /systems/ folder?')
 
         for filename in databaseXML:
             tree = ET.parse(open(filename, 'r'))
@@ -105,7 +105,7 @@ class OECDatabase(object):
 
             # Process the system
             if not root.tag == 'system':
-                raise LoadDataBaseError('system {} does not contain a valid system - could be an error with your version'
+                raise LoadDataBaseError('file {} does not contain a valid system - could be an error with your version'
                                         ' of the catalogue'.format(filename))
 
             systemParams = Parameters()

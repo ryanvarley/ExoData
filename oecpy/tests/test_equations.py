@@ -105,22 +105,38 @@ class Test_transitDuration(unittest.TestCase):
 
         self.assertAlmostEqual(answer, result, 3)
 
-@unittest.skip("Not written")
+
 class Test_logg(unittest.TestCase):
-    def test_works_gj1214(self):
-        assert False
+    def test_works_wasp10(self):
+        """ Christian et al. 2009 values
+        """
+        answer = 4.51
+        result = eq.logg(0.703*aq.M_s, 0.775*aq.R_s)
+
+        self.assertAlmostEqual(answer, result, 1)
 
 
-@unittest.skip("Not written")
 class Test_starTemperature(unittest.TestCase):
-    def test_works_gj1214(self):
-        assert False
+
+    def test_works_sun(self):
+        answer = 5800 * pq.K
+        result = eq.estimateStarTemperature(1*aq.M_s)
+
+        self.assertAlmostEqual(answer, result, 0)
+
+    def test_works_hd189(self):
+        answer = 4939 * pq.K
+        result = eq.estimateStarTemperature(0.846*aq.M_s)
+
+        self.assertTrue(result-answer < 300)
 
 
-@unittest.skip("Not written")
 class Test_transitDepth(unittest.TestCase):
     def test_works_gj1214(self):
-        assert False
+        """Charbonneau et. al. 2009 values"""
+        answer = 0.1162**2
+        result = eq.transitDepth(0.2110*aq.R_s, 2.678*aq.R_e)
+        self.assertAlmostEqual(answer, result, 3)
 
 
 class Test_density(unittest.TestCase):
@@ -201,10 +217,13 @@ class Test_calcPeriod(unittest.TestCase):
         self.assertAlmostEqual(answer, result, 3)
 
 
-@unittest.skip("Not written")
 class Test_impactParameter(unittest.TestCase):
-    def test_works_gj1214(self):
-        assert False
+    def test_works_wasp10b(self):
+        """ Christian et al. 2009 values
+        """
+        result = eq.impactParameter(0.0369 * pq.au, 0.775 * aq.R_s, 86.9 * pq.deg)
+        answer = 0.568
+        self.assertAlmostEqual(result, answer, 1)  # error bars are 0.05/0.08
 
 
 class Test_estimateDistance(unittest.TestCase):

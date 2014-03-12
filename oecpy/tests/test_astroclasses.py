@@ -1,3 +1,7 @@
+""" Note that many tests for the astroclasses are actually done in example. This is because this file generates fake
+planets from which the tests can be ran. In future some xml could be included here for the same purpose.
+"""
+
 import unittest
 
 import numpy as np
@@ -139,9 +143,8 @@ class TestFindNearest(unittest.TestCase):
     def test_above_last_value_works(self):
         self.assertEqual(_findNearest(self.arr, 13), 12)
 
-    @unittest.skip("TestFindNearest.test_mid_value_rounded_up skipped as it rounds down but it is not an issue atm")
-    def test_mid_value_rounded_up(self):  # It isnt, but this isn't a large issue
-        self.assertEqual(_findNearest(self.arr, 10.5), 11)
+    def test_mid_value_rounded_down(self):  # Note this isn't what you may expect, but as long as we are aware of it
+        self.assertEqual(_findNearest(self.arr, 10.5), 10)
 
     def test_low_value_rounded_down(self):
         self.assertEqual(_findNearest(self.arr, 10.4), 10)
@@ -234,11 +237,27 @@ class TestSpectralType(unittest.TestCase):
         self.assertEqual(test2.classNumber, 5)
         self.assertEqual(test2.lumType, 'IV')
 
-    @unittest.skip("Not coded yet")
-    def test_works_multi_letter_class(self):
+    def test_works_2_letter_class(self):
         test2 = SpectralType('DQ6')
         self.assertEqual(test2.classLetter, 'DQ')
         self.assertEqual(test2.classNumber, 6)
+        self.assertEqual(test2.lumType, '')
+
+    def test_works_3_letter_class(self):
+        test2 = SpectralType('DAV6')
+        self.assertEqual(test2.classLetter, 'DAV')
+        self.assertEqual(test2.classNumber, 6)
+        self.assertEqual(test2.lumType, '')
+
+        test3 = SpectralType('DA6')  # check two letter still works
+        self.assertEqual(test3.classLetter, 'DA')
+        self.assertEqual(test3.classNumber, 6)
+        self.assertEqual(test3.lumType, '')
+
+    def test_fake_3_letter_fails(self):
+        test2 = SpectralType('DAX6')
+        self.assertEqual(test2.classLetter, '')
+        self.assertEqual(test2.classNumber, '')
         self.assertEqual(test2.lumType, '')
 
     def test_works_unknown_lum_class(self):
@@ -265,7 +284,7 @@ class TestSpectralType(unittest.TestCase):
 
     def test_rejects_non_standard(self):
         # TODO rewrite with a list of cases to fail and for loop
-        testStrings = ('Catac. var.', 'AM Her', 'DAZ8+dM', 'nan', np.nan)
+        testStrings = ('Catac. var.', 'AM Her', 'nan', np.nan)
 
         for testStr in testStrings:
             test1 = SpectralType(testStr)
@@ -273,6 +292,27 @@ class TestSpectralType(unittest.TestCase):
             self.assertEqual(test1.classLetter, '', 'classLetter null test for {}'.format(testStr))
             self.assertEqual(test1.classNumber, '', 'classNumber null test for {}'.format(testStr))
             self.assertEqual(test1.specType, '', 'specType null test for {}'.format(testStr))
+
+
+class TestPlanetClass(unittest.TestCase):
+
+    def test_isTransiting_is_true_if_tag_present(self):
+        planet = genExamplePlanet()
+        planet.params['istransiting'] = '1'
+        self.assertTrue(planet.isTransiting())
+
+    def test_isTransiting_fails_with_missing_tag_or_incorrect_value(self):
+        planet = genExamplePlanet()
+        planet.params['istransiting'] = '0'
+        self.assertFalse(planet.isTransiting())
+
+        planet = genExamplePlanet()
+        planet.params['istransiting'] = '2'
+        self.assertFalse(planet.isTransiting())
+
+        planet = genExamplePlanet()
+        self.assertFalse(planet.isTransiting())
+
 
 if __name__ == '__main__':
     unittest.main()
