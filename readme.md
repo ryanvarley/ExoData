@@ -126,19 +126,19 @@ Overwriting these values (or adding new ones) will change the output.
 
 Please see assumptions.py for how to do this.
 
+# OECPY Global Parameters
+A few options can be set within OECPY to change the behaviour of the program. By default if a quantity is missing for a parameter it is calculated if possible. For example if you use .a for the semi-major axis and it is not present in the catalogue it will be calculated using the period and stellar mass and returned. this happens silently except for raising the `Calculated SMA` flag. (see flags). You can turn this behaviour off by typing
+
+`oecpy.params.estimateMissingValues = False`
+
+This will only take scope in the current project so if you close the interpreter it will reset to True.
+
 # Licence
 
 Copyright (C) 2013  Ryan Varley <ryanjvarley@gmail.com>
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-any later version.
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
