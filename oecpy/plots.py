@@ -104,10 +104,10 @@ class BaseDataPerClass(GlobalFigure):
     * _getSortKey (take the planet, turn it into a key)
     """
 
-    def __init__(self, mergedResults):
+    def __init__(self, astroObjectList):
         GlobalFigure.__init__(self)
         self._classVariables()  # add info from child classes
-        self.results = mergedResults
+        self.astroObjectList = astroObjectList
         self.resultsByClass = self._processResults()
 
     def _classVariables(self):
@@ -133,27 +133,14 @@ class BaseDataPerClass(GlobalFigure):
 
         resultsByClass = self._genEmptyResults()
 
-        for _, planetResult in self.results.iteritems():
-            planet = planetResult['planet']
-
-            resResult = planetResult['resolutions']['5050303030']  # will delibrately fail if res is changed to remind me to check this.
-            # this issue being we want CC results only
-
-            sortKey = self._getSortKey(planet)
-
-            if resResult['observable_pri']:
-                resultsByClass['pri'][sortKey] += 1
-
-            if resResult['observable_sec']:
-                resultsByClass['sec'][sortKey] += 1
-
-            if resResult['rating']:
-                resultsByClass['both'][sortKey] += 1
+        for astroObject in self.astroObjectList:
+            sortKey = self._getSortKey(astroObject)
+            resultsByClass[sortKey] += 1
 
         return resultsByClass
 
-    def plotBarChart(self, prisec, title='', xlabel='', c='#3ea0e4', xticksize=8, rotation=False):
-        resultsByClass = self.resultsByClass[prisec]
+    def plotBarChart(self, title='', xlabel='', c='#3ea0e4', xticksize=8, rotation=False):
+        resultsByClass = self.resultsByClass
 
         self.setup_fig()
         ax = self.ax
@@ -193,12 +180,9 @@ class BaseDataPerClass(GlobalFigure):
         plt.xlim([min(ind)-gap, max(ind)+(gap*2)])
         plt.draw()
 
-    def saveAllBarChart(self, filepath, filename, *args, **kwargs):
-
-        for prisec in ('pri', 'sec', 'both'):
-            self.plotBarChart(prisec, *args, **kwargs)
-
-            plt.savefig(os.path.join(filepath, '{} ({}).eps'.format(filename, prisec)))
+    def saveAllBarChart(self, filepath, *args, **kwargs):
+        self.plotBarChart(*args, **kwargs)
+        plt.savefig(os.path.join(filepath))
 
     def _genEmptyResults(self):
         """ Uses allowed keys to generate a empty dict to start counting from
@@ -212,7 +196,7 @@ class BaseDataPerClass(GlobalFigure):
             keysDict[k] = 0
 
 
-        resultsByClass = {'pri': keysDict, 'sec': deepcopy(keysDict), 'both': deepcopy(keysDict)}
+        resultsByClass = keysDict
 
         return resultsByClass
 
@@ -309,10 +293,10 @@ def sortValueIntoGroup(groupKeys, groupLimits, value):
                 break
 
     if keyIndex == 0:  # below the minimum
-        raise BelowLimitsError('Value {} above limit {}'.format(value, groupLimits[-1]))
+        raise BelowLimitsError('Value {} below limit {}'.format(value, groupLimits[0]))
 
     if keyIndex is None:
-        raise AboveLimitsError('Value {} below limit {}'.format(value, groupLimits[0]))
+        raise AboveLimitsError('Value {} above limit {}'.format(value, groupLimits[-1]))
 
     return groupKeys[keyIndex-1]
 
