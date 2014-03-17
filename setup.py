@@ -31,6 +31,10 @@ def find_version(*file_paths):
 with codecs.open(os.path.join(here, 'readme.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+install_requires = ['numpy', 'quantities']
+if sys.hexversion < 0x02070000:
+    install_requires.append('unittest2')
+
 setup(
     name="OECPy",
     version=find_version('oecpy', '__init__.py'),
@@ -53,6 +57,7 @@ setup(
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 2.6',
     ],
 
     # What does your project relate to?
@@ -64,7 +69,7 @@ setup(
 
     # List run-time dependencies here.  These will be installed by pip when your
     # project is installed.
-    install_requires = ['numpy', 'quantities'],
+    install_requires = install_requires,
 
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these

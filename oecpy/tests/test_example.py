@@ -1,7 +1,11 @@
 """ These test check the example system is working correctly but also that paramters are formated correctly with the
 right units.
 """
-import unittest
+import sys
+if sys.hexversion < 0x02070000:
+    import unittest2 as unittest
+else:
+    import unittest
 import quantities as pq
 
 from ..example import genExamplePlanet, examplePlanet, exampleSystem, exampleStar

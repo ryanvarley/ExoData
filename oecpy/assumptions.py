@@ -114,7 +114,7 @@ def planetType(temperature, mass, radius):
     else:
         return None
 
-    return '{} {}'.format(planetTempType(temperature), sizeType)
+    return '{0} {1}'.format(planetTempType(temperature), sizeType)
 
 
 def planetMu(sizeType):

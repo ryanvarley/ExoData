@@ -24,7 +24,7 @@ def genExampleSystem():
 
 def genExampleBinary():
     binaryPar = BinaryParameters()
-    binaryPar.addParam('name', 'Example Binary {}AB'.format(ac._ExampleSystemCount))
+    binaryPar.addParam('name', 'Example Binary {0}AB'.format(ac._ExampleSystemCount))
     binaryPar.addParam('semimajoraxis', 10)  # TODO add realistic value
     binaryPar.addParam('period', 10)  # TODO add realistic value
     # TODO add the rest of binary parameters
@@ -58,8 +58,8 @@ def genExampleStar(binaryLetter='', heirarchy=True):
     starPar.addParam('magV', '9.0')
     starPar.addParam('mass', '0.98')
     starPar.addParam('metallicity', '0.43')
-    starPar.addParam('name', 'Example Star {}{}'.format(ac._ExampleSystemCount, binaryLetter))
-    starPar.addParam('name', 'HD {}{}'.format(ac._ExampleSystemCount, binaryLetter))
+    starPar.addParam('name', 'Example Star {0}{1}'.format(ac._ExampleSystemCount, binaryLetter))
+    starPar.addParam('name', 'HD {0}{1}'.format(ac._ExampleSystemCount, binaryLetter))
     starPar.addParam('radius', '0.95')
     starPar.addParam('spectraltype', 'G5')
     starPar.addParam('temperature', '5370')
@@ -92,7 +92,7 @@ def genExamplePlanet(binaryLetter=''):
     planetPar.addParam('inclination', '89.2')
     planetPar.addParam('lastupdate', '12/12/08')
     planetPar.addParam('mass', '3.9')
-    planetPar.addParam('name', 'Example Star {}{} b'.format(ac._ExampleSystemCount, binaryLetter))
+    planetPar.addParam('name', 'Example Star {0}{1} b'.format(ac._ExampleSystemCount, binaryLetter))
     planetPar.addParam('period', '111.2')
     planetPar.addParam('radius', '0.92')
     planetPar.addParam('semimajoraxis', '0.449')
