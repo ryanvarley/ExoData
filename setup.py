@@ -2,11 +2,6 @@ from setuptools import setup
 import codecs
 import os
 import re
-import sys
-
-kw = {}
-if sys.version_info >= (3,):
-    kw['use_2to3'] = True
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -72,6 +67,4 @@ setup(
     include_package_data=True,
     zip_safe=False,
     test_suite = 'oecpy.tests.testsuite',
-
-    **kw
 )
