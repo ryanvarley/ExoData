@@ -1,10 +1,10 @@
 import unittest
-from collections import OrderedDict
 
 import numpy as np
+import quantities as pq
 
 from ..example import genExamplePlanet
-from ..plots import DataPerParameterBin
+from ..plots import DataPerParameterBin, GeneralPlotter
 from .. import astroquantities as aq
 
 
@@ -37,3 +37,41 @@ class Test_DataPerParameterBin(unittest.TestCase):
 
         answer = {'<0': 3, '0 to 5': 2, '5+': 4, 'Uncertain': 1}
         self.assertDictEqual(answer, data._processResults())
+
+
+def generate_list_of_planets(number):
+    planetList = []
+    for i in range(number):
+        planetList.append(genExamplePlanet())
+    return planetList
+
+
+class Test_GeneralPlotter(unittest.TestCase):
+
+    def test__init__(self):
+        x = GeneralPlotter(generate_list_of_planets(3))
+
+    def test_set_axis_with_variables(self):
+        planetlist = generate_list_of_planets(3)
+        radiusValues = (5*aq.R_j, 10*aq.R_j, 15*aq.R_j)
+
+        for i, radius in enumerate(radiusValues):
+            planetlist[i].params['radius'] = radius
+
+        fig = GeneralPlotter(planetlist)
+        self.assertItemsEqual(fig._set_axis('R'), radiusValues)
+
+    def test_set_axis_with_functions(self):
+        planetlist = generate_list_of_planets(3)
+        radiusValues = (5*aq.R_j, 10*aq.R_j, 15*aq.R_j)
+
+        for i, radius in enumerate(radiusValues):
+            planetlist[i].params['radius'] = radius
+
+        fig = GeneralPlotter(planetlist)
+        results = fig._set_axis('calcDensity()')
+        answer = (0.04138 * pq.g/pq.cm**3, 0.00517 * pq.g/pq.cm**3, 0.00153 * pq.g/pq.cm**3)
+
+        self.assertEqual(len(results), len(answer))
+        for i, result in enumerate(results):
+            self.assertAlmostEqual(result, answer[i], 4)

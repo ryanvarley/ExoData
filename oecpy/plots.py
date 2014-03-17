@@ -263,6 +263,76 @@ class DataPerParameterBin(BaseDataPerClass):
         self._allowedKeys = allowedKeys
 
 
+class GeneralPlotter(GlobalFigure):
+    """ This class should be able to create a plot with lots of options like the online visual plots. In future it
+    should be turned into a GUI
+    """
+
+    def __init__(self, objectList, xaxis=None, yaxis=None):
+        """
+        :param objectList: list of astro objects to use in plot ie planets, stars etc
+        :param xaxis: value to use on the xaxis, should be a variable or function of the objects in objectList. ie 'R'
+            for the radius variable and 'calcDensity()' for the calcDensity function
+        :param yaxis: value to use on the yaxis, should be a variable or function of the objects in objectList. ie 'R'
+            for the radius variable and 'calcDensity()' for the calcDensity function
+
+        :type objectList: list, tuple
+        :type xaxis: str
+        :type yaxis: str
+        """
+        GlobalFigure.__init__(self)
+
+        self.objectList = objectList  # list of planets, stars etc
+
+        if xaxis:
+            self.set_xaxis(xaxis)
+        else:
+            self.xaxis = None
+
+        if yaxis:
+            self.set_yaxis(yaxis)
+        else:
+            self.yaxis = None
+
+    def plot(self):
+        xaxis = self.xaxis
+        yaxis = self.yaxis
+
+        assert(len(xaxis) == len(yaxis))
+
+        plt.scatter(xaxis, yaxis)
+
+    def _set_axis(self, param):
+        """ this should take a variable or a function and turn it into a list by evaluating on each planet
+        """
+        return [eval('astroObject.{}'.format(param)) for astroObject in self.objectList]
+
+    def set_xaxis(self, param):
+        """ Sets the value of use on the x axis
+        :param param: value to use on the xaxis, should be a variable or function of the objects in objectList. ie 'R'
+        for the radius variable and 'calcDensity()' for the calcDensity function
+        """
+        self.xaxis = self._set_axis(param)
+
+    def set_yaxis(self, param):
+        """ Sets the value of use on the yaxis
+        :param param: value to use on the yaxis, should be a variable or function of the objects in objectList. ie 'R'
+        for the radius variable and 'calcDensity()' for the calcDensity function
+        """
+        self.yaxis = self._set_axis(param)
+
+    def set_y_axis_log(self, logscale=True):
+        # TODO write code and include code to modify labels
+        pass
+
+    def set_x_axis_log(self, logscale=True):
+        pass
+
+    def set_marker_color(self):
+        # TODO allow a single colour or colour set per another variable
+        pass
+
+
 def sortValueIntoGroup(groupKeys, groupLimits, value):
     """ returns the Key of the group a value belongs to
     :param groupKeys: a list/tuple of keys ie ['1-3', '3-5', '5-8', '8-10', '10+']
