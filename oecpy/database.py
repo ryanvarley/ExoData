@@ -5,7 +5,7 @@ import re
 import xml.etree.ElementTree as ET
 import glob
 
-from astroclasses import System, Binary, Star, Planet, Parameters, BinaryParameters, StarParameters, PlanetParameters
+from .astroclasses import System, Binary, Star, Planet, Parameters, BinaryParameters, StarParameters, PlanetParameters
 
 compactString = lambda string: string.replace(' ', '').replace('-', '').lower()
 
@@ -24,8 +24,8 @@ class OECDatabase(object):
 
         self._loadDatabase(databaseLocation)
         self._planetSearchDict = self._generatePlanetSearchDict()
-        self.systemDict = {system.name: system for system in self.systems}
-        self.planetDict = {planet.name: planet for planet in self.planets}
+        self.systemDict = dict((system.name, system) for system in self.systems)
+        self.planetDict = dict((planet.name, planet) for planet in self.planets)
 
     def searchPlanet(self, name):
         """ Searches the database for a planet. Input can be complete ie GJ1214b, alternate name variations or even
@@ -105,7 +105,7 @@ class OECDatabase(object):
 
             # Process the system
             if not root.tag == 'system':
-                raise LoadDataBaseError('file {} does not contain a valid system - could be an error with your version'
+                raise LoadDataBaseError('file {0} does not contain a valid system - could be an error with your version'
                                         ' of the catalogue'.format(filename))
 
             systemParams = Parameters()

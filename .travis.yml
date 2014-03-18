@@ -3,7 +3,9 @@ language: python
 install: "pip install -r requirements.txt --use-mirrors"
 
 python:
+  - "2.6"
   - "2.7"
+  - "3.3"
 
 script:
-    - python setup.py test
+  - python setup.py test

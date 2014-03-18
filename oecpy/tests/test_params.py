@@ -1,16 +1,20 @@
 """ this includes code to check the params act globally over all modules as we expect, we don't really care about values
 here. just that the calculation is performed.
 """
-
-import unittest
+import sys
+if sys.hexversion < 0x02070000:
+    import unittest2 as unittest
+else:
+    import unittest
 import quantities as pq
 import numpy as np
 
 from .. import params
 from .. import example as ex
+from .patches import TestCase
 
 
-class estimateMissingValues(unittest.TestCase):
+class estimateMissingValues(TestCase):
 
     def tearDown(self):
         """ reset back to default after
