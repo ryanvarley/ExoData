@@ -9,7 +9,7 @@ If anyone has a good solution to this issue, please create it in a fork or email
 import numpy as np
 
 import quantities as pq
-import astroquantities as aq
+from . import astroquantities as aq
 
 # TODO open an issue about this module for community discussion
 
@@ -114,7 +114,7 @@ def planetType(temperature, mass, radius):
     else:
         return None
 
-    return '{} {}'.format(planetTempType(temperature), sizeType)
+    return '{0} {1}'.format(planetTempType(temperature), sizeType)
 
 
 def planetMu(sizeType):

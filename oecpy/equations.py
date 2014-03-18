@@ -21,12 +21,14 @@ from numpy import sqrt, arcsin, sin, cos, log10, nan
 
 import numpy as np
 import os
+import sys
 from pkg_resources import resource_stream, resource_filename
+import math
 
 import quantities as pq
 import quantities.constants as const
-import astroquantities as aq
-import math
+from . import astroquantities as aq
+
 
 pi = const.pi
 sigma = const.Stefan_Boltzmann_constant
@@ -348,11 +350,15 @@ def _createAbsMagEstimationDict():
     creates a dict in the form [Classletter][ClassNumber][List of values for each L Class]
     """
     magnitude_estimation_filepath = resource_filename(__name__, 'data/magnitude_estimation.dat')
-    raw_table = np.loadtxt(magnitude_estimation_filepath, 'string')
+    raw_table = np.loadtxt(magnitude_estimation_filepath, '|S5')
 
     absMagDict = {'O': {}, 'B': {}, 'A': {}, 'F': {}, 'G': {}, 'K': {}, 'M': {}}
     for row in raw_table:
-        absMagDict[row[0][0]][int(row[0][1])] = [float(x) for x in row[1:]]  # dict of spectral type = {abs mag for each luminosity class}
+        if sys.hexversion >= 0x03000000:
+            starClass = row[0].decode("utf-8")  # otherwise we get byte ints or b' caused by 2to3
+            absMagDict[starClass[0]][int(starClass[1])] = [float(x) for x in row[1:]]
+        else:
+            absMagDict[row[0][0]][int(row[0][1])] = [float(x) for x in row[1:]]  # dict of spectral type = {abs mag for each luminosity class}
 
     # manually typed from table headers - used to match columns with the L class (header)
     LClassRef = {'V': 0, 'IV': 1, 'III': 2, 'II': 3, 'Ib': 4, 'Iab': 5, 'Ia': 6, 'Ia0': 7}
@@ -366,7 +372,7 @@ def estimateAbsoluteMagnitude(spectralType):
     """ Uses the spectral type to lookup an aproximate absolute magnitude for the star.
     """
 
-    from astroclasses import SpectralType
+    from .astroclasses import SpectralType
 
     specType = SpectralType(spectralType)
 
@@ -384,11 +390,11 @@ def estimateAbsoluteMagnitude(spectralType):
 
     try:
         return absMagDict[classLet][classNum][LNum]
-    except KeyError:  # value not in table. Assume the number isn't there
+    except (KeyError, IndexError):  # value not in table. Assume the number isn't there (Key p2.7, Ind p3+)
         try:
             classLookup = absMagDict[classLet]
-            values = np.array(classLookup.values())[:, LNum]  # only select the right L Type
-            return np.interp(classNum, classLookup.keys(), values)
+            values = np.array(list(classLookup.values()))[:, LNum]  # only select the right L Type
+            return np.interp(classNum, list(classLookup.keys()), values)
         except (KeyError, ValueError):
             return np.nan  # class not covered in table
 
@@ -397,11 +403,17 @@ def _createMagConversionDict():
     """ loads magnitude_conversion.dat which is table A% 1995ApJS..101..117K
     """
     magnitude_conversion_filepath = resource_stream(__name__, 'data/magnitude_conversion.dat')
-    raw_table = np.loadtxt(magnitude_conversion_filepath, 'string')
+    raw_table = np.loadtxt(magnitude_conversion_filepath, '|S5')
 
     magDict = {}
     for row in raw_table:
-        magDict[row[1]] = row[3:]
+        if sys.hexversion >= 0x03000000:
+            starClass = row[1].decode("utf-8")  # otherwise we get byte ints or b' caused by 2to3
+            tableData = [x.decode("utf-8") for x in row[3:]]
+        else:
+            starClass = row[1]
+            tableData = row[3:]
+        magDict[starClass] = tableData
 
     return magDict
 

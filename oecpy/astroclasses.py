@@ -6,11 +6,11 @@ from pkg_resources import resource_stream
 
 import quantities as pq
 
-import equations as eq
-import astroquantities as aq
-import assumptions as assum
-import flags
-import params
+from . import equations as eq
+from . import astroquantities as aq
+from . import assumptions as assum
+from . import flags
+from . import params
 
 
 class baseObject(object):
@@ -43,7 +43,7 @@ class baseObject(object):
             if not startClass:  # reached system with no hits
                 raise AttributeError
         except AttributeError:  # i.e calling binary on an object without one
-                raise HierarchyError('This object has no {} as a parent object'.format(parentClass))
+                raise HierarchyError('This object has no {0} as a parent object'.format(parentClass))
 
         if startClass.classType == parentClass:
             return startClass
@@ -63,7 +63,7 @@ class baseObject(object):
             return 'Un-named ' + self.classType
 
     def __repr__(self):
-        return '{}({!r})'.format(self.classType, self.name)
+        return '{0}({1!r})'.format(self.classType, self.name)
 
     def getParam(self, paramKey):
         """ Fetches a parameter from the params dictionary. If it's not there it will return NaN. This allows the use
@@ -368,7 +368,7 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
         coeffTable = np.loadtxt(quadratic_filepath)
 
         foundValues = False
-        for i in xrange(len(coeffTable)):
+        for i in range(len(coeffTable)):
             if coeffTable[i, 2] == lgselect and coeffTable[i, 3] == tempselect and coeffTable[i, 4] == mhselect:
                 if coeffTable[i, 0] == 1:
                     u1array = coeffTable[i, 8:]  # Limb darkening parameter u1 for each wl in waveind
@@ -588,7 +588,7 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
                     name = self.params['name']
                 except KeyError:
                     name = 'Unnamed'
-                print 'rejected duplicate {}: {} in {}'.format(key, value, name)  # TODO: log rejected value
+                print('rejected duplicate {0}: {1} in {2}'.format(key, value, name))  # TODO: log rejected value
                 return False  # TODO Replace with exception
 
         else:  # If the key dosnt already exist and isn't rejected
@@ -607,7 +607,7 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
                 try:
                     value = float(value) * self._defaultUnits[key]
                 except:
-                    print 'caught an error with {} - {}'.format(key, value)
+                    print('caught an error with {0} - {1}'.format(key, value))
             self.params[key] = value
 
 
@@ -755,7 +755,7 @@ class SpectralType(object):
                     if int(number) in possNumbers:
                         decimalNumbers += number
                     else:
-                        print ('Something went wrong in decimal checking') # TODO replace with logging
+                        print('Something went wrong in decimal checking') # TODO replace with logging
                         return False # somethings gone wrong
                 except ValueError:
                     break  # recevied a non-number (probably L class)
