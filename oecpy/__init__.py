@@ -1,7 +1,7 @@
 """
 Help?
 """
-__version__ = '1.0b1.3'
+__version__ = '1.0b1.3.1'
 
 import sys
 
