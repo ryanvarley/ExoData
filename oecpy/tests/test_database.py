@@ -7,9 +7,10 @@ from tempfile import mkdtemp, mkstemp
 import shutil
 
 from ..database import OECDatabase, LoadDataBaseError
+from .patches import TestCase
 
 
-class TestDataBaseLoading(unittest.TestCase):
+class TestDataBaseLoading(TestCase):
 
     def setUp(self):
         # create temp dir
@@ -45,7 +46,7 @@ class TestDataBaseLoading(unittest.TestCase):
         ]
 
         for systems in xmlCases:
-            with open(mkstemp('.xml', dir=self.tempDir)[1], 'wb') as f:
+            with open(mkstemp('.xml', dir=self.tempDir)[1], 'w') as f:
                 f.write(systems)
 
     def test_correct_system_number(self):
@@ -99,7 +100,7 @@ class TestDataBaseLoading(unittest.TestCase):
         shutil.rmtree(self.tempDir)
 
 
-class TestDataBaseFailing(unittest.TestCase):
+class TestDataBaseFailing(TestCase):
 
     def setUp(self):
         self.tempDir = mkdtemp()
@@ -117,7 +118,7 @@ class TestDataBaseFailing(unittest.TestCase):
         ]
 
         for systems in xmlCases:
-            with open(mkstemp('.xml', dir=self.tempDir)[1], 'wb') as f:
+            with open(mkstemp('.xml', dir=self.tempDir)[1], 'w') as f:
                 f.write(systems)
 
         with self.assertRaises(LoadDataBaseError):

@@ -5,7 +5,7 @@ import re
 import xml.etree.ElementTree as ET
 import glob
 
-from astroclasses import System, Binary, Star, Planet, Parameters, BinaryParameters, StarParameters, PlanetParameters
+from .astroclasses import System, Binary, Star, Planet, Parameters, BinaryParameters, StarParameters, PlanetParameters
 
 compactString = lambda string: string.replace(' ', '').replace('-', '').lower()
 

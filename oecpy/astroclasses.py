@@ -6,11 +6,11 @@ from pkg_resources import resource_stream
 
 import quantities as pq
 
-import equations as eq
-import astroquantities as aq
-import assumptions as assum
-import flags
-import params
+from . import equations as eq
+from . import astroquantities as aq
+from . import assumptions as assum
+from . import flags
+from . import params
 
 
 class baseObject(object):
@@ -368,7 +368,7 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
         coeffTable = np.loadtxt(quadratic_filepath)
 
         foundValues = False
-        for i in xrange(len(coeffTable)):
+        for i in range(len(coeffTable)):
             if coeffTable[i, 2] == lgselect and coeffTable[i, 3] == tempselect and coeffTable[i, 4] == mhselect:
                 if coeffTable[i, 0] == 1:
                     u1array = coeffTable[i, 8:]  # Limb darkening parameter u1 for each wl in waveind

@@ -4,8 +4,8 @@
 # I am making a make system so that unit tests in EASE can load fake targets that will stay constant for the tests
 # Due to its wider applicability im putting these here
 
-from astroclasses import Planet, Star, Binary, System, Parameters, PlanetParameters, StarParameters, BinaryParameters
-import astroclasses as ac
+from .astroclasses import Planet, Star, Binary, System, Parameters, PlanetParameters, StarParameters, BinaryParameters
+from . import astroclasses as ac
 
 
 def genExampleSystem():

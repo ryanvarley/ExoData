@@ -6,12 +6,12 @@ __version__ = '1.0b1.2'
 import sys
 
 # Import package modules
-import assumptions, astroclasses, astroquantities, equations, example, flags
+from . import assumptions, astroclasses, astroquantities, equations, example, flags
 # import OEC database
-from database import OECDatabase
+from .database import OECDatabase
 
 
-def tests():
+def test():
     if sys.hexversion < 0x02070000:
         import unittest2 as unittest
     else:

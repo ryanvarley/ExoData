@@ -11,11 +11,12 @@ import quantities as pq
 from ..example import genExamplePlanet, examplePlanet, exampleSystem, exampleStar
 from .. import astroquantities as aq
 from .. import astroclasses as ac
+from .patches import TestCase
 
 secondExamplePlanet = genExamplePlanet()
 
 
-class TestExampleInstances(unittest.TestCase):
+class TestExampleInstances(TestCase):
 
     def setUp(self):  # setup runs before each test!
         ac._ExampleSystemCount = 1
@@ -107,7 +108,7 @@ class TestExampleInstances(unittest.TestCase):
         self.assertEqual(planet1.R, 0.92 * aq.R_j)
 
 
-class TestExampleInstancesWithBinary(unittest.TestCase):
+class TestExampleInstancesWithBinary(TestCase):
 
     def setUp(self):  # setup runs before each test!
         ac._ExampleSystemCount = 2

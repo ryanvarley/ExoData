@@ -4,8 +4,10 @@ if sys.hexversion < 0x02070000:
 else:
     import unittest
 
+from .patches import TestCase
 
-class Test_planetAssumptions(unittest.TestCase):
+
+class Test_planetAssumptions(TestCase):
 
     def test_MassType(self):
 

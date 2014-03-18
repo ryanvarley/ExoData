@@ -13,9 +13,10 @@ import quantities as pq
 
 from ..astroclasses import Parameters, Star, Planet, Binary, System, _findNearest, SpectralType
 from ..example import genExamplePlanet, examplePlanet
+from .patches import TestCase
 
 
-class TestListFiles(unittest.TestCase):
+class TestListFiles(TestCase):
 
     def create_Parameter_object(self):
 

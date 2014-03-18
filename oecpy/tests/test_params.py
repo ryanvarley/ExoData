@@ -11,9 +11,10 @@ import numpy as np
 
 from .. import params
 from .. import example as ex
+from .patches import TestCase
 
 
-class estimateMissingValues(unittest.TestCase):
+class estimateMissingValues(TestCase):
 
     def tearDown(self):
         """ reset back to default after

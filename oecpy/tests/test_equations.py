@@ -13,9 +13,10 @@ from ..equations import scaleHeight, meanPlanetTemp, starLuminosity, ratioTermin
     estimateDistance, estimateAbsoluteMagnitude
 
 from .. import equations as eq
+from .patches import TestCase
 
 
-class Test_scaleHeight(unittest.TestCase):
+class Test_scaleHeight(TestCase):
     def test_works_earth(self):
 
         mu_p = 28.964 * pq.u
@@ -28,7 +29,7 @@ class Test_scaleHeight(unittest.TestCase):
         self.assertAlmostEqual(answer, result, 2)
 
 
-class Test_meanPlanetTemp(unittest.TestCase):
+class Test_meanPlanetTemp(TestCase):
     def test_works_mars(self):
 
         a = 1.524 * pq.au
@@ -42,7 +43,7 @@ class Test_meanPlanetTemp(unittest.TestCase):
         self.assertAlmostEqual(answer, result, 1)
 
 
-class Test_starLuminosity(unittest.TestCase):
+class Test_starLuminosity(TestCase):
     def test_works_sun(self):
 
         R_s = 1 * aq.R_s
@@ -54,7 +55,7 @@ class Test_starLuminosity(unittest.TestCase):
         self.assertAlmostEqual(answer, result, delta=0.0001e27)
 
 
-class Test_ratioTerminatorToStar(unittest.TestCase):
+class Test_ratioTerminatorToStar(TestCase):
     def test_works_earth(self):
 
         H_p = 8500 * pq.m
@@ -67,7 +68,7 @@ class Test_ratioTerminatorToStar(unittest.TestCase):
         self.assertTrue(answer - result < 0.001)
 
 
-class Test_SNRPlanet(unittest.TestCase):
+class Test_SNRPlanet(TestCase):
     def test_works(self):
 
         params = {'SNRStar': 400,
@@ -83,7 +84,7 @@ class Test_SNRPlanet(unittest.TestCase):
         self.assertAlmostEqual(answer, result, 5)
 
 
-class Test_surfaceGravity(unittest.TestCase):
+class Test_surfaceGravity(TestCase):
     def test_works_earth(self):
 
         R_p = 1 * aq.R_e
@@ -95,7 +96,7 @@ class Test_surfaceGravity(unittest.TestCase):
         self.assertAlmostEqual(answer, result, 2)
 
 
-class Test_transitDuration(unittest.TestCase):
+class Test_transitDuration(TestCase):
     def test_works_gj1214(self):
 
         R_p = 0.02 * aq.R_j
@@ -110,7 +111,7 @@ class Test_transitDuration(unittest.TestCase):
         self.assertAlmostEqual(answer, result, 3)
 
 
-class Test_logg(unittest.TestCase):
+class Test_logg(TestCase):
     def test_works_wasp10(self):
         """ Christian et al. 2009 values
         """
@@ -120,7 +121,7 @@ class Test_logg(unittest.TestCase):
         self.assertAlmostEqual(answer, result, 1)
 
 
-class Test_starTemperature(unittest.TestCase):
+class Test_starTemperature(TestCase):
 
     def test_works_sun(self):
         answer = 5800 * pq.K
@@ -135,7 +136,7 @@ class Test_starTemperature(unittest.TestCase):
         self.assertTrue(result-answer < 300)
 
 
-class Test_transitDepth(unittest.TestCase):
+class Test_transitDepth(TestCase):
     def test_works_gj1214(self):
         """Charbonneau et. al. 2009 values"""
         answer = 0.1162**2
@@ -143,7 +144,7 @@ class Test_transitDepth(unittest.TestCase):
         self.assertAlmostEqual(answer, result, 3)
 
 
-class Test_density(unittest.TestCase):
+class Test_density(TestCase):
     def test_works_water(self):  # Doesnt work as its not a sphere
 
         M = 1 * pq.kg
@@ -165,7 +166,7 @@ class Test_density(unittest.TestCase):
         self.assertAlmostEqual(answer, result, 3)
 
 
-class Test_estimateMass(unittest.TestCase):
+class Test_estimateMass(TestCase):
     def test_works_jupiter(self):
 
         R = 6.9911 * (10**7) * pq.m
@@ -178,12 +179,12 @@ class Test_estimateMass(unittest.TestCase):
 
 
 @unittest.skip("Not written")
-class Test_estimateStellarMass(unittest.TestCase):
+class Test_estimateStellarMass(TestCase):
     def test_works_gj1214(self):
         assert False
 
 
-class Test_calcSemiMajorAxis(unittest.TestCase):
+class Test_calcSemiMajorAxis(TestCase):
     def test_works_earth(self):
 
         M_s = aq.M_s
@@ -195,7 +196,7 @@ class Test_calcSemiMajorAxis(unittest.TestCase):
         self.assertAlmostEqual(answer, result, 3)
 
 
-class Test_calcSemiMajorAxis2(unittest.TestCase):
+class Test_calcSemiMajorAxis2(TestCase):
     def test_works_gj1214(self):
 
         T_p = 520 * pq.K
@@ -209,7 +210,7 @@ class Test_calcSemiMajorAxis2(unittest.TestCase):
         self.assertAlmostEqual(answer, result, 3)
 
 
-class Test_calcPeriod(unittest.TestCase):
+class Test_calcPeriod(TestCase):
     def test_works_gj1214(self):
 
         a = 0.014 * pq.au
@@ -221,7 +222,7 @@ class Test_calcPeriod(unittest.TestCase):
         self.assertAlmostEqual(answer, result, 3)
 
 
-class Test_impactParameter(unittest.TestCase):
+class Test_impactParameter(TestCase):
     def test_works_wasp10b(self):
         """ Christian et al. 2009 values
         """
@@ -230,7 +231,7 @@ class Test_impactParameter(unittest.TestCase):
         self.assertAlmostEqual(result, answer, 1)  # error bars are 0.05/0.08
 
 
-class Test_estimateDistance(unittest.TestCase):
+class Test_estimateDistance(TestCase):
     def test_works_online_example(self):
 
         m = 14
@@ -242,7 +243,7 @@ class Test_estimateDistance(unittest.TestCase):
         self.assertAlmostEqual(answer, result, 1)
 
 
-class Test_createAbsMagEstimationDict(unittest.TestCase):
+class Test_createAbsMagEstimationDict(TestCase):
 
     def test_works(self):
         magTable, LClassRef = eq._createAbsMagEstimationDict()
@@ -252,7 +253,7 @@ class Test_createAbsMagEstimationDict(unittest.TestCase):
         self.assertTrue(math.isnan(magTable['A'][7][LClassRef['Iab']]))
 
 
-class Test_estimateAbsoluteMagnitude(unittest.TestCase):
+class Test_estimateAbsoluteMagnitude(TestCase):
 
     def test_works_no_interp(self):
         self.assertEqual(estimateAbsoluteMagnitude('O9'), -4.5)
@@ -276,7 +277,7 @@ class Test_estimateAbsoluteMagnitude(unittest.TestCase):
         self.assertEqual(estimateAbsoluteMagnitude('F2Ia'), -8.0)
 
 
-class Test_createMagConversionDict(unittest.TestCase):
+class Test_createMagConversionDict(TestCase):
 
     def test_works(self):
         magTable = eq._createMagConversionDict()
@@ -286,7 +287,7 @@ class Test_createMagConversionDict(unittest.TestCase):
         self.assertEqual(magTable['M6'][14], 'nan')
 
 
-class Test_MagConversion(unittest.TestCase):
+class Test_MagConversion(TestCase):
 
     def test_magKtoMagV_works(self):
         self.assertAlmostEqual(eq.magKtoMagV('F2', 8.66), 9.48, 2)

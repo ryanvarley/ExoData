@@ -3,9 +3,10 @@ import codecs
 import os
 import re
 import sys
+import multiprocessing  # stops exit fail on setup.py test
 
 kw = {}
-if sys.version_info >= (3,):
+if sys.hexversion >= 0x03000000:
     kw['use_2to3'] = True
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -31,9 +32,16 @@ def find_version(*file_paths):
 with codecs.open(os.path.join(here, 'readme.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-install_requires = ['numpy', 'quantities']
+install_requires = ['numpy', 'quantities', 'nose>=1.0']
 if sys.hexversion < 0x02070000:
     install_requires.append('unittest2')
+
+
+if sys.hexversion < 0x02070000:
+    test_suite = 'oecpy.tests.testsuite'  # otherwise skiptests dont work with 2.6, TODO plugin?
+else:
+    test_suite = 'nose.collector'
+
 
 setup(
     name="OECPy",
@@ -56,6 +64,7 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
+        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 2.6',
     ],
@@ -76,7 +85,7 @@ setup(
     # have to be included in MANIFEST.in as well.
     include_package_data=True,
     zip_safe=False,
-    test_suite = 'oecpy.tests.testsuite',
+    test_suite = test_suite,
 
     **kw
 )
