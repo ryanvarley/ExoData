@@ -2,16 +2,21 @@
 planets from which the tests can be ran. In future some xml could be included here for the same purpose.
 """
 
-import unittest
+import sys
+if sys.hexversion < 0x02070000:
+    import unittest2 as unittest
+else:
+    import unittest
 
 import numpy as np
 import quantities as pq
 
 from ..astroclasses import Parameters, Star, Planet, Binary, System, _findNearest, SpectralType
 from ..example import genExamplePlanet, examplePlanet
+from .patches import TestCase
 
 
-class TestListFiles(unittest.TestCase):
+class TestListFiles(TestCase):
 
     def create_Parameter_object(self):
 
@@ -288,10 +293,10 @@ class TestSpectralType(unittest.TestCase):
 
         for testStr in testStrings:
             test1 = SpectralType(testStr)
-            self.assertEqual(test1.lumType, '', 'lumType null test for {}'.format(testStr))
-            self.assertEqual(test1.classLetter, '', 'classLetter null test for {}'.format(testStr))
-            self.assertEqual(test1.classNumber, '', 'classNumber null test for {}'.format(testStr))
-            self.assertEqual(test1.specType, '', 'specType null test for {}'.format(testStr))
+            self.assertEqual(test1.lumType, '', 'lumType null test for {0}'.format(testStr))
+            self.assertEqual(test1.classLetter, '', 'classLetter null test for {0}'.format(testStr))
+            self.assertEqual(test1.classNumber, '', 'classNumber null test for {0}'.format(testStr))
+            self.assertEqual(test1.specType, '', 'specType null test for {0}'.format(testStr))
 
 
 class TestPlanetClass(unittest.TestCase):

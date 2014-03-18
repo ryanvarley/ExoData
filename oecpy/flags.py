@@ -27,7 +27,7 @@ class Flag(object):  # or tags? or lists?
 
     def __repr__(self):
 
-        return 'Flags({})'.format(self.__str__())
+        return 'Flags({0})'.format(self.__str__())
 
     def __str__(self):
 

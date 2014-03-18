@@ -17,7 +17,7 @@ This module depends on
 * [numpy](http://www.numpy.org/)
 * [Open Exoplanet Catalogue](https://github.com/hannorein/open_exoplanet_catalogue) (somewhere on your system)
 
-**Currently only tested under Python 2.7 on mac**. If you use a different OS or python version try it anyway and open an issue if you encounter problems. Linux should be fine but windows may have some issues.
+**Currently only tested under Python 2.6, 2.7, 3.3 on mac and linux**. If you use windows or a different python version try it anyway and open an issue if you encounter problems.
 
 Easiest way
 
