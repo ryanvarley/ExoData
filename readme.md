@@ -136,18 +136,17 @@ This will only take scope in the current project so if you close the interpreter
 # Plotting
 OECPy features a plotting library for planet and stellar parameters in a scatter plot and per parameter bin. Please see the plots section of the documentation for further information.
 
-## Examples ##
 ### Planet Mass with Planet Radius ###
-`genplot = oecpy.plots.GeneralPlotter(exocat.planets, 'R', 'M')`
-![Planet Mass with Planet Radius](https://www.dropbox.com/s/hedfzvyxeuiuk7c/oecpy-planet-mass-radius.png "Plot")
+`oecpy.plots.GeneralPlotter(exocat.planets, 'R', 'M', yaxislog=True).plot()`
+![Planet Mass with Planet Radius](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-planet-mass-radius.png "Planet Mass with Planet Radius Plot")
 
-Stellar V Magnitude with Planet Radius
-`oecpy.plots.GeneralPlotter(exocat.planets, 'R', 'star.magV', xunit=aq.R_e, xaxislog=True)`
-![Stellar V Magnitude with Planet Radius](https://www.dropbox.com/s/mp8k6arcannr30p/oecpy-vmag-planetradius.png "Plot")
+### Stellar V Magnitude with Planet Radius ###
+`oecpy.plots.GeneralPlotter(exocat.planets, 'R', 'star.magV', xunit=aq.R_e, xaxislog=True).plot()`
+![Stellar V Magnitude with Planet Radius](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-vmag-planetradius.png "Stellar V Magnitude with Planet Radius Plot")
 
-Planet Eccentricity
+### Planet Eccentricity ###
 `oecpy.plots.DataPerParameterBin(exocat.planets, 'e', (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotBarChart()`
-![Planet Eccentricity](https://www.dropbox.com/s/ayw2welto6xxsyz/oecpy-orbital-eccentricity.png "Plot")
+![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-orbital-eccentricity.png "Planet Eccentricity Plot")
 
 # Licence
 
