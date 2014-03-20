@@ -1,14 +1,21 @@
 """ This module contains some plotting functions and plot types for easy plot creation
 """
-
-from collections import OrderedDict
 import os
-from copy import deepcopy
+import math
 
+import quantities as pq
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import rcParams, ticker
-from matplotlib.ticker import ScalarFormatter
+from matplotlib import rcParams
+
+from . import astroquantities as aq
+from . import astroclasses as ac
+
+import sys
+if sys.hexversion < 0x02070000:
+    from ordereddict import OrderedDict
+else:
+    from collections import OrderedDict
 
 rcParams.update({'figure.autolayout': True})
 
@@ -97,17 +104,90 @@ class GlobalFigure(object):
 
          plt.draw()
 
+    def set_y_axis_log(self, logscale=True):
+        if logscale:
+            self.ax.set_yscale('log')
+        else:
+            self.ax.set_yscale('linear')
 
-class BaseDataPerClass(GlobalFigure):
+    def set_x_axis_log(self, logscale=True):
+        if logscale:
+            self.ax.set_xscale('log')
+        else:
+            self.ax.set_xscale('linear')
+
+
+class _AstroObjectFigs(GlobalFigure):
+    """ contains extra functions for dealing with input of astro objects
+    """
+
+    def __init__(self, objectList):
+        GlobalFigure.__init__(self)
+        self.objectList = objectList  # list of planets, stars etc
+        self._objectType = self._getInputObjectTypes()  # are we dealing with planets, stars etc
+
+    def _getInputObjectTypes(self):
+        # get the type of the first object
+        firstObject = self.objectList[0]
+        firstObjectType = type(firstObject)
+
+        for astroObject in self.objectList:
+            if not firstObjectType == type(astroObject):
+                raise TypeError('Input object list contains mixed types ({0} and {1})'.format(firstObjectType,
+                                                                                              type(astroObject)))
+        return firstObjectType
+
+    def _getParLabelAndUnit(self, param):
+        """ checks param to see if it contains a parent link (ie star.) then returns the correct unit and label for the
+         job from the parDicts
+        :return:
+        """
+
+        firstObject = self.objectList[0]
+
+        if isinstance(firstObject, ac.Planet):
+            if 'star.' in param:
+                return _starPars[param[5:]]  # cut off star. part
+            else:
+                return _planetPars[param]
+        elif isinstance(firstObject, ac.Star):
+            return _starPars[param]
+        else:
+            raise TypeError('Only Planets and Star object are currently supported, you gave {0}'.format(type(firstObject)))
+
+    # OECPy specific functions
+    def _gen_label(self, param, unit):
+        # TODO could be star or other in future
+        parValues = self._getParLabelAndUnit(param)
+
+        if unit is None:
+            return parValues[0]
+        else:
+            unitsymbol = self._get_unit_symbol(unit)
+            return '{0} ({1})'.format(parValues[0], unitsymbol)
+
+    def _get_unit_symbol(self, unit):
+        """ Every quantities object has a symbol, but i have added `latex_symbol` for some types. This first checks for
+        a latex symbol and then if it fails will just use symbol
+        :return:
+        """
+        try:
+            return '${0}$'.format(unit.latex_symbol)
+        except AttributeError:
+            return unit.symbol
+
+
+class BaseDataPerClass(_AstroObjectFigs):
     """ Base class for plots counting the results by a attribute. Child classes must modify
     * _classVariables (self._allowedKeys, )
     * _getSortKey (take the planet, turn it into a key)
     """
 
-    def __init__(self, astroObjectList):
-        GlobalFigure.__init__(self)
+    def __init__(self, astroObjectList, unit=None):  # added unit here as class will break without it anyway
+        _AstroObjectFigs.__init__(self, astroObjectList)
+
         self._classVariables()  # add info from child classes
-        self.astroObjectList = astroObjectList
+        self.unit = unit
         self.resultsByClass = self._processResults()
 
     def _classVariables(self):
@@ -133,16 +213,15 @@ class BaseDataPerClass(GlobalFigure):
 
         resultsByClass = self._genEmptyResults()
 
-        for astroObject in self.astroObjectList:
+        for astroObject in self.objectList:
             sortKey = self._getSortKey(astroObject)
             resultsByClass[sortKey] += 1
 
         return resultsByClass
 
-    def plotBarChart(self, title='', xlabel='', c='#3ea0e4', xticksize=8, rotation=False):
+    def plotBarChart(self, title='', xlabel=None, c='#3ea0e4', xticksize=8, rotation=False):
         resultsByClass = self.resultsByClass
 
-        self.setup_fig()
         ax = self.ax
 
         try:
@@ -151,17 +230,17 @@ class BaseDataPerClass(GlobalFigure):
         except KeyError:
             pass
 
-        plotData = zip(*resultsByClass.items())
+        plotData = list(zip(*resultsByClass.items()))
 
         ydata = plotData[1]
 
         numItems = float(len(ydata))
 
         ind = np.arange(numItems)  # the x locations for the groups
-        ind /= numItems # between 0 and 1
+        ind /= numItems  # between 0 and 1
 
         spacePerBar = 1./numItems
-        gapratio = 0.5 # gap to bar ratio, 0.5 is even
+        gapratio = 0.5  # gap to bar ratio, 0.5 is even
         width = spacePerBar*gapratio
         gap = spacePerBar - width
 
@@ -172,10 +251,18 @@ class BaseDataPerClass(GlobalFigure):
         for axis in self.ax.get_xticklabels():
             axis.set_fontsize(xticksize)
 
+        if self.unit is None:  # TODO this is hacked in so it only work with DataPerParameterClass
+            self.unit = self._getParLabelAndUnit(self._planetProperty)[1]  # use the default unit defined in this class
+        self.yaxis_unit = self.unit
+
+        if xlabel is None:
+            plt.xlabel(self._gen_label(self._planetProperty, self.unit))
+        else:
+            plt.xlabel(xlabel)
+
         if rotation:
             plt.xticks(rotation=rotation)
         plt.ylabel('Number of Observable Planets')
-        plt.xlabel(xlabel)
         plt.title(title)
         plt.xlim([min(ind)-gap, max(ind)+(gap*2)])
         plt.draw()
@@ -204,10 +291,11 @@ class BaseDataPerClass(GlobalFigure):
 class DataPerParameterBin(BaseDataPerClass):
     """ Generates Data for observable planets per parameter bin"""
 
-    def __init__(self, results, planetProperty, binLimits):
+    def __init__(self, results, planetProperty, binLimits, unit=None):
         """
-        :param planetProperty: property of planet to bin. IE 'e' for eccentricity, 'parent.magV' for magV
+        :param planetProperty: property of planet to bin. IE 'e' for eccentricity, 'star.magV' for magV
         :param binLimits: list of bin limits (lower limit, upper, upper, maximum) (note you can have maximum +)
+        :param unit: unit to scale param to (see general plotter)
         :return:
         """
 
@@ -215,7 +303,7 @@ class DataPerParameterBin(BaseDataPerClass):
         self._planetProperty = planetProperty
 
         self._genKeysBins()  # Generate the bin keys/labels (must do before base class processes results)
-        BaseDataPerClass.__init__(self, results)
+        BaseDataPerClass.__init__(self, results, unit)
 
     def _getSortKey(self, planet):
         """ Takes a planet and turns it into a key to be sorted by
@@ -226,6 +314,12 @@ class DataPerParameterBin(BaseDataPerClass):
         value = eval('planet.'+self._planetProperty)
 
         # TODO some sort of data validation, either before or using try except
+
+        if self.unit is not None:
+            try:
+                value = value.rescale(self.unit)
+            except AttributeError:  # either nan or unitless
+                pass
 
         return sortValueIntoGroup(self._allowedKeys[:-1], self._binlimits, value)
 
@@ -242,7 +336,7 @@ class DataPerParameterBin(BaseDataPerClass):
 
         if binlimits[0] == -float('inf'):
             midbinlimits = binlimits[1:]  # remove the bottom limit
-            allowedKeys.append('<{}'.format(midbinlimits[0]))
+            allowedKeys.append('<{0}'.format(midbinlimits[0]))
 
         if binlimits[-1] == float('inf'):
             midbinlimits = midbinlimits[:-1]
@@ -251,19 +345,19 @@ class DataPerParameterBin(BaseDataPerClass):
 
         for binlimit in midbinlimits[1:]:
             if lastbin == binlimit:
-                allowedKeys.append('{}'.format(binlimit))
+                allowedKeys.append('{0}'.format(binlimit))
             else:
-                allowedKeys.append('{} to {}'.format(lastbin, binlimit))
+                allowedKeys.append('{0} to {1}'.format(lastbin, binlimit))
             lastbin = binlimit
 
         if binlimits[-1] == float('inf'):
-            allowedKeys.append('{}+'.format(binlimits[-2]))
+            allowedKeys.append('{0}+'.format(binlimits[-2]))
 
         allowedKeys.append('Uncertain')
         self._allowedKeys = allowedKeys
 
 
-class GeneralPlotter(GlobalFigure):
+class GeneralPlotter(_AstroObjectFigs):
     """ This class should be able to create a plot with lots of options like the online visual plots. In future it
     should be turned into a GUI
     """
@@ -280,10 +374,14 @@ class GeneralPlotter(GlobalFigure):
         :type xaxis: str
         :type yaxis: str
         """
-        GlobalFigure.__init__(self)
+        _AstroObjectFigs.__init__(self, objectList)
 
-        self.objectList = objectList  # list of planets, stars etc
 
+        # set later
+        self.xlabel = None
+        self.ylabel = None
+
+        # Handle given parameters
         if xaxis:
             self.set_xaxis(xaxis)
         else:
@@ -295,38 +393,78 @@ class GeneralPlotter(GlobalFigure):
             self.yaxis = None
 
     def plot(self):
-        xaxis = self.xaxis
-        yaxis = self.yaxis
+        xaxis = [float(x) for x in self.xaxis]
+        yaxis = [float(y) for y in self.yaxis]
 
         assert(len(xaxis) == len(yaxis))
 
         plt.scatter(xaxis, yaxis)
 
-    def _set_axis(self, param):
-        """ this should take a variable or a function and turn it into a list by evaluating on each planet
-        """
-        return [eval('astroObject.{}'.format(param)) for astroObject in self.objectList]
+        plt.xlabel(self.xlabel)
+        plt.ylabel(self.ylabel)
 
-    def set_xaxis(self, param):
+    def set_xaxis(self, param, unit=None, label=None):
         """ Sets the value of use on the x axis
         :param param: value to use on the xaxis, should be a variable or function of the objects in objectList. ie 'R'
         for the radius variable and 'calcDensity()' for the calcDensity function
-        """
-        self.xaxis = self._set_axis(param)
 
-    def set_yaxis(self, param):
+        :param unit: the unit to scale the values to, None will use the default
+        :type unit: quantities unit or None
+
+        :param label: axis label to use, if None "Parameter (Unit)" is generated here and used
+        :type label: str
+        """
+
+        if unit is None:
+            unit = self._getParLabelAndUnit(param)[1]  # use the default unit defined in this class
+        self.xaxis_unit = unit
+
+        self.xaxis = self._set_axis(param, unit)
+        if label is None:
+            self.xlabel = self._gen_label(param, unit)
+        else:
+            self.xlabel = label
+
+    def set_yaxis(self, param, unit=None, label=None):
         """ Sets the value of use on the yaxis
         :param param: value to use on the yaxis, should be a variable or function of the objects in objectList. ie 'R'
         for the radius variable and 'calcDensity()' for the calcDensity function
+
+        :param unit: the unit to scale the values to
+        :type unit: quantities unit or None
+
+        :param label: axis label to use, if None "Parameter (Unit)" is generated here and used
+        :type label: str
         """
-        self.yaxis = self._set_axis(param)
+        if unit is None:
+            unit = self._getParLabelAndUnit(param)[1]  # use the default unit defined in this class
+        self.yaxis_unit = unit
 
-    def set_y_axis_log(self, logscale=True):
-        # TODO write code and include code to modify labels
-        pass
+        self.yaxis = self._set_axis(param, unit)
+        if label is None:
+            self.ylabel = self._gen_label(param, unit)
+        else:
+            self.ylabel = label
 
-    def set_x_axis_log(self, logscale=True):
-        pass
+    def _set_axis(self, param, unit):
+        """ this should take a variable or a function and turn it into a list by evaluating on each planet
+        """
+        axisValues = []
+        for astroObject in self.objectList:
+            try:
+                value = eval('astroObject.{0}'.format(param))
+            except ac.HierarchyError:  # ie trying to call planet.star and one planet is a lone ranger
+                value = np.nan
+
+            if unit is None:  # no unit to rescale (a pq.unitless quanitity would otherwise fail with ValueError)
+                axisValues.append(value)
+            else:
+                try:
+                    axisValues.append(value.rescale(unit))
+                except AttributeError:  # either nan or unitless
+                    axisValues.append(value)
+
+        return axisValues
 
     def set_marker_color(self):
         # TODO allow a single colour or colour set per another variable
@@ -343,10 +481,10 @@ def sortValueIntoGroup(groupKeys, groupLimits, value):
     """
 
     if not len(groupKeys) == len(groupLimits)-1:
-        raise ValueError('len(groupKeys) must equal len(grouplimits)-1 got \nkeys:{} \nlimits:{}'.format(groupKeys,
+        raise ValueError('len(groupKeys) must equal len(grouplimits)-1 got \nkeys:{0} \nlimits:{1}'.format(groupKeys,
                                                                                                          groupLimits))
 
-    if value is np.nan:
+    if math.isnan(value):
         return 'Uncertain'
 
     # TODO add to other if bad value or outside limits
@@ -363,10 +501,10 @@ def sortValueIntoGroup(groupKeys, groupLimits, value):
                 break
 
     if keyIndex == 0:  # below the minimum
-        raise BelowLimitsError('Value {} below limit {}'.format(value, groupLimits[0]))
+        raise BelowLimitsError('Value {0} below limit {1}'.format(value, groupLimits[0]))
 
     if keyIndex is None:
-        raise AboveLimitsError('Value {} above limit {}'.format(value, groupLimits[-1]))
+        raise AboveLimitsError('Value {0} above limit {1}'.format(value, groupLimits[-1]))
 
     return groupKeys[keyIndex-1]
 
@@ -381,3 +519,74 @@ class BelowLimitsError(Exception):
 
 class AboveLimitsError(Exception):
     pass
+
+# A parameter dict based on the current astroclass list and the parameter selected. Here the standard
+# unit, full name for labels and short name are stored. All values that could be used are listed here, many are
+# commented because i dont think they should be used or will not work without further code to interpret
+_planetPars = {
+    # paramKey    : (axis label,      unit)
+    #'isTransiting': ('Is Transiting', bool), TODO add bool and grouped values
+    'calcTransitDuration()': ('Transit Duration', pq.day),
+    'calcTransitDepth()': ('Transit Depth', None),
+    #'type()': ('Planet Class', None),
+    # 'massType()': ('Planet Mass Class', None),
+    # 'radiusType()': ('Planet Radius Class', None),
+    # 'temptype()': ('Planet Temp Class', None),
+    'mu': ('Mean Molecular Weight', None),
+    'albedo()': ('Planet Albedo', None),
+    #'calcTemperature()': ('Mean Planet Temperature (Calculated)', pq.K),
+    #'estimateMass()': ('Planet Mass Estimated From Radius', aq.M_j),
+    # 'calcSMA()': ('Semi-Major Axis', pq.au),
+    # 'calcSMAfromT()': ('Semi-Major Axis (calculated from T)', pq.au),
+    # 'calcPeriod': ('Planet Radius', aq.R_j),
+    # 'discoveryMethod': ('Planet Radius', aq.R_j),
+    'e': ('Planet Radius', aq.R_j),
+    'discoveryYear': ('Discovery Year', None),
+    # 'lastUpdate': ('Last Updated', Date),
+    'age': ('Planet Age', aq.Gyear),
+    # 'ra': ('RA', None),
+    # 'dec': ('DEC', None),
+    'd': ('Distance to System', pq.pc),
+    'R': ('Planet Radius', aq.R_j),
+    'T': ('Planet Temperature', pq.K),
+    'M': ('Planet Mass', aq.M_j),
+    'calcSurfaceGravity()': ('Planet Surface Gravity', aq.ms2),
+    'calcLogg()': ('Planet logg', None),
+    'calcDensity()': ('Planet Density', aq.gcm3),
+    'i': ('Orbital Inclination', pq.deg),
+    'P': ('Period', pq.day),
+    'a': ('Semi-Major Axis', pq.au),
+    # 'transittime': ('Transit Time', aq.JulianDay),
+    # TODO Catalogue Unit issue with theese
+    # 'periastron': ('Orbit Periastron', pq.deg),
+    # 'longitude': ('Orbit Longitude', pq.deg),
+    # 'ascendingnode': ('Orbit Ascending Node', pq.deg),
+}
+
+_starPars = {
+    # paramKey    : (axis label,      unit)
+    'magV': ('V Magnitude', None),
+    'magB': ('B Magnitude', None),
+    'magH': ('H Magnitude', None),
+    'magI': ('I Magnitude', None),
+    'magJ': ('J Magnitude', None),
+    'magK': ('K Magnitude', None),
+    'd': ('Distance to System', pq.pc),
+    'calcLuminosity()': ('Stellar Luminosity', aq.L_s),
+    #'calcTemperature()': ('Stellar Temperature (Calculated)', pq.K),
+    'Z': ('Stellar Metallicity', None),
+    # 'Spectral Type': ('Spectral Type', str),
+    # 'estimateAbsoluteMagnitude': ('Stellar Age', aq.Gyear),
+    # 'estimateDistance': ('Stellar Age', aq.Gyear),
+    'age': ('Stellar Age', aq.Gyear),
+    # 'ra': ('RA', None),
+    # 'dec': ('DEC', None),
+    'R': ('Stellar Radius', aq.R_s),
+    'T': ('Stellar Temperature', pq.K),
+    'M': ('Stellar Mass', aq.M_s),
+    'calcSurfaceGravity()': ('Planet Surface Gravity', aq.ms2),
+    'calcLogg()': ('Stellar logg', None),
+    'calcDensity()': ('Stellar Density', aq.gcm3),
+}
+
+# TODO Binary and System support for plots

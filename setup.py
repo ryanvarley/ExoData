@@ -35,7 +35,7 @@ with codecs.open(os.path.join(here, 'readme.md'), encoding='utf-8') as f:
 install_requires = ['numpy', 'quantities', 'nose>=1.0', 'matplotlib']
 if sys.hexversion < 0x02070000:
     install_requires.append('unittest2')
-
+    install_requires.append('ordereddict')
 
 if sys.hexversion < 0x02070000:
     test_suite = 'oecpy.tests.testsuite'  # otherwise skiptests dont work with 2.6, TODO plugin?

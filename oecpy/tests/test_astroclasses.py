@@ -304,19 +304,19 @@ class TestPlanetClass(unittest.TestCase):
     def test_isTransiting_is_true_if_tag_present(self):
         planet = genExamplePlanet()
         planet.params['istransiting'] = '1'
-        self.assertTrue(planet.isTransiting())
+        self.assertTrue(planet.isTransiting)
 
     def test_isTransiting_fails_with_missing_tag_or_incorrect_value(self):
         planet = genExamplePlanet()
         planet.params['istransiting'] = '0'
-        self.assertFalse(planet.isTransiting())
+        self.assertFalse(planet.isTransiting)
 
         planet = genExamplePlanet()
         planet.params['istransiting'] = '2'
-        self.assertFalse(planet.isTransiting())
+        self.assertFalse(planet.isTransiting)
 
         planet = genExamplePlanet()
-        self.assertFalse(planet.isTransiting())
+        self.assertFalse(planet.isTransiting)
 
 
 if __name__ == '__main__':

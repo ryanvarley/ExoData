@@ -142,8 +142,6 @@ def surfaceGravity(M_p, R_p):
     :return: g - acceleration due to gravity * m / s**2
     """
 
-    # TODO find out what logg is and how it can be used
-
     g_p = (G * M_p)/(R_p**2)
     return g_p.rescale(pq.m / pq.s**2)
 
