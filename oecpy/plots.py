@@ -24,17 +24,34 @@ class GlobalFigure(object):
     """ sets up the figure and subfigure object with all the global parameters.
     """
 
-    def __init__(self):
-        self.setup_fig()
+    def __init__(self, size='small'):
+        self.setup_fig(size)
 
-    def setup_fig(self):
-        self.fig = fig = plt.figure(figsize=(5, 4))
-        self.ax = fig.add_subplot(1, 1, 1)
+    def setup_fig(self, size='small'):
+        self.set_size(size)
+        self.ax = self.fig.add_subplot(1, 1, 1)
 
-        # initial fonts and colours
+    def set_size(self, size):
+        """ choose a preset size for the plot
+        :param size: 'small' for documenta or 'large' for presentations
+        """
+
+        if size == 'small':
+            self._set_size_small()
+        elif size == 'large':
+            self._set_size_large()
+
+    def _set_size_small(self):
+        self.fig = plt.figure(figsize=(5, 4))
         self.set_title_size(10)
         self.set_axis_label_size(12)
         self.set_axis_tick_label_size(12)
+
+    def _set_size_large(self):
+        self.fig = plt.figure(figsize=(10, 7.5))
+        self.set_title_size(20)
+        self.set_axis_label_size(20)
+        self.set_axis_tick_label_size(20)
 
     def set_global_font_size(self, fontsize):
         ax = self.ax
@@ -190,6 +207,14 @@ class BaseDataPerClass(_AstroObjectFigs):
         self.unit = unit
         self.resultsByClass = self._processResults()
 
+    def _set_size_small(self):
+        _AstroObjectFigs._set_size_small(self)
+        self.xticksize = 8
+
+    def _set_size_large(self):
+        _AstroObjectFigs._set_size_large(self)
+        self.xticksize = 15
+
     def _classVariables(self):
         """ Variables to be loaded in init by child classes
 
@@ -219,7 +244,7 @@ class BaseDataPerClass(_AstroObjectFigs):
 
         return resultsByClass
 
-    def plotBarChart(self, title='', xlabel=None, c='#3ea0e4', xticksize=8, label_rotation=False):
+    def plotBarChart(self, title='', xlabel=None, c='#3ea0e4', label_rotation=False):
         resultsByClass = self.resultsByClass
 
         ax = self.ax
@@ -249,7 +274,7 @@ class BaseDataPerClass(_AstroObjectFigs):
         ax.set_xticks(ind+(width/2.))
 
         for axis in self.ax.get_xticklabels():
-            axis.set_fontsize(xticksize)
+            axis.set_fontsize(self.xticksize)
 
         if self.unit is None:  # TODO this is hacked in so it only work with DataPerParameterClass
             self.unit = self._getParLabelAndUnit(self._planetProperty)[1]  # use the default unit defined in this class
