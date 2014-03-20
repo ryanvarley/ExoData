@@ -6,7 +6,7 @@ __version__ = '1.0b1.3.1'
 import sys
 
 # Import package modules
-from . import assumptions, astroclasses, astroquantities, equations, example, flags
+from . import assumptions, astroclasses, astroquantities, equations, example, flags, plots
 # import OEC database
 from .database import OECDatabase
 
