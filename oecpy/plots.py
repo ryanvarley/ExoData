@@ -262,7 +262,7 @@ class BaseDataPerClass(_AstroObjectFigs):
 
         if rotation:
             plt.xticks(rotation=rotation)
-        plt.ylabel('Number of Observable Planets')
+        plt.ylabel('Number of Planets')  # TODO could be stars
         plt.title(title)
         plt.xlim([min(ind)-gap, max(ind)+(gap*2)])
         plt.draw()
@@ -289,7 +289,7 @@ class BaseDataPerClass(_AstroObjectFigs):
 
 
 class DataPerParameterBin(BaseDataPerClass):
-    """ Generates Data for observable planets per parameter bin"""
+    """ Generates Data for planets per parameter bin"""
 
     def __init__(self, results, planetProperty, binLimits, unit=None):
         """
@@ -362,7 +362,7 @@ class GeneralPlotter(_AstroObjectFigs):
     should be turned into a GUI
     """
 
-    def __init__(self, objectList, xaxis=None, yaxis=None):
+    def __init__(self, objectList, xaxis=None, yaxis=None, xunit=None, yunit=None, xaxislog=False, yaxislog=False):
         """
         :param objectList: list of astro objects to use in plot ie planets, stars etc
         :param xaxis: value to use on the xaxis, should be a variable or function of the objects in objectList. ie 'R'
@@ -389,14 +389,17 @@ class GeneralPlotter(_AstroObjectFigs):
 
         # Handle given parameters
         if xaxis:
-            self.set_xaxis(xaxis)
+            self.set_xaxis(xaxis, xunit)
         else:
             self._xaxis = None
 
         if yaxis:
-            self.set_yaxis(yaxis)
+            self.set_yaxis(yaxis, yunit)
         else:
             self._yaxis = None
+
+        self.set_x_axis_log(xaxislog)
+        self.set_y_axis_log(yaxislog)
 
     def plot(self):
         xaxis = [float(x) for x in self._xaxis]
@@ -557,7 +560,7 @@ _planetPars = {
     # 'calcSMAfromT()': ('Semi-Major Axis (calculated from T)', pq.au),
     # 'calcPeriod': ('Planet Radius', aq.R_j),
     # 'discoveryMethod': ('Planet Radius', aq.R_j),
-    'e': ('Planet Radius', aq.R_j),
+    'e': ('Orbital Eccentricity', None),
     'discoveryYear': ('Discovery Year', None),
     # 'lastUpdate': ('Last Updated', Date),
     'age': ('Planet Age', aq.Gyear),
