@@ -145,7 +145,7 @@ OECPy features a plotting library for planet and stellar parameters in a scatter
 ![Stellar V Magnitude with Planet Radius](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-vmag-planetradius.png "Stellar V Magnitude with Planet Radius Plot")
 
 ### Planet Eccentricity ###
-`oecpy.plots.DataPerParameterBin(exocat.planets, 'e', (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotBarChart()`
+`oecpy.plots.DataPerParameterBin(exocat.planets, 'e', (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotBarChart(label_rotation=45)`
 ![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-orbital-eccentricity.png "Planet Eccentricity Plot")
 
 # Licence

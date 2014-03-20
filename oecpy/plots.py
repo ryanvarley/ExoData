@@ -219,7 +219,7 @@ class BaseDataPerClass(_AstroObjectFigs):
 
         return resultsByClass
 
-    def plotBarChart(self, title='', xlabel=None, c='#3ea0e4', xticksize=8, rotation=False):
+    def plotBarChart(self, title='', xlabel=None, c='#3ea0e4', xticksize=8, label_rotation=False):
         resultsByClass = self.resultsByClass
 
         ax = self.ax
@@ -260,8 +260,8 @@ class BaseDataPerClass(_AstroObjectFigs):
         else:
             plt.xlabel(xlabel)
 
-        if rotation:
-            plt.xticks(rotation=rotation)
+        if label_rotation:
+            plt.xticks(rotation=label_rotation)
         plt.ylabel('Number of Planets')  # TODO could be stars
         plt.title(title)
         plt.xlim([min(ind)-gap, max(ind)+(gap*2)])
