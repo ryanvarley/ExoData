@@ -253,7 +253,7 @@ class BaseDataPerClass(_AstroObjectFigs):
 
         if self.unit is None:  # TODO this is hacked in so it only work with DataPerParameterClass
             self.unit = self._getParLabelAndUnit(self._planetProperty)[1]  # use the default unit defined in this class
-        self.yaxis_unit = self.unit
+        self._yaxis_unit = self.unit
 
         if xlabel is None:
             plt.xlabel(self._gen_label(self._planetProperty, self.unit))
@@ -376,6 +376,12 @@ class GeneralPlotter(_AstroObjectFigs):
         """
         _AstroObjectFigs.__init__(self, objectList)
 
+        # setup vars - to be replaced by themes
+        self.set_marker_color()
+        self.set_marker_size()
+
+        # params that can be modified by user
+        self.marker = 'o'
 
         # set later
         self.xlabel = None
@@ -385,20 +391,21 @@ class GeneralPlotter(_AstroObjectFigs):
         if xaxis:
             self.set_xaxis(xaxis)
         else:
-            self.xaxis = None
+            self._xaxis = None
 
         if yaxis:
             self.set_yaxis(yaxis)
         else:
-            self.yaxis = None
+            self._yaxis = None
 
     def plot(self):
-        xaxis = [float(x) for x in self.xaxis]
-        yaxis = [float(y) for y in self.yaxis]
+        xaxis = [float(x) for x in self._xaxis]
+        yaxis = [float(y) for y in self._yaxis]
 
         assert(len(xaxis) == len(yaxis))
 
-        plt.scatter(xaxis, yaxis)
+        plt.scatter(xaxis, yaxis, marker=self.marker, facecolor=self._marker_color, edgecolor=self._edge_color,
+                    s=self._marker_size)
 
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
@@ -417,9 +424,9 @@ class GeneralPlotter(_AstroObjectFigs):
 
         if unit is None:
             unit = self._getParLabelAndUnit(param)[1]  # use the default unit defined in this class
-        self.xaxis_unit = unit
+        self._xaxis_unit = unit
 
-        self.xaxis = self._set_axis(param, unit)
+        self._xaxis = self._set_axis(param, unit)
         if label is None:
             self.xlabel = self._gen_label(param, unit)
         else:
@@ -438,9 +445,9 @@ class GeneralPlotter(_AstroObjectFigs):
         """
         if unit is None:
             unit = self._getParLabelAndUnit(param)[1]  # use the default unit defined in this class
-        self.yaxis_unit = unit
+        self._yaxis_unit = unit
 
-        self.yaxis = self._set_axis(param, unit)
+        self._yaxis = self._set_axis(param, unit)
         if label is None:
             self.ylabel = self._gen_label(param, unit)
         else:
@@ -466,9 +473,19 @@ class GeneralPlotter(_AstroObjectFigs):
 
         return axisValues
 
-    def set_marker_color(self):
-        # TODO allow a single colour or colour set per another variable
-        pass
+    def set_marker_color(self, color='#3ea0e4', edgecolor='k'):
+        """ set the marker color used in the plot
+        :param color: matplotlib color (ie 'r', '#000000')
+        """
+        # TODO allow a colour set per another variable
+        self._marker_color = color
+        self._edge_color = edgecolor
+
+    def set_marker_size(self, size=30):
+        """ set the marker size used in the plot
+        :param size: matplotlib size
+        """
+        self._marker_size = size
 
 
 def sortValueIntoGroup(groupKeys, groupLimits, value):

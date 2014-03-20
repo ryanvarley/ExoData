@@ -176,8 +176,8 @@ class Test_GeneralPlotter(TestCase):
         fig = GeneralPlotter(planetlist)
         fig.set_xaxis('R', None)
         fig.set_yaxis('star.magV', None)
-        self.assertItemsAlmostEqual(fig.xaxis, radiusValues, 1)
-        self.assertItemsAlmostEqual(fig.yaxis, magVValues, 1)
+        self.assertItemsAlmostEqual(fig._xaxis, radiusValues, 1)
+        self.assertItemsAlmostEqual(fig._yaxis, magVValues, 1)
         fig.plot()
 
     def test_set_axis_with_functions(self):
