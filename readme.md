@@ -134,19 +134,36 @@ A few options can be set within OECPY to change the behaviour of the program. By
 This will only take scope in the current project so if you close the interpreter it will reset to True.
 
 # Plotting
-OECPy features a plotting library for planet and stellar parameters in a scatter plot and per parameter bin. Please see the plots section of the documentation for further information.
+OECPy features a plotting library for planet and stellar parameters in a scatter plot and per parameter bin. Please see the [plots section](https://github.com/ryanvarley/open-exoplanet-catalogue-python/wiki/Plotting) of the documentation for further information.
 
 ### Planet Mass with Planet Radius ###
-`oecpy.plots.GeneralPlotter(exocat.planets, 'R', 'M', yaxislog=True).plot()`
+```python
+oecpy.plots.GeneralPlotter(exocat.planets, 'R', 'M', yaxislog=True).plot()
+```
 ![Planet Mass with Planet Radius](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-planet-mass-radius.png "Planet Mass with Planet Radius Plot")
 
 ### Stellar V Magnitude with Planet Radius ###
-`oecpy.plots.GeneralPlotter(exocat.planets, 'R', 'star.magV', xunit=aq.R_e, xaxislog=True).plot()`
+```python
+oecpy.plots.GeneralPlotter(exocat.planets, 'R', 'star.magV',
+                            xunit=aq.R_e, xaxislog=True).plot()
+```
+
 ![Stellar V Magnitude with Planet Radius](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-vmag-planetradius.png "Stellar V Magnitude with Planet Radius Plot")
 
 ### Planet Eccentricity ###
-`oecpy.plots.DataPerParameterBin(exocat.planets, 'e', (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotBarChart()`
-![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-orbital-eccentricity.png "Planet Eccentricity Plot")
+```python
+oecpy.plots.DataPerParameterBin(exocat.planets, 'e',
+      (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotBarChart(label_rotation=45)
+```
+![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-orbital-eccentricity-2.png "Planet Eccentricity Plot")
+
+You can also make plots large (ie for presentations), and change the color easily
+
+```python
+oecpy.plots.DataPerParameterBin(exocat.planets, 'M',
+    (0, 0.2, 0.5, 1, 2, 3, 6, 12, float('inf')), size='large').plotBarChart(c='r')
+```
+![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-orbital-eccentricity-large.png "Planet Eccentricity Plot Large")
 
 # Licence
 
