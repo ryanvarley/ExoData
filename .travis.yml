@@ -9,3 +9,8 @@ python:
 
 script:
   - python setup.py test
+
+# blacklist
+branches:
+  except:
+    - images
