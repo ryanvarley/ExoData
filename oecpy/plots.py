@@ -24,17 +24,36 @@ class GlobalFigure(object):
     """ sets up the figure and subfigure object with all the global parameters.
     """
 
-    def __init__(self):
-        self.setup_fig()
+    def __init__(self, size='small'):
+        self.setup_fig(size)
 
-    def setup_fig(self):
-        self.fig = fig = plt.figure(figsize=(5, 4))
-        self.ax = fig.add_subplot(1, 1, 1)
+    def setup_fig(self, size='small'):
+        self.set_size(size)
 
-        # initial fonts and colours
+    def set_size(self, size):
+        """ choose a preset size for the plot
+        :param size: 'small' for documents or 'large' for presentations
+        """
+        if size == 'small':
+            self._set_size_small()
+        elif size == 'large':
+            self._set_size_large()
+        else:
+            raise ValueError('Size must be large or small')
+
+    def _set_size_small(self):
+        self.fig = plt.figure(figsize=(5, 4))
+        self.ax = self.fig.add_subplot(1, 1, 1)
         self.set_title_size(10)
         self.set_axis_label_size(12)
         self.set_axis_tick_label_size(12)
+
+    def _set_size_large(self):
+        self.fig = plt.figure(figsize=(10, 7.5))
+        self.ax = self.fig.add_subplot(1, 1, 1)
+        self.set_title_size(20)
+        self.set_axis_label_size(20)
+        self.set_axis_tick_label_size(20)
 
     def set_global_font_size(self, fontsize):
         ax = self.ax
@@ -121,8 +140,8 @@ class _AstroObjectFigs(GlobalFigure):
     """ contains extra functions for dealing with input of astro objects
     """
 
-    def __init__(self, objectList):
-        GlobalFigure.__init__(self)
+    def __init__(self, objectList, size='small'):
+        GlobalFigure.__init__(self, size)
         self.objectList = objectList  # list of planets, stars etc
         self._objectType = self._getInputObjectTypes()  # are we dealing with planets, stars etc
 
@@ -183,12 +202,20 @@ class BaseDataPerClass(_AstroObjectFigs):
     * _getSortKey (take the planet, turn it into a key)
     """
 
-    def __init__(self, astroObjectList, unit=None):  # added unit here as class will break without it anyway
-        _AstroObjectFigs.__init__(self, astroObjectList)
+    def __init__(self, astroObjectList, unit=None, size='small'):  # added unit here as class will break without it anyway
+        _AstroObjectFigs.__init__(self, astroObjectList, size)
 
         self._classVariables()  # add info from child classes
         self.unit = unit
         self.resultsByClass = self._processResults()
+
+    def _set_size_small(self):
+        _AstroObjectFigs._set_size_small(self)
+        self.xticksize = 8
+
+    def _set_size_large(self):
+        _AstroObjectFigs._set_size_large(self)
+        self.xticksize = 15
 
     def _classVariables(self):
         """ Variables to be loaded in init by child classes
@@ -219,7 +246,7 @@ class BaseDataPerClass(_AstroObjectFigs):
 
         return resultsByClass
 
-    def plotBarChart(self, title='', xlabel=None, c='#3ea0e4', xticksize=8, rotation=False):
+    def plotBarChart(self, title='', xlabel=None, c='#3ea0e4', label_rotation=False):
         resultsByClass = self.resultsByClass
 
         ax = self.ax
@@ -249,7 +276,7 @@ class BaseDataPerClass(_AstroObjectFigs):
         ax.set_xticks(ind+(width/2.))
 
         for axis in self.ax.get_xticklabels():
-            axis.set_fontsize(xticksize)
+            axis.set_fontsize(self.xticksize)
 
         if self.unit is None:  # TODO this is hacked in so it only work with DataPerParameterClass
             self.unit = self._getParLabelAndUnit(self._planetProperty)[1]  # use the default unit defined in this class
@@ -260,8 +287,8 @@ class BaseDataPerClass(_AstroObjectFigs):
         else:
             plt.xlabel(xlabel)
 
-        if rotation:
-            plt.xticks(rotation=rotation)
+        if label_rotation:
+            plt.xticks(rotation=label_rotation)
         plt.ylabel('Number of Planets')  # TODO could be stars
         plt.title(title)
         plt.xlim([min(ind)-gap, max(ind)+(gap*2)])
@@ -291,7 +318,7 @@ class BaseDataPerClass(_AstroObjectFigs):
 class DataPerParameterBin(BaseDataPerClass):
     """ Generates Data for planets per parameter bin"""
 
-    def __init__(self, results, planetProperty, binLimits, unit=None):
+    def __init__(self, results, planetProperty, binLimits, unit=None, size='small'):
         """
         :param planetProperty: property of planet to bin. IE 'e' for eccentricity, 'star.magV' for magV
         :param binLimits: list of bin limits (lower limit, upper, upper, maximum) (note you can have maximum +)
@@ -303,7 +330,7 @@ class DataPerParameterBin(BaseDataPerClass):
         self._planetProperty = planetProperty
 
         self._genKeysBins()  # Generate the bin keys/labels (must do before base class processes results)
-        BaseDataPerClass.__init__(self, results, unit)
+        BaseDataPerClass.__init__(self, results, unit, size)
 
     def _getSortKey(self, planet):
         """ Takes a planet and turns it into a key to be sorted by
@@ -362,7 +389,7 @@ class GeneralPlotter(_AstroObjectFigs):
     should be turned into a GUI
     """
 
-    def __init__(self, objectList, xaxis=None, yaxis=None, xunit=None, yunit=None, xaxislog=False, yaxislog=False):
+    def __init__(self, objectList, xaxis=None, yaxis=None, xunit=None, yunit=None, xaxislog=False, yaxislog=False, size='small'):
         """
         :param objectList: list of astro objects to use in plot ie planets, stars etc
         :param xaxis: value to use on the xaxis, should be a variable or function of the objects in objectList. ie 'R'
@@ -374,7 +401,7 @@ class GeneralPlotter(_AstroObjectFigs):
         :type xaxis: str
         :type yaxis: str
         """
-        _AstroObjectFigs.__init__(self, objectList)
+        _AstroObjectFigs.__init__(self, objectList, size)
 
         # setup vars - to be replaced by themes
         self.set_marker_color()
@@ -400,6 +427,10 @@ class GeneralPlotter(_AstroObjectFigs):
 
         self.set_x_axis_log(xaxislog)
         self.set_y_axis_log(yaxislog)
+
+    def _set_size_large(self):
+        _AstroObjectFigs._set_size_large(self)
+        self.set_marker_size(60)
 
     def plot(self):
         xaxis = [float(x) for x in self._xaxis]
