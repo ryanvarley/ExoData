@@ -13,7 +13,7 @@ from . import flags
 from . import params
 
 
-class baseObject(object):
+class _BaseObject(object):
 
     def __init__(self, params=None):
 
@@ -77,11 +77,20 @@ class baseObject(object):
         except KeyError:
             return np.NaN
 
+    def __eq__(self, other):
+        """ check the parameter dictionaries for both clases are the same (and both are of the same class)
+        """
 
-class System(baseObject):
+        if type(self) == type(other):
+            return self.params == other.params
+        else:
+            return False
+
+
+class System(_BaseObject):
 
     def __init__(self, *args, **kwargs):
-        baseObject.__init__(self, *args, **kwargs)
+        _BaseObject.__init__(self, *args, **kwargs)
         self.classType = 'System'
 
     @property
@@ -105,9 +114,9 @@ class System(baseObject):
         return self.getParam('epoch')
 
 
-class PlanetAndBinaryCommon(baseObject):
+class PlanetAndBinaryCommon(_BaseObject):
     def __init__(self, *args, **kwargs):
-        baseObject.__init__(self, *args, **kwargs)
+        _BaseObject.__init__(self, *args, **kwargs)
         self.classType = 'PlanetAndBinaryCommon'
 
     @property
@@ -159,9 +168,9 @@ class PlanetAndBinaryCommon(baseObject):
         return self.getParam('ascendingnode')
 
 
-class StarAndBinaryCommon(baseObject):
+class StarAndBinaryCommon(_BaseObject):
     def __init__(self, *args, **kwargs):
-        baseObject.__init__(self, *args, **kwargs)
+        _BaseObject.__init__(self, *args, **kwargs)
         self.classType = 'StarAndBinaryCommon'
 
     @property
@@ -189,9 +198,9 @@ class StarAndBinaryCommon(baseObject):
         return self.getParam('magV')
 
 
-class StarAndPlanetCommon(baseObject):
+class StarAndPlanetCommon(_BaseObject):
     def __init__(self, *args, **kwargs):
-        baseObject.__init__(self, *args, **kwargs)
+        _BaseObject.__init__(self, *args, **kwargs)
         self.classType = 'StarAndPlanetCommon'
 
     @property
