@@ -11,8 +11,8 @@ else:
 import numpy as np
 import quantities as pq
 
-from ..astroclasses import Parameters, Star, Planet, Binary, System, _findNearest, SpectralType
-from ..example import genExamplePlanet, examplePlanet
+from ..astroclasses import Parameters, Star, Planet, Binary, System, _findNearest, SpectralType, _BaseObject
+from ..example import genExamplePlanet
 from .patches import TestCase
 
 
@@ -83,7 +83,40 @@ class TestListFiles(TestCase):
         Binary().__repr__()
 
 
-class TestStarParameters(unittest.TestCase):
+class TestAstroObject__eq__method(TestCase):
+
+    def setUp(self):
+        self.object1 = _BaseObject()
+        self.object1.params = {'name': 'name1', 'radius': 10*pq.km, 'd': 1}
+
+    def test_astroObject_same_object_is_eq(self):
+        self.assertEqual(self.object1, self.object1)
+
+    def test_astroObject_is_eq_same_param_dict(self):
+        object2 = _BaseObject()
+        object2.params = self.object1.params
+        self.assertEqual(self.object1, object2)
+
+    def test_astroObject_is_neq_changed_param_dict(self):
+        object2 = _BaseObject()
+        object2.params = {'name': 'name1', 'radius': 10*pq.km, 'd': 2}
+        self.assertNotEqual(self.object1, object2)
+
+    def test_astroObject_is_eq_different_param_dict_same_values(self):
+        object2 = _BaseObject()
+        object2.params = {'name': 'name1', 'radius': 10*pq.km, 'd': 1}
+        self.assertEqual(self.object1, object2)
+
+    def test_planet_and_star_same_params_are_neq(self):
+        planet = Planet()
+        planet.params = {'name': 'name1', 'radius': 10*pq.km, 'd': 1}
+        star = Star()
+        star.params = {'name': 'name1', 'radius': 10*pq.km, 'd': 1}
+
+        self.assertNotEqual(planet, star)
+
+
+class TestStarParameters(TestCase):
 
     def test_getLimbdarkeningCoeff_works(self):
         pass  # This simple check covered by test_example
@@ -134,7 +167,7 @@ class TestStarParameters(unittest.TestCase):
         self.assertTrue('Estimated magV' in star.flags.flags)
 
 
-class TestFindNearest(unittest.TestCase):
+class TestFindNearest(TestCase):
 
     def setUp(self):
         self.arr = np.array([1.2,4,6,7.0,9.5,10,11,12])
@@ -158,7 +191,7 @@ class TestFindNearest(unittest.TestCase):
         self.assertEqual(_findNearest(self.arr, 10.6), 11)
 
 
-class TestSpectralType(unittest.TestCase):
+class TestSpectralType(TestCase):
 
     def test_classType_and_Type(self):
         A8V = SpectralType('')
@@ -299,7 +332,7 @@ class TestSpectralType(unittest.TestCase):
             self.assertEqual(test1.specType, '', 'specType null test for {0}'.format(testStr))
 
 
-class TestPlanetClass(unittest.TestCase):
+class TestPlanetClass(TestCase):
 
     def test_isTransiting_is_true_if_tag_present(self):
         planet = genExamplePlanet()
