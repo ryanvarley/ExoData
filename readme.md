@@ -15,7 +15,7 @@ Please note that this package is currently in Beta. The Docs are incomplete, it 
 This module depends on
 * [Quantities](https://github.com/python-quantities/python-quantities)
 * [numpy](http://www.numpy.org/)
-* [Open Exoplanet Catalogue](https://github.com/hannorein/open_exoplanet_catalogue) (somewhere on your system)
+* [Open Exoplanet Catalogue](https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue) (somewhere on your system)
 
 **Currently only tested under Python 2.6, 2.7, 3.3 on mac and linux**. If you use windows or a different python version try it anyway and open an issue if you encounter problems.
 
@@ -29,7 +29,7 @@ Or from this repo
 
 Now if you want to work with planets you need the exoplanet catalogue. Move to the folder on your system where you want to store it and clone the Open Exoplanet Catalogue (this process will create a folder named open-exoplanet-catalogue within your working directory).
 
-    git clone https://github.com/hannorein/open_exoplanet_catalogue.git
+    git clone https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue.git
 
 The catalogue should then download. If you want to update the catalogue, move to the open_exoplanet_catalogue folder and pull
 
