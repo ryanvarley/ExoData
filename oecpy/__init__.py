@@ -3,13 +3,6 @@ Help?
 """
 __version__ = '1.0b1.4.1.1'
 
-import sys
-
-# Import package modules
-from . import assumptions, astroclasses, astroquantities, equations, example, flags, plots
-# import OEC database
-from .database import OECDatabase
-
 
 def test():
     if sys.hexversion < 0x02070000:
@@ -19,3 +12,14 @@ def test():
 
     from tests import testsuite as _testsuite
     unittest.TextTestRunner(verbosity=2).run(_testsuite)
+
+# OECPy Imports
+import sys
+
+# Import package modules
+from . import assumptions, astroclasses, astroquantities, equations, example, flags, plots
+# import OEC database
+from .database import OECDatabase
+
+
+

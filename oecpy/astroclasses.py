@@ -43,7 +43,7 @@ class _BaseObject(object):
             if not startClass:  # reached system with no hits
                 raise AttributeError
         except AttributeError:  # i.e calling binary on an object without one
-                raise HierarchyError('This object has no {0} as a parent object'.format(parentClass))
+                raise HierarchyError('This object ({0}) has no {1} as a parent object'.format(self.name, parentClass))
 
         if startClass.classType == parentClass:
             return startClass
@@ -144,9 +144,11 @@ class PlanetAndBinaryCommon(_BaseObject):
             if self.getParam('period') is not np.nan:
                 sma = self.calcSMA()  # calc using period
                 self.flags.addFlag('Calculated SMA')
+                return sma
             else:
                 return np.nan
-        return sma
+        else:
+            return sma
 
     def calcSMA(self):
         raise NotImplementedError('Only implemented for Binary and Planet child classes')

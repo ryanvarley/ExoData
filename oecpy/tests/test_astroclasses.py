@@ -352,5 +352,15 @@ class TestPlanetClass(TestCase):
         self.assertFalse(planet.isTransiting)
 
 
+class Test_Planet_Parameter_Estimation(TestCase):
+
+    def test_sma_estimation(self):
+        planet = genExamplePlanet()
+        planet.params.pop('semimajoraxis')
+
+        self.assertAlmostEqual(planet.a, 0.449636494929 * pq.au, 5)
+
+
+
 if __name__ == '__main__':
     unittest.main()

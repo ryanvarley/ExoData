@@ -60,7 +60,7 @@ class OECDatabase(object):
 
         for planet in self.planets:
             try:
-                if planet.isTransiting():
+                if planet.isTransiting:
                     transitingPlanets.append(planet)
             except KeyError:  # No 'discoverymethod' tag - this also filters Solar System planets
                 pass
