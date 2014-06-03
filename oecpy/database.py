@@ -27,6 +27,10 @@ class OECDatabase(object):
         self.systemDict = dict((system.name, system) for system in self.systems)
         self.planetDict = dict((planet.name, planet) for planet in self.planets)
 
+    def __repr__(self):
+        return 'OECDatabase({} Systems, {} Binaries, {} Stars, {} Planets)'.format(len(self.systems), len(self.binaries),
+                                                                                   len(self.stars), len(self.planets))
+
     def searchPlanet(self, name):
         """ Searches the database for a planet. Input can be complete ie GJ1214b, alternate name variations or even
         just 1214.

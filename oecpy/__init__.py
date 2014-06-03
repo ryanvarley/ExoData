@@ -1,7 +1,7 @@
 """
 Help?
 """
-__version__ = '1.0b1.4.1.1'
+__version__ = '1.1b1'
 
 
 def test():
