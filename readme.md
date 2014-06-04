@@ -11,6 +11,8 @@ This python interface serves as a link between the raw XML of the [Open Exoplane
 
 Please note that this package is currently in Beta. The Docs are incomplete, it is not fully unit tested and any and all methods and variables are subjected to change in the development process
 
+![OECPy DOI](https://zenodo.org/badge/doi/10.5281/zenodo.10286.png 'OECPy DOI')
+
 # Installation
 This module depends on
 * [Quantities](https://github.com/python-quantities/python-quantities)
