@@ -110,7 +110,7 @@ class TestDataBaseFailing(TestCase):
         with self.assertRaises(LoadDataBaseError):
             OECDatabase(self.tempDir)
 
-    def test_raises_LoadDataBaseError_without_system(self):
+    def test_raises_LoadDataBaseError_without_system_tag(self):
         xmlCases = [
             "<name>System 1</name><star><name>Star 1</name></star>",
             "<star><name>Star 2</name>"  # system -> star -> planet

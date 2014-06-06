@@ -105,7 +105,11 @@ class OECDatabase(object):
             raise LoadDataBaseError('could not find the database xml files. Have you given the correct location to the open exoplanet catalogues /systems folder?')
 
         for filename in databaseXML:
-            tree = ET.parse(open(filename, 'r'))
+            try:
+                tree = ET.parse(open(filename, 'r'))
+            except ET.ParseError as e:  # this is sometimes raised rather than the root.tag system check
+                raise LoadDataBaseError(e.message)
+
             root = tree.getroot()
 
             # Process the system

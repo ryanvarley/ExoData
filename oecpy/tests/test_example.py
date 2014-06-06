@@ -65,7 +65,7 @@ class TestExampleInstances(TestCase):
         self.assertEqual(examplePlanet.R, 0.92 * aq.R_j)
         self.assertEqual(examplePlanet.a, 0.449 * pq.au)
         self.assertEqual(examplePlanet.T, 339.6 * pq.K)
-        self.assertEqual(examplePlanet.transittime, 2454876.344 * pq.d)
+        self.assertEqual(examplePlanet.transittime, 2454876.344 * aq.JD)
 
     def test_hierarchy_for_planet(self):
         self.assertEqual(self.examplePlanet.star, self.exampleStar)

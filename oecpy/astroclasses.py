@@ -661,7 +661,7 @@ class PlanetParameters(Parameters):
             'eccentricity': 1,
             'period': pq.day,
             'semimajoraxis': pq.au,
-            'transittime': pq.d,
+            'transittime': aq.JD,  # TODO specific JD, MJF etc
             'molweight': pq.atomic_mass_unit,
         })
 
