@@ -7,7 +7,7 @@ else:
 from .patches import TestCase
 
 import numpy as np
-import quantities as pq
+
 
 from ..example import genExamplePlanet
 from ..plots import DataPerParameterBin, GeneralPlotter, _AstroObjectFigs, GlobalFigure, _planetPars, _starPars
@@ -38,12 +38,12 @@ class Test_AstroObjectFigs(TestCase):
     def test_gen_label(self):
         fig = _AstroObjectFigs([genExamplePlanet()])
         self.assertEqual(fig._gen_label('R', None), 'Planet Radius')
-        self.assertEqual(fig._gen_label('R', pq.m), 'Planet Radius (m)')
+        self.assertEqual(fig._gen_label('R', aq.m), 'Planet Radius (m)')
         self.assertEqual(fig._gen_label('R', aq.R_j), 'Planet Radius ($R_J$)')
 
     def test_get_unit_symbol(self):
         fig = _AstroObjectFigs([genExamplePlanet()])
-        self.assertEqual(fig._get_unit_symbol(pq.m), 'm')
+        self.assertEqual(fig._get_unit_symbol(aq.m), 'm')
         self.assertEqual(fig._get_unit_symbol(aq.R_j), '$R_J$')
 
     def test_get_unit_symbol_with_no_unit_raises_error(self):
@@ -189,7 +189,7 @@ class Test_GeneralPlotter(TestCase):
 
         fig = GeneralPlotter(planetlist)
         results = fig._set_axis('calcDensity()', None)
-        answer = (0.04138 * pq.g/pq.cm**3, 0.00517 * pq.g/pq.cm**3, 0.00153 * pq.g/pq.cm**3)
+        answer = (0.04138 * aq.g/aq.cm**3, 0.00517 * aq.g/aq.cm**3, 0.00153 * aq.g/aq.cm**3)
 
         self.assertItemsAlmostEqual(answer, results, 4)
 
@@ -202,7 +202,7 @@ class Test_GeneralPlotter(TestCase):
 
         fig = GeneralPlotter(planetlist)
         # for some reason the items equal assert fails, comparing the str representations is equivilent with strict order
-        self.assertItemsAlmostEqual(fig._set_axis('R', pq.m), [x.rescale(pq.m) for x in radiusValues], 4)
+        self.assertItemsAlmostEqual(fig._set_axis('R', aq.m), [x.rescale(aq.m) for x in radiusValues], 4)
 
     def test_set_axis_with_unitless_stellar_quantity(self):
         planetlist = generate_list_of_planets(3)
@@ -247,7 +247,7 @@ class Test_GeneralPlotter(TestCase):
         for i, radius in enumerate(radiusValues):
             planetlist[i].params['radius'] = radius
 
-        kmhr = pq.CompoundUnit('km / hr**2')
+        kmhr = aq.CompoundUnit('km / hr**2')
 
         fig = GeneralPlotter(planetlist)
         # for some reason the items equal assert fails, comparing the str representations is equivilent with strict order
@@ -263,5 +263,5 @@ class Test_GeneralPlotter(TestCase):
 
         fig = GeneralPlotter(planetlist)
 
-        self.assertItemsAlmostEqual(fig._set_axis('calcSurfaceGravity()', pq.km / pq.hr**2),
-                                    (52417.5200676341 * pq.km/pq.h**2, 13104.380016908524 * pq.km/pq.h**2, 5824.1688964037885 * pq.km/pq.h**2), 4)
+        self.assertItemsAlmostEqual(fig._set_axis('calcSurfaceGravity()', aq.km / aq.hr**2),
+                                    (52417.5200676341 * aq.km/aq.h**2, 13104.380016908524 * aq.km/aq.h**2, 5824.1688964037885 * aq.km/aq.h**2), 4)

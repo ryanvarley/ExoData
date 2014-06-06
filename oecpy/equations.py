@@ -24,7 +24,6 @@ import sys
 from pkg_resources import resource_stream, resource_filename
 import math
 
-import quantities as pq
 import quantities.constants as const
 from . import astroquantities as aq
 
@@ -52,7 +51,7 @@ def scaleHeight(T_eff_p, mu_p, g_p):
     """
 
     H = (const.k * T_eff_p) / (mu_p * g_p)
-    return H.rescale(pq.m)
+    return H.rescale(aq.m)
 
 
 def meanPlanetTemp(A_p, T_s, R_s, a):
@@ -63,7 +62,7 @@ def meanPlanetTemp(A_p, T_s, R_s, a):
 
     T_p = T_s * ((1-A_p)/0.7)**(1/4) * sqrt(R_s/(2*a))
 
-    return T_p.rescale(pq.degK)
+    return T_p.rescale(aq.degK)
 
 
 def starLuminosity(R_s, T_eff):
@@ -82,7 +81,7 @@ def starLuminosity(R_s, T_eff):
 
     L_s = 4 * pi * R_s**2 * sigma * T_eff**4
 
-    return L_s.rescale(pq.W)
+    return L_s.rescale(aq.W)
 
 
 def ratioTerminatorToStar(H_p, R_p, R_s):  # TODO use this in code with scale height calc
@@ -140,7 +139,7 @@ def surfaceGravity(M_p, R_p):
     """
 
     g_p = (G * M_p)/(R_p**2)
-    return g_p.rescale(pq.m / pq.s**2)
+    return g_p.rescale(aq.m / aq.s**2)
 
 
 def calcRatioTerminatorToStar(params):
@@ -189,15 +188,15 @@ def transitDuration(P, R_s, R_p, a, i):
 
     # TODO use non circular orbit version?
     if i is nan:
-        i = 90 * pq.deg
+        i = 90 * aq.deg
 
-    i = i.rescale(pq.rad)
+    i = i.rescale(aq.rad)
     k = R_p / R_s  # lit reference for eclipsing binaries
     b = (a * cos(i)) / R_s
 
     duration = (P / pi) * arcsin(((R_s * sqrt((1 + k) ** 2 - b ** 2)) / (a * sin(i))).simplified)
 
-    return duration.rescale(pq.min)
+    return duration.rescale(aq.min)
 
 
 def logg(M_p, R_p):
@@ -206,7 +205,7 @@ def logg(M_p, R_p):
     """
 
     g = surfaceGravity(M_p, R_p)
-    logg = log10(float(g.rescale(pq.cm / pq.s**2)))  # the float wrapper is needed to remove dimensionality
+    logg = log10(float(g.rescale(aq.cm / aq.s**2)))  # the float wrapper is needed to remove dimensionality
 
     return logg
 
@@ -214,7 +213,7 @@ def logg(M_p, R_p):
 def estimateStarTemperature(M_s):
     """ Estimates stellar temperature using the main sequence relationship T ~ 5800*M^0.65
     """
-    return (5800*pq.K * float(M_s.rescale(aq.M_s)**0.65)).rescale(pq.K)
+    return (5800*aq.K * float(M_s.rescale(aq.M_s)**0.65)).rescale(aq.K)
 
 
 def transitDepth(R_s, R_p):
@@ -223,7 +222,7 @@ def transitDepth(R_s, R_p):
 
     depth = (R_p / R_s)**2
 
-    return depth.rescale(pq.dimensionless)
+    return depth.rescale(aq.dimensionless)
 
 
 def density(M, R):
@@ -235,7 +234,7 @@ def density(M, R):
 
     volume = 4 / 3 * pi * R**3
 
-    return (M/volume).rescale(pq.g / pq.cm**3)
+    return (M/volume).rescale(aq.g / aq.cm**3)
 
 
 def estimateMass(R, density):
@@ -275,7 +274,7 @@ def calcSemiMajorAxis(Period, M_s):
     """
     a = ((Period**2 * G * M_s)/(4 * pi**2))**(1/3)
 
-    return a.rescale(pq.au)
+    return a.rescale(aq.au)
 
 
 def calcSemiMajorAxis2(T_p, T_s, A_p, R_s, epsilon=0.7):
@@ -286,7 +285,7 @@ def calcSemiMajorAxis2(T_p, T_s, A_p, R_s, epsilon=0.7):
     """
     a = sqrt((1-A_p)/epsilon) * (R_s/2) * (T_s/T_p)**2
 
-    return a.rescale(pq.au)
+    return a.rescale(aq.au)
 
 
 def calcPeriod(a, M_s):
@@ -299,7 +298,7 @@ def calcPeriod(a, M_s):
 
     P = 2 * pi * sqrt(a**3 / (G * M_s))
 
-    return P.rescale(pq.day)
+    return P.rescale(aq.day)
 
 
 def impactParameter(a, R_s, i):
@@ -308,9 +307,9 @@ def impactParameter(a, R_s, i):
         b \equiv \frac{a}{R_*} \cos{i}
     (Seager & Mallen-Ornelas 2003).
     """
-    b = (a/R_s) * cos(i.rescale(pq.rad))
+    b = (a/R_s) * cos(i.rescale(aq.rad))
 
-    return b.rescale(pq.dimensionless)
+    return b.rescale(aq.dimensionless)
 
 
 def estimateDistance(m, M, Av=0.0):
@@ -335,7 +334,7 @@ def estimateDistance(m, M, Av=0.0):
     if math.isnan(d):
         return np.nan
     else:
-        return d * pq.pc
+        return d * aq.pc
 
 
 def _createAbsMagEstimationDict():

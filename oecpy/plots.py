@@ -3,7 +3,7 @@
 import os
 import math
 
-import quantities as pq
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
@@ -497,7 +497,7 @@ class GeneralPlotter(_AstroObjectFigs):
             except ac.HierarchyError:  # ie trying to call planet.star and one planet is a lone ranger
                 value = np.nan
 
-            if unit is None:  # no unit to rescale (a pq.unitless quanitity would otherwise fail with ValueError)
+            if unit is None:  # no unit to rescale (a aq.unitless quanitity would otherwise fail with ValueError)
                 axisValues.append(value)
             else:
                 try:
@@ -577,7 +577,7 @@ class AboveLimitsError(Exception):
 _planetPars = {
     # paramKey    : (axis label,      unit)
     #'isTransiting': ('Is Transiting', bool), TODO add bool and grouped values
-    'calcTransitDuration()': ('Transit Duration', pq.day),
+    'calcTransitDuration()': ('Transit Duration', aq.day),
     'calcTransitDepth()': ('Transit Depth', None),
     #'type()': ('Planet Class', None),
     # 'massType()': ('Planet Mass Class', None),
@@ -585,10 +585,10 @@ _planetPars = {
     # 'temptype()': ('Planet Temp Class', None),
     'mu': ('Mean Molecular Weight', None),
     'albedo()': ('Planet Albedo', None),
-    #'calcTemperature()': ('Mean Planet Temperature (Calculated)', pq.K),
+    #'calcTemperature()': ('Mean Planet Temperature (Calculated)', aq.K),
     #'estimateMass()': ('Planet Mass Estimated From Radius', aq.M_j),
-    # 'calcSMA()': ('Semi-Major Axis', pq.au),
-    # 'calcSMAfromT()': ('Semi-Major Axis (calculated from T)', pq.au),
+    # 'calcSMA()': ('Semi-Major Axis', aq.au),
+    # 'calcSMAfromT()': ('Semi-Major Axis (calculated from T)', aq.au),
     # 'calcPeriod': ('Planet Radius', aq.R_j),
     # 'discoveryMethod': ('Planet Radius', aq.R_j),
     'e': ('Orbital Eccentricity', None),
@@ -597,21 +597,21 @@ _planetPars = {
     'age': ('Planet Age', aq.Gyear),
     # 'ra': ('RA', None),
     # 'dec': ('DEC', None),
-    'd': ('Distance to System', pq.pc),
+    'd': ('Distance to System', aq.pc),
     'R': ('Planet Radius', aq.R_j),
-    'T': ('Planet Temperature', pq.K),
+    'T': ('Planet Temperature', aq.K),
     'M': ('Planet Mass', aq.M_j),
     'calcSurfaceGravity()': ('Planet Surface Gravity', aq.ms2),
     'calcLogg()': ('Planet logg', None),
     'calcDensity()': ('Planet Density', aq.gcm3),
-    'i': ('Orbital Inclination', pq.deg),
-    'P': ('Period', pq.day),
-    'a': ('Semi-Major Axis', pq.au),
+    'i': ('Orbital Inclination', aq.deg),
+    'P': ('Period', aq.day),
+    'a': ('Semi-Major Axis', aq.au),
     # 'transittime': ('Transit Time', aq.JulianDay),
     # TODO Catalogue Unit issue with theese
-    # 'periastron': ('Orbit Periastron', pq.deg),
-    # 'longitude': ('Orbit Longitude', pq.deg),
-    # 'ascendingnode': ('Orbit Ascending Node', pq.deg),
+    # 'periastron': ('Orbit Periastron', aq.deg),
+    # 'longitude': ('Orbit Longitude', aq.deg),
+    # 'ascendingnode': ('Orbit Ascending Node', aq.deg),
 }
 
 _starPars = {
@@ -622,9 +622,9 @@ _starPars = {
     'magI': ('I Magnitude', None),
     'magJ': ('J Magnitude', None),
     'magK': ('K Magnitude', None),
-    'd': ('Distance to System', pq.pc),
+    'd': ('Distance to System', aq.pc),
     'calcLuminosity()': ('Stellar Luminosity', aq.L_s),
-    #'calcTemperature()': ('Stellar Temperature (Calculated)', pq.K),
+    #'calcTemperature()': ('Stellar Temperature (Calculated)', aq.K),
     'Z': ('Stellar Metallicity', None),
     # 'Spectral Type': ('Spectral Type', str),
     # 'estimateAbsoluteMagnitude': ('Stellar Age', aq.Gyear),
@@ -633,7 +633,7 @@ _starPars = {
     # 'ra': ('RA', None),
     # 'dec': ('DEC', None),
     'R': ('Stellar Radius', aq.R_s),
-    'T': ('Stellar Temperature', pq.K),
+    'T': ('Stellar Temperature', aq.K),
     'M': ('Stellar Mass', aq.M_s),
     'calcSurfaceGravity()': ('Planet Surface Gravity', aq.ms2),
     'calcLogg()': ('Stellar logg', None),

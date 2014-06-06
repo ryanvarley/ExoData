@@ -4,8 +4,6 @@ import numpy as np
 import math
 from pkg_resources import resource_stream
 
-import quantities as pq
-
 from . import equations as eq
 from . import astroquantities as aq
 from . import assumptions as assum
@@ -558,14 +556,14 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
 
         self._defaultUnits = {
             'age': aq.Gyear,
-            'distance': pq.pc, # TODO more specific unit handling here or in classes?
+            'distance': aq.pc, # TODO more specific unit handling here or in classes?
             'magB': 1,
             'magH': 1,
             'magI': 1,
             'magJ': 1,
             'magK': 1,
             'magV': 1,
-            'temperature': pq.K,
+            'temperature': aq.K,
         }
 
         self.rejectTags = ('system', 'binary', 'star', 'planet', 'moon')  # These are handled in their own classes
@@ -657,12 +655,12 @@ class PlanetParameters(Parameters):
             'discoveryyear': 1,
             'mass': aq.M_j,
             'radius': aq.R_j,
-            'inclination': pq.deg,
+            'inclination': aq.deg,
             'eccentricity': 1,
-            'period': pq.day,
-            'semimajoraxis': pq.au,
+            'period': aq.day,
+            'semimajoraxis': aq.au,
             'transittime': aq.JD,  # TODO specific JD, MJF etc
-            'molweight': pq.atomic_mass_unit,
+            'molweight': aq.atomic_mass_unit,
         })
 
 
