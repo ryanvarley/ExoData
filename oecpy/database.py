@@ -5,6 +5,12 @@ import re
 import xml.etree.ElementTree as ET
 import glob
 import os.path
+import sys
+
+# 2.6 patch for ExpatError being raised over ParseError (which didn't exist)
+if sys.hexversion < 0x02070000:
+    import xml.parsers.expat
+    ET.ParseError = xml.parsers.expat.ExpatError
 
 from .astroclasses import System, Binary, Star, Planet, Parameters, BinaryParameters, StarParameters, PlanetParameters
 
@@ -108,7 +114,7 @@ class OECDatabase(object):
             try:
                 tree = ET.parse(open(filename, 'r'))
             except ET.ParseError as e:  # this is sometimes raised rather than the root.tag system check
-                raise LoadDataBaseError(e.message)
+                raise LoadDataBaseError(e)
 
             root = tree.getroot()
 
