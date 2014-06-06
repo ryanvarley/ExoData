@@ -1,6 +1,5 @@
 """
-Contains code for simulating observations and calculating signal to noise of various targets. The module was stolen
-from another private project and so contains a few equations i left in incase anyone finds them useful.
+Contains code for simulating observations and calculating signal to noise of various targets.
 
 **Abbreviations used in this module**
 
@@ -11,7 +10,7 @@ from another private project and so contains a few equations i left in incase an
 * H - Scale height of the Planets Atmosphere
 * i - orbital inclination
 * e - orbit eccentricity
-* T_eff_s - Effective Temperature Star
+* T_eff_s - Effective Temperature of the Star
 * A - Albedo
 * mu - mean molecular weight
 """
@@ -38,7 +37,7 @@ _rootdir = os.path.dirname(__file__)
 
 
 def scaleHeight(T_eff_p, mu_p, g_p):
-    """ Caculate the scale height H of the atmosphere
+    """ Calculate the scale height H of the atmosphere
 
     .. math::
         H = \\frac{k T_eff}{\mu g}
@@ -51,8 +50,6 @@ def scaleHeight(T_eff_p, mu_p, g_p):
     :param g: surface gravity
     :return: H (scale Height)
     """
-
-    # TODO allow overwrite of scale heights assumed in atmosphere
 
     H = (const.k * T_eff_p) / (mu_p * g_p)
     return H.rescale(pq.m)
@@ -184,7 +181,7 @@ def transitDuration(P, R_s, R_p, a, i):
         T_\\text{dur} = \\frac{P}{\pi}\sin^{-1} \left[\\frac{R_\star}{a}\\frac{\sqrt{(1+k)^2 + b^2}}{\sin{a}} \\right]
 
     Where :math:`T_\\text{dur}` transit duration, P orbital period, :math:`R_\star` radius of the star,
-    a is the semi-major axis, k is :math:`\\frac{R_p}{R_s}` (Seager & Mallen-Ornelas 2003)
+    a is the semi-major axis, k is :math:`\\frac{R_p}{R_s}`, b is :math:`(a*\\cos{i})/R_s` (Seager & Mallen-Ornelas 2003)
 
     :param i: orbital inclination
     :return:
@@ -367,7 +364,7 @@ absMagDict, LClassRef = _createAbsMagEstimationDict()
 
 
 def estimateAbsoluteMagnitude(spectralType):
-    """ Uses the spectral type to lookup an aproximate absolute magnitude for the star.
+    """ Uses the spectral type to lookup an approximate absolute magnitude for the star.
     """
 
     from .astroclasses import SpectralType
