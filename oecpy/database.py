@@ -4,6 +4,7 @@
 import re
 import xml.etree.ElementTree as ET
 import glob
+import os.path
 
 from .astroclasses import System, Binary, Star, Planet, Parameters, BinaryParameters, StarParameters, PlanetParameters
 
@@ -99,9 +100,9 @@ class OECDatabase(object):
         self.stars = []
         self.planets = []
 
-        databaseXML = glob.glob(databaseLocation + '*.xml')
+        databaseXML = glob.glob(os.path.join(databaseLocation, '*.xml'))
         if not len(databaseXML):
-            raise LoadDataBaseError('could not find the database xml files. Have you given the correct location to the open exoplanet catalogues /systems/ folder?')
+            raise LoadDataBaseError('could not find the database xml files. Have you given the correct location to the open exoplanet catalogues /systems folder?')
 
         for filename in databaseXML:
             tree = ET.parse(open(filename, 'r'))
