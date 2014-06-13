@@ -31,7 +31,10 @@ class OECDatabase(object):
 
         self._loadDatabase(databaseLocation)
         self._planetSearchDict = self._generatePlanetSearchDict()
+
         self.systemDict = dict((system.name, system) for system in self.systems)
+        self.binaryDict = dict((binary.name, binary) for binary in self.binaries)
+        self.starDict = dict((star.name, star) for star in self.stars)
         self.planetDict = dict((planet.name, planet) for planet in self.planets)
 
     def __repr__(self):
