@@ -18,7 +18,7 @@ class _BaseObject(object):
         self.children = []
         self.parent = False
         self.classType = 'BaseObject'
-        self.flags = flags.Flag()
+        self.flags = flags.Flags()
 
         self.params = {}
         if params is not None:
