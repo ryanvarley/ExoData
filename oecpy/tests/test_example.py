@@ -107,6 +107,12 @@ class TestExampleInstances(TestCase):
         self.assertTrue(planet2.R, 12345)
         self.assertEqual(planet1.R, 0.92 * aq.R_j)
 
+    def test_fake_flags_raised(self):
+        self.assertTrue('Fake' in self.examplePlanet.flags)
+        self.assertTrue('Fake' in self.exampleStar.flags)
+        self.assertTrue('Fake' in self.exampleSystem.flags)
+
+
 
 class TestExampleInstancesWithBinary(TestCase):
 
@@ -150,6 +156,13 @@ class TestExampleInstancesWithBinary(TestCase):
         self.assertIsInstance(self.exampleSystem, ac.System)
         self.assertEqual(self.exampleSystem.name, 'Example System 2')
         self.assertItemsEqual(self.exampleSystem.stars, [self.exampleBinary])
+
+    def test_fake_flags_raised(self):
+        self.assertTrue('Fake' in self.examplePlanet.flags)
+        self.assertTrue('Fake' in self.exampleStarA.flags)
+        self.assertTrue('Fake' in self.exampleStarB.flags)
+        self.assertTrue('Fake' in self.exampleBinary.flags)
+        self.assertTrue('Fake' in self.exampleSystem.flags)
 
 
 

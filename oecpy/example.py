@@ -16,6 +16,7 @@ def genExampleSystem():
     systemPar.addParam('rightascension', '01 02 03')
 
     exampleSystem = System(systemPar.params)
+    exampleSystem.flags.addFlag('Fake')
 
     ac._ExampleSystemCount += 1
 
@@ -30,6 +31,7 @@ def genExampleBinary():
     # TODO add the rest of binary parameters
 
     exampleBinary = Binary(binaryPar.params)
+    exampleBinary.flags.addFlag('Fake')
 
     # generate other star
     exampleStar2 = genExampleStar('B', False)
@@ -65,6 +67,7 @@ def genExampleStar(binaryLetter='', heirarchy=True):
     starPar.addParam('temperature', '5370')
 
     exampleStar = Star(starPar.params)
+    exampleStar.flags.addFlag('Fake')
 
     if heirarchy:
         if binaryLetter:
@@ -100,6 +103,7 @@ def genExamplePlanet(binaryLetter=''):
     planetPar.addParam('transittime', '2454876.344')
 
     examplePlanet = Planet(planetPar.params)
+    examplePlanet.flags.addFlag('Fake')
 
     exampleStar = genExampleStar(binaryLetter=binaryLetter)
     exampleStar._addChild(examplePlanet)
