@@ -10,18 +10,18 @@ import numpy as np
 
 
 from ..example import genExamplePlanet
-from ..plots import DataPerParameterBin, GeneralPlotter, _AstroObjectFigs, GlobalFigure, _planetPars, _starPars
+from ..plots import DataPerParameterBin, GeneralPlotter, _AstroObjectFigs, _GlobalFigure, _planetPars, _starPars
 from .. import astroquantities as aq
 
 
 class Test_GlobalFigure(TestCase):
 
     def test_set_y_axis_log(self):  # Simple test to ensure theres no exception
-        fig = GlobalFigure()
+        fig = _GlobalFigure()
         fig.set_y_axis_log()
 
     def test_set_x_axis_log(self):
-        fig = GlobalFigure()
+        fig = _GlobalFigure()
         fig.set_x_axis_log()
 
 
@@ -109,25 +109,38 @@ class Test_DataPerParameterBin(TestCase):
 
         self.assertDictEqual(answer, data._processResults())
 
-    def test_set_axis_on_all_planet_params_generate_without_exception(self):
+    def test_plotbarchart_for_all_planet_params_generate_without_exception(self):
         planetlist = generate_list_of_planets(3)
 
         for param in _planetPars:
             DataPerParameterBin(planetlist, param, (-float('inf'), 0, 5, float('inf'))).plotBarChart()
 
-    def test_set_axis_on_all_stellar_params_generate_without_exception(self):
+    def test_plotbarchart_for_all_stellar_params_generate_without_exception(self):
         planetlist = generate_list_of_planets(3)
         starlist = [planet.star for planet in planetlist]
 
         for param in _starPars:
             DataPerParameterBin(starlist, param, (-float('inf'), 0, 5, float('inf'))).plotBarChart()
 
-    def test_mix_of_planet_and_star_classes_on_input_raises_TypeError(self):
+    def test_plotbarchart_for_all_planet_and_star_classes_on_input_raises_TypeError(self):
         planetlist = generate_list_of_planets(3)
         starlist = [planet.star for planet in planetlist]
 
         with self.assertRaises(TypeError):
             fig = DataPerParameterBin(starlist + planetlist, 'R', (-float('inf'), 0, 5, float('inf'))).plotBarChart()
+
+    def test_plotpiechart_for_all_planet_params_generate_without_exception(self):
+        planetlist = generate_list_of_planets(3)
+
+        for param in _planetPars:
+            DataPerParameterBin(planetlist, param, (-float('inf'), 0, 5, float('inf'))).plotPieChart()
+
+    def test_plotpiechart_for_all_stellar_params_generate_without_exception(self):
+        planetlist = generate_list_of_planets(3)
+        starlist = [planet.star for planet in planetlist]
+
+        for param in _starPars:
+            DataPerParameterBin(starlist, param, (-float('inf'), 0, 5, float('inf'))).plotPieChart()
 
 
 def generate_list_of_planets(number):

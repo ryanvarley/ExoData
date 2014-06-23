@@ -20,7 +20,7 @@ else:
 rcParams.update({'figure.autolayout': True})
 
 
-class GlobalFigure(object):
+class _GlobalFigure(object):
     """ sets up the figure and subfigure object with all the global parameters.
     """
 
@@ -136,12 +136,12 @@ class GlobalFigure(object):
             self.ax.set_xscale('linear')
 
 
-class _AstroObjectFigs(GlobalFigure):
+class _AstroObjectFigs(_GlobalFigure):
     """ contains extra functions for dealing with input of astro objects
     """
 
     def __init__(self, objectList, size='small'):
-        GlobalFigure.__init__(self, size)
+        _GlobalFigure.__init__(self, size)
         self.objectList = objectList  # list of planets, stars etc
         self._objectType = self._getInputObjectTypes()  # are we dealing with planets, stars etc
 
@@ -196,7 +196,7 @@ class _AstroObjectFigs(GlobalFigure):
             return unit.symbol
 
 
-class BaseDataPerClass(_AstroObjectFigs):
+class _BaseDataPerClass(_AstroObjectFigs):  # hangover from ETLOS's multiple child plot classes
     """ Base class for plots counting the results by a attribute. Child classes must modify
     * _classVariables (self._allowedKeys, )
     * _getSortKey (take the planet, turn it into a key)
@@ -246,10 +246,13 @@ class BaseDataPerClass(_AstroObjectFigs):
 
         return resultsByClass
 
-    def plotBarChart(self, title='', xlabel=None, c='#3ea0e4', label_rotation=False):
-        resultsByClass = self.resultsByClass
+    def _getPlotData(self):
+        """ Turns the resultsByClass Dict into a list of bin groups skipping the uncertain group if empty
 
-        ax = self.ax
+        return: (label list, ydata list)
+        :rtype: tuple(list(str), list(float))
+        """
+        resultsByClass = self.resultsByClass
 
         try:
             if resultsByClass['Uncertain'] == 0:  # remove uncertain tag if present and = 0
@@ -257,9 +260,14 @@ class BaseDataPerClass(_AstroObjectFigs):
         except KeyError:
             pass
 
-        plotData = list(zip(*resultsByClass.items()))
+        plotData = list(zip(*resultsByClass.items()))  # (labels, ydata)
 
-        ydata = plotData[1]
+        return plotData
+
+    def plotBarChart(self, title='', xlabel=None, c='#3ea0e4', label_rotation=False):
+        ax = self.ax
+
+        labels, ydata = self._getPlotData()
 
         numItems = float(len(ydata))
 
@@ -271,14 +279,14 @@ class BaseDataPerClass(_AstroObjectFigs):
         width = spacePerBar*gapratio
         gap = spacePerBar - width
 
-        ax.bar(ind, plotData[1], width, color=c)
-        ax.set_xticklabels(plotData[0])
+        ax.bar(ind, ydata, width, color=c)
+        ax.set_xticklabels(labels)
         ax.set_xticks(ind+(width/2.))
 
         for axis in self.ax.get_xticklabels():
             axis.set_fontsize(self.xticksize)
 
-        if self.unit is None:  # TODO this is hacked in so it only work with DataPerParameterClass
+        if self.unit is None:  # NOTE this is hacked in so it only works with DataPerParameterClass
             self.unit = self._getParLabelAndUnit(self._planetProperty)[1]  # use the default unit defined in this class
         self._yaxis_unit = self.unit
 
@@ -289,10 +297,40 @@ class BaseDataPerClass(_AstroObjectFigs):
 
         if label_rotation:
             plt.xticks(rotation=label_rotation)
-        plt.ylabel('Number of Planets')  # TODO could be stars
+        plt.ylabel('Number of Planets')  # TODO could be stars, binaries etc
         plt.title(title)
         plt.xlim([min(ind)-gap, max(ind)+(gap*2)])
         plt.draw()
+
+    def plotPieChart(self, title=None):
+        self.fig.set_tight_layout(True)
+
+        # Generate plot data
+        labels, ydata = self._getPlotData()
+        totalobjects = float(np.sum(ydata))
+        fracs = [ynum / totalobjects for ynum in ydata]
+
+        explode = np.zeros(len(fracs))  # non zero makes the slices come out of the pie
+
+        # plot pie chart
+        cmap = plt.cm.get_cmap('hsv')
+        colors = cmap(np.linspace(0., 0.9, len(fracs)))
+        plt.pie(fracs, explode=explode, labels=labels, autopct='%1.1f%%', shadow=False, startangle=90,
+                colors=colors)
+
+        # generate plot / axis labels
+        for axis in self.ax.get_xticklabels():
+            axis.set_fontsize(self.xticksize)
+
+        if self.unit is None:  # NOTE this is hacked in so it only works with DataPerParameterClass
+            self.unit = self._getParLabelAndUnit(self._planetProperty)[1]  # use the default unit defined in this class
+        self._yaxis_unit = self.unit
+
+        if title is None:
+            title = 'Planet {0} Bins'.format(self._gen_label(self._planetProperty, self.unit))  # NOTE not always planet
+
+        plt.title(title)
+        plt.xlim(-1.5, 1.5)
 
     def saveAllBarChart(self, filepath, *args, **kwargs):
         self.plotBarChart(*args, **kwargs)
@@ -315,7 +353,7 @@ class BaseDataPerClass(_AstroObjectFigs):
         return resultsByClass
 
 
-class DataPerParameterBin(BaseDataPerClass):
+class DataPerParameterBin(_BaseDataPerClass):
     """ Generates Data for planets per parameter bin"""
 
     def __init__(self, results, planetProperty, binLimits, unit=None, size='small'):
@@ -330,7 +368,7 @@ class DataPerParameterBin(BaseDataPerClass):
         self._planetProperty = planetProperty
 
         self._genKeysBins()  # Generate the bin keys/labels (must do before base class processes results)
-        BaseDataPerClass.__init__(self, results, unit, size)
+        _BaseDataPerClass.__init__(self, results, unit, size)
 
     def _getSortKey(self, planet):
         """ Takes a planet and turns it into a key to be sorted by
@@ -348,7 +386,7 @@ class DataPerParameterBin(BaseDataPerClass):
             except AttributeError:  # either nan or unitless
                 pass
 
-        return sortValueIntoGroup(self._allowedKeys[:-1], self._binlimits, value)
+        return _sortValueIntoGroup(self._allowedKeys[:-1], self._binlimits, value)
 
     def _classVariables(self):
         pass  # Overload as we dont want it to set anything in this class
@@ -522,7 +560,7 @@ class GeneralPlotter(_AstroObjectFigs):
         self._marker_size = size
 
 
-def sortValueIntoGroup(groupKeys, groupLimits, value):
+def _sortValueIntoGroup(groupKeys, groupLimits, value):
     """ returns the Key of the group a value belongs to
     :param groupKeys: a list/tuple of keys ie ['1-3', '3-5', '5-8', '8-10', '10+']
     :param groupLimits: a list of the limits for the group [1,3,5,8,10,float('inf')] note the first value is an absolute
@@ -572,8 +610,9 @@ class AboveLimitsError(Exception):
     pass
 
 # A parameter dict based on the current astroclass list and the parameter selected. Here the standard
-# unit, full name for labels and short name are stored. All values that could be used are listed here, many are
+# units, full name for labels and short name as stored. All values that could be used are listed here and many are
 # commented because i dont think they should be used or will not work without further code to interpret
+# These dicts allow axis labels for the plots
 _planetPars = {
     # paramKey    : (axis label,      unit)
     #'isTransiting': ('Is Transiting', bool), TODO add bool and grouped values

@@ -157,15 +157,24 @@ oecpy.plots.GeneralPlotter(exocat.planets, 'R', 'star.magV',
 oecpy.plots.DataPerParameterBin(exocat.planets, 'e',
       (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotBarChart(label_rotation=45)
 ```
-![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-orbital-eccentricity-2.png "Planet Eccentricity Plot")
+![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-orbital-eccentricity-3.png "Planet Eccentricity Plot")
 
-You can also make plots large (ie for presentations), and change the color easily
+You can also plot this as a pie chart
+
+```python
+oecpy.plots.DataPerParameterBin(exocat.planets, 'e',
+      (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotPieChart)
+```
+
+![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-orbital-eccentricity-pie.png "Planet Eccentricity Pie Chart")
+
+Plots can also be large (i.e. for presentations), and you can change the color easily with normal *matplotlib* syntax
 
 ```python
 oecpy.plots.DataPerParameterBin(exocat.planets, 'M',
     (0, 0.2, 0.5, 1, 2, 3, 6, 12, float('inf')), size='large').plotBarChart(c='r')
 ```
-![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-orbital-eccentricity-large.png "Planet Eccentricity Plot Large")
+![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-orbital-eccentricity-large-2.png "Planet Eccentricity Plot Large")
 
 # Licence
 
