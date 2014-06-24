@@ -17,6 +17,9 @@ Please note that this package is currently in Beta. The Docs are incomplete, it 
 This module depends on
 * [Quantities](https://github.com/python-quantities/python-quantities)
 * [numpy](http://www.numpy.org/)
+* nose
+* matplotlib
+* requests
 * [Open Exoplanet Catalogue](https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue) (somewhere on your system)
 
 **Currently only tested under Python 2.6, 2.7, 3.3, 3.4 on mac and linux**. If you use windows or a different python version try it anyway and open an issue if you encounter problems.
@@ -29,7 +32,9 @@ Or from this repo
 
     python setup.py install
 
-Now if you want to work with planets you need the exoplanet catalogue. Move to the folder on your system where you want to store it and clone the Open Exoplanet Catalogue (this process will create a folder named open-exoplanet-catalogue within your working directory).
+You can either download and manage the Open Exoplanet Catalogue yourself or automatically load the latest version from the web each time.
+
+To get your own copy move to the folder on your system where you want to store it and clone the Open Exoplanet Catalogue (this process will create a folder named open-exoplanet-catalogue within your working directory).
 
     git clone https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue.git
 
@@ -38,13 +43,17 @@ The catalogue should then download. If you want to update the catalogue, move to
     cd open_exoplanet_catalogue/
     git pull origin master
 
-If you want to keep track of this repo in a GUI way, i recommend [sourcetree](http://www.sourcetreeapp.com/) or the [github client](https://help.github.com/articles/set-up-git).
+If you want to keep track of this repo in a GUI way, I recommend [sourcetree](http://www.sourcetreeapp.com/) or the [github client](https://help.github.com/articles/set-up-git).
 
 # Usage
 
 	import oecpy
 	databaseLocation = '/git/open_exoplanet_catalogue/systems/' # Your path here (to systems folder)
 	exocat = oecpy.OECDatabase(databaseLocation)
+
+	# To automatically load the latest version from github you can instead type which fetches the
+	# latest version from https://github.com/OpenExoplanetCatalogue/oec_gzip/raw/master/systems.xml.gz
+	exocat = oecpy.load_db_from_url()
 
 You can then access the lists
 
