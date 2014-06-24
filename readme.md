@@ -9,9 +9,7 @@ This python interface serves as a link between the raw XML of the [Open Exoplane
 * Easily navigate hierarchy (ie from planet to star or star to planets)
 * Availability of system parameters in planets (ie ra, dec, d (distance))
 
-Please note that this package is currently in Beta. The Docs are incomplete, it is not fully unit tested and any and all methods and variables are subjected to change in the development process
-
-![OECPy DOI](https://zenodo.org/badge/doi/10.5281/zenodo.10286.png 'OECPy DOI')
+Please note that this package is in active development. The Docs are incomplete, it is not fully unit tested and any and all methods and variables are subjected to change in the development process
 
 # Installation
 This module depends on
@@ -51,8 +49,8 @@ If you want to keep track of this repo in a GUI way, I recommend [sourcetree](ht
 	databaseLocation = '/git/open_exoplanet_catalogue/systems/' # Your path here (to systems folder)
 	exocat = oecpy.OECDatabase(databaseLocation)
 
-	# To automatically load the latest version from github you can instead type which fetches the
-	# latest version from https://github.com/OpenExoplanetCatalogue/oec_gzip/raw/master/systems.xml.gz
+	# To automatically load the latest version from github you can instead use load_db_from_url() which fetches
+	# the latest version from https://github.com/OpenExoplanetCatalogue/oec_gzip/raw/master/systems.xml.gz
 	exocat = oecpy.load_db_from_url()
 
 You can then access the lists
