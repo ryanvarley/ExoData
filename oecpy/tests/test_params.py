@@ -6,11 +6,12 @@ if sys.hexversion < 0x02070000:
     import unittest2 as unittest
 else:
     import unittest
-import quantities as pq
+
 import numpy as np
 
 from .. import params
 from .. import example as ex
+from .. import astroquantities as aq
 from .patches import TestCase
 
 
@@ -29,7 +30,7 @@ class estimateMissingValuesPlanet(estimateMissingValues):
 
     def testSMAEstimatedWhenTrue(self):
         del self.planet.params['semimajoraxis']
-        self.assertAlmostEqual(self.planet.a, 0.4496365 * pq.au, 7)
+        self.assertAlmostEqual(self.planet.a, 0.4496365 * aq.au, 7)
         self.assertTrue('Calculated SMA' in self.planet.flags.flags)
 
     def testSMANotEstimatedWhenFalse(self):
@@ -40,7 +41,7 @@ class estimateMissingValuesPlanet(estimateMissingValues):
 
     def testPeriodEstimatedWhenTrue(self):
         del self.planet.params['period']
-        self.assertAlmostEqual(self.planet.P, 110.96397 * pq.day, 4)
+        self.assertAlmostEqual(self.planet.P, 110.96397 * aq.day, 4)
         self.assertTrue('Calculated Period' in self.planet.flags.flags)
 
     def testPeriodNotEstimatedWhenFalse(self):
@@ -51,7 +52,7 @@ class estimateMissingValuesPlanet(estimateMissingValues):
 
     def testTempEstimatedWhenTrue(self):
         del self.planet.params['temperature']
-        self.assertAlmostEqual(self.planet.T, 402.175111 * pq.K, 4)
+        self.assertAlmostEqual(self.planet.T, 402.175111 * aq.K, 4)
         self.assertTrue('Calculated Temperature' in self.planet.flags.flags)
 
     def testTempNotEstimatedWhenFalse(self):
@@ -79,7 +80,7 @@ class estimateMissingValuesStar(estimateMissingValues):
 
     def testDistanceEstimatedWhenTrue(self):
         del self.star.system.params['distance']
-        self.assertAlmostEqual(self.star.d, 60.256 * pq.pc, 3)
+        self.assertAlmostEqual(self.star.d, 60.256 * aq.pc, 3)
         self.assertTrue('Estimated Distance' in self.star.flags.flags)
 
     def testDistanceNotEstimatedWhenFalse(self):
@@ -97,7 +98,7 @@ class estimateMissingValuesBinary(estimateMissingValues):
     @unittest.skip('Currently the calculation is not implemented')
     def testSMAEstimatedWhenTrue(self):
         del self.binary.params['semimajoraxis']
-        self.assertAlmostEqual(self.binary.a, 0.4496365 * pq.au, 7)
+        self.assertAlmostEqual(self.binary.a, 0.4496365 * aq.au, 7)
         self.assertTrue('Calculated SMA' in self.binary.flags.flags)
 
     def testSMANotEstimatedWhenFalse(self):
@@ -109,7 +110,7 @@ class estimateMissingValuesBinary(estimateMissingValues):
     @unittest.skip('Currently the calculation is not implemented')
     def testPeriodEstimatedWhenTrue(self):
         del self.binary.params['period']
-        self.assertAlmostEqual(self.binary.P, 110.96397 * pq.day, 4)
+        self.assertAlmostEqual(self.binary.P, 110.96397 * aq.day, 4)
         self.assertTrue('Calculated Period' in self.binary.flags.flags)
 
     def testPeriodNotEstimatedWhenFalse(self):

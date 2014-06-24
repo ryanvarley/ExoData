@@ -9,8 +9,8 @@ else:
     import unittest
 
 import numpy as np
-import quantities as pq
 
+from .. import astroquantities as aq
 from ..astroclasses import Parameters, Star, Planet, Binary, System, _findNearest, SpectralType, _BaseObject
 from ..example import genExamplePlanet
 from .patches import TestCase
@@ -87,7 +87,7 @@ class TestAstroObject__eq__method(TestCase):
 
     def setUp(self):
         self.object1 = _BaseObject()
-        self.object1.params = {'name': 'name1', 'radius': 10*pq.km, 'd': 1}
+        self.object1.params = {'name': 'name1', 'radius': 10*aq.km, 'd': 1}
 
     def test_astroObject_same_object_is_eq(self):
         self.assertEqual(self.object1, self.object1)
@@ -99,19 +99,19 @@ class TestAstroObject__eq__method(TestCase):
 
     def test_astroObject_is_neq_changed_param_dict(self):
         object2 = _BaseObject()
-        object2.params = {'name': 'name1', 'radius': 10*pq.km, 'd': 2}
+        object2.params = {'name': 'name1', 'radius': 10*aq.km, 'd': 2}
         self.assertNotEqual(self.object1, object2)
 
     def test_astroObject_is_eq_different_param_dict_same_values(self):
         object2 = _BaseObject()
-        object2.params = {'name': 'name1', 'radius': 10*pq.km, 'd': 1}
+        object2.params = {'name': 'name1', 'radius': 10*aq.km, 'd': 1}
         self.assertEqual(self.object1, object2)
 
     def test_planet_and_star_same_params_are_neq(self):
         planet = Planet()
-        planet.params = {'name': 'name1', 'radius': 10*pq.km, 'd': 1}
+        planet.params = {'name': 'name1', 'radius': 10*aq.km, 'd': 1}
         star = Star()
-        star.params = {'name': 'name1', 'radius': 10*pq.km, 'd': 1}
+        star.params = {'name': 'name1', 'radius': 10*aq.km, 'd': 1}
 
         self.assertNotEqual(planet, star)
 
@@ -140,7 +140,7 @@ class TestStarParameters(TestCase):
         star.params['magV'] = 5
         star.parent.params.pop('distance')
 
-        self.assertAlmostEqual(star.d, 45.19 * pq.pc, 2)
+        self.assertAlmostEqual(star.d, 45.19 * aq.pc, 2)
         self.assertTrue('Estimated Distance' in star.flags.flags)
 
     def test_distance_estimation_not_called_if_d_present(self):
@@ -148,7 +148,7 @@ class TestStarParameters(TestCase):
         star = planet.star
         star.parent.params['distance'] = 10
 
-        self.assertEqual(star.d, 10 * pq.pc)
+        self.assertEqual(star.d, 10 * aq.pc)
         self.assertFalse('Estimated Distance' in star.flags.flags)
 
     def test_magV_when_present(self):
@@ -358,7 +358,7 @@ class Test_Planet_Parameter_Estimation(TestCase):
         planet = genExamplePlanet()
         planet.params.pop('semimajoraxis')
 
-        self.assertAlmostEqual(planet.a, 0.449636494929 * pq.au, 5)
+        self.assertAlmostEqual(planet.a, 0.449636494929 * aq.au, 5)
 
 
 

@@ -4,6 +4,16 @@
 import re
 import xml.etree.ElementTree as ET
 import glob
+import os.path
+import sys
+import io
+import gzip
+import requests
+
+# 2.6 patch for ExpatError being raised over ParseError (which didn't exist)
+if sys.hexversion < 0x02070000:
+    import xml.parsers.expat
+    ET.ParseError = xml.parsers.expat.ExpatError
 
 from .astroclasses import System, Binary, Star, Planet, Parameters, BinaryParameters, StarParameters, PlanetParameters
 
@@ -14,18 +24,27 @@ class OECDatabase(object):
     """ This Class Handles the OEC database including search functions.
     """
 
-    def __init__(self, databaseLocation):
+    def __init__(self, databaseLocation, stream=False):
         """ Holds the Open Exoplanet Catalogue database in python
 
         :param databaseLocation: file path to the Open Exoplanet Catalogue systems folder ie
             ~/git/open-exoplanet-catalogue-atmospheres/systems/
             get the catalogue from https://github.com/hannorein/open_exoplanet_catalogue
+            OR the stream object (used by load_db_from_url)
+        :param stream: if true treats the databaseLocation as a stream object
         """
 
-        self._loadDatabase(databaseLocation)
+        self._loadDatabase(databaseLocation, stream)
         self._planetSearchDict = self._generatePlanetSearchDict()
+
         self.systemDict = dict((system.name, system) for system in self.systems)
+        self.binaryDict = dict((binary.name, binary) for binary in self.binaries)
+        self.starDict = dict((star.name, star) for star in self.stars)
         self.planetDict = dict((planet.name, planet) for planet in self.planets)
+
+    def __repr__(self):
+        return 'OECDatabase({} Systems, {} Binaries, {} Stars, {} Planets)'.format(len(self.systems), len(self.binaries),
+                                                                                   len(self.stars), len(self.planets))
 
     def searchPlanet(self, name):
         """ Searches the database for a planet. Input can be complete ie GJ1214b, alternate name variations or even
@@ -85,8 +104,11 @@ class OECDatabase(object):
 
         return planetNameDict
 
-    def _loadDatabase(self, databaseLocation):
+    def _loadDatabase(self, databaseLocation, stream=False):
         """ Loads the database from a given file path in the class
+
+        :param databaseLocation: the location on disk or the stream object
+        :param stream: if true treats the databaseLocation as a stream object
         """
 
         # Initialise Database
@@ -95,33 +117,46 @@ class OECDatabase(object):
         self.stars = []
         self.planets = []
 
-        databaseXML = glob.glob(databaseLocation + '*.xml')
-        if not len(databaseXML):
-            raise LoadDataBaseError('could not find the database xml files. Have you given the correct location to the open exoplanet catalogues /systems/ folder?')
+        if stream:
+            tree = ET.parse(databaseLocation)
+            for system in tree.findall(".//system"):
+                self._loadSystem(system)
+        else:
+            databaseXML = glob.glob(os.path.join(databaseLocation, '*.xml'))
+            if not len(databaseXML):
+                raise LoadDataBaseError('could not find the database xml files. Have you given the correct location '
+                                        'to the open exoplanet catalogues /systems folder?')
 
-        for filename in databaseXML:
-            tree = ET.parse(open(filename, 'r'))
-            root = tree.getroot()
+            for filename in databaseXML:
+                try:
+                    tree = ET.parse(open(filename, 'r'))
+                except ET.ParseError as e:  # this is sometimes raised rather than the root.tag system check
+                    raise LoadDataBaseError(e)
 
-            # Process the system
-            if not root.tag == 'system':
-                raise LoadDataBaseError('file {0} does not contain a valid system - could be an error with your version'
-                                        ' of the catalogue'.format(filename))
+                root = tree.getroot()
 
-            systemParams = Parameters()
-            for systemXML in root:
+                # Process the system
+                if not root.tag == 'system':
+                    raise LoadDataBaseError('file {0} does not contain a valid system - could be an error with your version'
+                                            ' of the catalogue'.format(filename))
 
-                tag = systemXML.tag
-                text = systemXML.text
-                attrib = systemXML.attrib
+                self._loadSystem(root)
 
-                systemParams.addParam(tag, text, attrib)
+    def _loadSystem(self, root):
+        systemParams = Parameters()
+        for systemXML in root:
 
-            system = System(systemParams.params)
-            self.systems.append(system)  # Add system to the index
+            tag = systemXML.tag
+            text = systemXML.text
+            attrib = systemXML.attrib
 
-            self._loadBinarys(root, system)
-            self._loadStars(root, system)
+            systemParams.addParam(tag, text, attrib)
+
+        system = System(systemParams.params)
+        self.systems.append(system)  # Add system to the index
+
+        self._loadBinarys(root, system)
+        self._loadStars(root, system)
 
     def _loadBinarys(self, parentXML, parent):
 
@@ -194,6 +229,22 @@ class OECDatabase(object):
 
             parent._addChild(planet)  # Add planet to the star
             self.planets.append(planet)  # Add planet to the index
+
+
+def load_db_from_url(url="https://github.com/OpenExoplanetCatalogue/oec_gzip/raw/master/systems.xml.gz"):
+    """ Loads the database from a gzipped version of the system folder, by default the one located in the oec_gzip repo
+    in the OpenExoplanetCatalogue GitHub group.
+
+    The database is loaded from the url in memory
+
+    :param url: url to load (must be gzipped version of systems folder)
+    :return: OECDatabase objected initialised with latest OEC Version
+    """
+
+    catalogue = gzip.GzipFile(fileobj=io.BytesIO(requests.get(url).content))
+    database = OECDatabase(catalogue, stream=True)
+
+    return database
 
 
 class LoadDataBaseError(IOError):

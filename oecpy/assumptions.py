@@ -8,7 +8,6 @@ If anyone has a good solution to this issue, please create it in a fork or email
 """
 import numpy as np
 
-import quantities as pq
 from . import astroquantities as aq
 
 # TODO open an issue about this module for community discussion
@@ -36,16 +35,16 @@ planetAssumptions = {
 
     'tempType':
         [
-            (350 * pq.K, 'Temperate'),
-            (700 * pq.K, 'Warm'),
+            (350 * aq.K, 'Temperate'),
+            (700 * aq.K, 'Warm'),
             (float('inf'), 'Hot'),
         ],
 
     'mu':  # depends on masstype so takes the masstype as the key, and mu as the value
         {
-            'Super-Earth': 18 * pq.atomic_mass_unit,  # TODO these should be more inherently linked to masstype
-            'Neptune': 2 * pq.atomic_mass_unit,
-            'Jupiter': 2 * pq.atomic_mass_unit
+            'Super-Earth': 18 * aq.atomic_mass_unit,  # TODO these should be more inherently linked to masstype
+            'Neptune': 2 * aq.atomic_mass_unit,
+            'Jupiter': 2 * aq.atomic_mass_unit
         },
 
     'albedo':  # depends on temperature so it takes tempType as the key and the albedo as the value
@@ -60,9 +59,9 @@ planetAssumptions = {
 
     'density':
     {
-        'Super-Earth': 4 * pq.g / pq.cm**3,
-        'Neptune': 1.638 * pq.g / pq.cm**3,
-        'Jupiter': 1.326 * pq.g / pq.cm**3
+        'Super-Earth': 4 * aq.g / aq.cm**3,
+        'Neptune': 1.638 * aq.g / aq.cm**3,
+        'Jupiter': 1.326 * aq.g / aq.cm**3
     }
 }
 

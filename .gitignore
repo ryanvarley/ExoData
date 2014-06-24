@@ -11,3 +11,4 @@ MANIFEST
 
 # File used for testing code (mainly plots)
 runtest.py
+run.py

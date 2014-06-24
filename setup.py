@@ -32,7 +32,7 @@ def find_version(*file_paths):
 with codecs.open(os.path.join(here, 'readme.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-install_requires = ['numpy', 'quantities', 'nose>=1.0', 'matplotlib']
+install_requires = ['numpy', 'quantities', 'nose>=1.0', 'matplotlib>=1.3.1', 'requests']
 if sys.hexversion < 0x02070000:
     install_requires.append('unittest2')
     install_requires.append('ordereddict')
@@ -50,7 +50,7 @@ setup(
     long_description=long_description,
     url='https://github.com/ryanvarley/open-exoplanet-catalogue-python',
     author='Ryan Varley',
-    author_email='oecpy@ryanvarley.co.uk',
+    author_email='oecpy@ryanvarley.uk',
     license='GPLv3',
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -64,6 +64,7 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
+        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 2.7',

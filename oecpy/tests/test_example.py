@@ -6,7 +6,7 @@ if sys.hexversion < 0x02070000:
     import unittest2 as unittest
 else:
     import unittest
-import quantities as pq
+
 
 from ..example import genExamplePlanet, examplePlanet, exampleSystem, exampleStar
 from .. import astroquantities as aq
@@ -28,7 +28,7 @@ class TestExampleInstances(TestCase):
         exampleSystem = self.exampleSystem
 
         self.assertEqual(exampleSystem.name, 'Example System 1')
-        self.assertEqual(exampleSystem.d, 58 * pq.pc)
+        self.assertEqual(exampleSystem.d, 58 * aq.pc)
         self.assertEqual(exampleSystem.dec, '+04 05 06')
         self.assertEqual(exampleSystem.ra, '01 02 03')
 
@@ -48,7 +48,7 @@ class TestExampleInstances(TestCase):
         self.assertEqual(exampleStar.name, 'Example Star 1')
         self.assertEqual(exampleStar.R, 0.95 * aq.R_s)
         self.assertEqual(exampleStar.spectralType, 'G5')
-        self.assertEqual(exampleStar.T, 5370 * pq.K)
+        self.assertEqual(exampleStar.T, 5370 * aq.K)
         self.assertEqual(exampleStar.getLimbdarkeningCoeff(1.22), (0.3531, 0.2822))
 
     def test_planet_object(self):
@@ -57,15 +57,15 @@ class TestExampleInstances(TestCase):
         self.assertEqual(examplePlanet.discoveryMethod, 'transit')
         self.assertEqual(examplePlanet.discoveryYear, 2001)
         self.assertEqual(examplePlanet.e, 0.09)
-        self.assertEqual(examplePlanet.i, 89.2 * pq.deg)
+        self.assertEqual(examplePlanet.i, 89.2 * aq.deg)
         self.assertEqual(examplePlanet.lastUpdate, '12/12/08')
         self.assertEqual(examplePlanet.M, 3.9 * aq.M_j)
         self.assertEqual(examplePlanet.name, 'Example Star 1 b')
-        self.assertEqual(examplePlanet.P, 111.2 * pq.d)
+        self.assertEqual(examplePlanet.P, 111.2 * aq.d)
         self.assertEqual(examplePlanet.R, 0.92 * aq.R_j)
-        self.assertEqual(examplePlanet.a, 0.449 * pq.au)
-        self.assertEqual(examplePlanet.T, 339.6 * pq.K)
-        self.assertEqual(examplePlanet.transittime, 2454876.344 * pq.d)
+        self.assertEqual(examplePlanet.a, 0.449 * aq.au)
+        self.assertEqual(examplePlanet.T, 339.6 * aq.K)
+        self.assertEqual(examplePlanet.transittime, 2454876.344 * aq.JD)
 
     def test_hierarchy_for_planet(self):
         self.assertEqual(self.examplePlanet.star, self.exampleStar)
@@ -106,6 +106,12 @@ class TestExampleInstances(TestCase):
         planet2.params['radius'] = 12345
         self.assertTrue(planet2.R, 12345)
         self.assertEqual(planet1.R, 0.92 * aq.R_j)
+
+    def test_fake_flags_raised(self):
+        self.assertTrue('Fake' in self.examplePlanet.flags)
+        self.assertTrue('Fake' in self.exampleStar.flags)
+        self.assertTrue('Fake' in self.exampleSystem.flags)
+
 
 
 class TestExampleInstancesWithBinary(TestCase):
@@ -150,6 +156,13 @@ class TestExampleInstancesWithBinary(TestCase):
         self.assertIsInstance(self.exampleSystem, ac.System)
         self.assertEqual(self.exampleSystem.name, 'Example System 2')
         self.assertItemsEqual(self.exampleSystem.stars, [self.exampleBinary])
+
+    def test_fake_flags_raised(self):
+        self.assertTrue('Fake' in self.examplePlanet.flags)
+        self.assertTrue('Fake' in self.exampleStarA.flags)
+        self.assertTrue('Fake' in self.exampleStarB.flags)
+        self.assertTrue('Fake' in self.exampleBinary.flags)
+        self.assertTrue('Fake' in self.exampleSystem.flags)
 
 
 

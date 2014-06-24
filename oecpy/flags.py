@@ -4,11 +4,11 @@ entered by the catalogue when assuming values such as 'Temperature calculated' o
 These are designed to be attached to a planet, system, star or binary class in .flags
 """
 
-allowedFlags = ['Calculated Temperature', 'Estimated Mass', 'Calculated SMA', 'Fake Planet', 'Estimated Distance',
+allowedFlags = ['Calculated Temperature', 'Estimated Mass', 'Calculated SMA', 'Fake', 'Estimated Distance',
                 'Estimated magV', 'Calculated Period']
 
 
-class Flag(object):  # or tags? or lists?
+class Flags(object):  # or tags? or lists?
 
     def __init__(self):
 
@@ -27,11 +27,11 @@ class Flag(object):  # or tags? or lists?
 
     def __repr__(self):
 
-        return 'Flags({0})'.format(self.__str__())
+        return 'Flags({0})'.format(str(self.flags)[4:-1])
 
-    def __str__(self):
+    def __iter__(self):
 
-        return str(self.flags)[4:-1]
+        return iter(self.flags)
 
 
 class InvalidFlag(BaseException):

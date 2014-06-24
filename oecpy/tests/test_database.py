@@ -6,7 +6,8 @@ else:
 from tempfile import mkdtemp, mkstemp
 import shutil
 
-from ..database import OECDatabase, LoadDataBaseError
+from .. import OECDatabase, load_db_from_url  # load from root
+from ..database import LoadDataBaseError
 from .patches import TestCase
 
 
@@ -110,7 +111,7 @@ class TestDataBaseFailing(TestCase):
         with self.assertRaises(LoadDataBaseError):
             OECDatabase(self.tempDir)
 
-    def test_raises_LoadDataBaseError_without_system(self):
+    def test_raises_LoadDataBaseError_without_system_tag(self):
         xmlCases = [
             "<name>System 1</name><star><name>Star 1</name></star>",
             "<star><name>Star 2</name>"  # system -> star -> planet
@@ -126,6 +127,16 @@ class TestDataBaseFailing(TestCase):
 
     def tearDown(self):
         shutil.rmtree(self.tempDir)
+
+
+class Test_load_db_from_url(TestCase):
+
+    def test_autoload(self):
+        exocat = load_db_from_url()  # Note will fail without internet connection
+
+        self.assertTrue(len(exocat.planets) > 1000)
+        self.assertTrue(len(exocat.systems) > 1000)
+        self.assertTrue(len(exocat.stars) > 1000)
 
 
 if __name__ == '__main__':
