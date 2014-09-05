@@ -10,6 +10,8 @@ from .. import OECDatabase, load_db_from_url  # load from root
 from ..database import LoadDataBaseError
 from .patches import TestCase
 
+from .. import astroquantities as aq
+
 
 class TestDataBaseLoading(TestCase):
 
@@ -44,6 +46,10 @@ class TestDataBaseLoading(TestCase):
             "<binary><name>Binary 6AB</name><star><name>Star 6A</name></star>"
             "<star><name>Star 6B</name></star>"
             "<planet><name>Planet 6AB b</name></planet></binary></system>",
+
+            "<system><name>System 7</name><star><name>Star 7</name>"  # system -> star -> planet (seperation unit)
+            '<planet><name>Planet 7 b</name><separation unit="arcsec">2.2</separation>'
+			'<separation unit="AU">330</separation></planet></star></system>',
         ]
 
         for systems in xmlCases:
@@ -51,7 +57,7 @@ class TestDataBaseLoading(TestCase):
                 f.write(systems)
 
     def test_correct_system_number(self):
-        self.assertEqual(len(self.oecdb.systems), 6)
+        self.assertEqual(len(self.oecdb.systems), 7)
 
     def test_correct_star_only_system(self):  # 1
         system = self.oecdb.systemDict['System 1']
@@ -96,6 +102,11 @@ class TestDataBaseLoading(TestCase):
         self.assertEqual(str(system.children[0].children), "[Star('Star 6A'), Star('Star 6B'), Planet('Planet 6AB b')]")
         self.assertEqual(system.children[0].children[0].children, [])
         self.assertEqual(system.children[0].children[1].children, [])
+
+    def test_seperation_tag_AU_imported_only(self):  # TODO code full solution
+        system = self.oecdb.systemDict['System 7']
+
+        self.assertEqual(system.children[0].children[0].separation, 330 * aq.au)
 
     def tearDown(self):
         shutil.rmtree(self.tempDir)
