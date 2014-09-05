@@ -41,7 +41,7 @@ def scaleHeight(T_eff_p, mu_p, g_p):
     .. math::
         H = \\frac{k T_eff}{\mu g}
 
-    Where H is the scale height of the planets atmosphere, :math:`T_eff` is the planetary effective temperature,
+    Where H is the scale height of the planets atmosphere, :math:`T_{eff}` is the planetary effective temperature,
     :math:`\mu` is the mean molecular weight of the planetary atmosphere and g is the planets surface gravity.
 
     :param T_eff_p: Effective temperature

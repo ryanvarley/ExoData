@@ -167,6 +167,10 @@ class PlanetAndBinaryCommon(_BaseObject):
     def ascendingnode(self):
         return self.getParam('ascendingnode')
 
+    @property
+    def separation(self):
+        return self.getParam('separation')
+
 
 class StarAndBinaryCommon(_BaseObject):
     def __init__(self, *args, **kwargs):
@@ -554,9 +558,9 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
             'list': [],
         }
 
-        self._defaultUnits = {
+        self._defaultUnits = {  # this holds quantities with no current or projected ambiguity about their unit
             'age': aq.Gyear,
-            'distance': aq.pc, # TODO more specific unit handling here or in classes?
+            'distance': aq.pc,  # TODO more specific unit handling here or in classes?
             'magB': 1,
             'magH': 1,
             'magI': 1,
@@ -578,6 +582,17 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
 
         if key in self.rejectTags:
             return False  # TODO Replace with exception
+
+        # Temporary code to handle the seperation tag than can occur several times with different units.
+        # TODO code a full multi unit solution (github issue #1)
+        if key == 'separation':
+            if attrib is None:
+                return False  # reject seperations without a unit
+            try:
+                if not attrib['unit'] == 'AU':
+                    return False  # reject for now
+            except KeyError:  # a seperation attribute exists but not one for units
+                return False
 
         if key in self.params:  # if already exists
 
@@ -628,7 +643,7 @@ class BinaryParameters(Parameters):
         Parameters.__init__(self)
 
         self._defaultUnits.update({
-         # TODO add binary parameters
+            'separation': aq.au,  # TODO there is actually 2 different measurements (other is arcsec)
         })
 
 
@@ -661,6 +676,7 @@ class PlanetParameters(Parameters):
             'semimajoraxis': aq.au,
             'transittime': aq.JD,  # TODO specific JD, MJF etc
             'molweight': aq.atomic_mass_unit,
+            'separation': aq.au,  # TODO there is actually 2 different measurements (other is arcsec)
         })
 
 

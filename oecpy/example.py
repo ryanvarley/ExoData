@@ -101,6 +101,7 @@ def genExamplePlanet(binaryLetter=''):
     planetPar.addParam('semimajoraxis', '0.449')
     planetPar.addParam('temperature', '339.6')
     planetPar.addParam('transittime', '2454876.344')
+    planetPar.addParam('separation', '330', {'unit': 'AU'})
 
     examplePlanet = Planet(planetPar.params)
     examplePlanet.flags.addFlag('Fake')

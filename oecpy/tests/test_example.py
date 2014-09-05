@@ -32,6 +32,8 @@ class TestExampleInstances(TestCase):
         self.assertEqual(exampleSystem.dec, '+04 05 06')
         self.assertEqual(exampleSystem.ra, '01 02 03')
 
+    # TODO test_binary object
+
     def test_star_object(self):
         exampleStar = self.exampleStar
 
@@ -66,6 +68,7 @@ class TestExampleInstances(TestCase):
         self.assertEqual(examplePlanet.a, 0.449 * aq.au)
         self.assertEqual(examplePlanet.T, 339.6 * aq.K)
         self.assertEqual(examplePlanet.transittime, 2454876.344 * aq.JD)
+        self.assertEqual(examplePlanet.separation, 330 * aq.au)
 
     def test_hierarchy_for_planet(self):
         self.assertEqual(self.examplePlanet.star, self.exampleStar)
