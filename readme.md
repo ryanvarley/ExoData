@@ -1,9 +1,6 @@
 # Open Exoplanet Catalogue Python
-.. image:: https://api.travis-ci.org/ryanvarley/open-exoplanet-catalogue-python.png?branch=master
-    :target: https://travis-ci.org/ryanvarley/open-exoplanet-catalogue-python
-
-.. image:: https://coveralls.io/repos/ryanvarley/open-exoplanet-catalogue-python/badge.png?branch=coveralls 
-    :target: https://coveralls.io/r/ryanvarley/open-exoplanet-catalogue-python?branch=coveralls
+[![Build Status](https://api.travis-ci.org/ryanvarley/open-exoplanet-catalogue-python.png?branch=master)](https://travis-ci.org/ryanvarley/open-exoplanet-catalogue-python)
+[![Coverage Status](https://coveralls.io/repos/ryanvarley/open-exoplanet-catalogue-python/badge.png?branch=coveralls)](https://coveralls.io/r/ryanvarley/open-exoplanet-catalogue-python?branch=coveralls)
 
 This python interface serves as a link between the raw XML of the [Open Exoplanet Catalogue](https://github.com/hannorein/open_exoplanet_catalogue). It allows:
 * Searching of planets (including alternate names)
