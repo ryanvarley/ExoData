@@ -292,7 +292,7 @@ def calcSemiMajorAxis2(T_p, T_s, A_p, R_s, epsilon=0.7):
     return a.rescale(aq.au)
 
 
-def calcPeriod(a, M_s, M_p=0.):
+def calcPeriod(a, M_s, M_p=0.*aq.M_e):
     """ Calculates the period of the orbit using the stellar mass, planet mass and sma using keplers Third Law
     :return:
 
