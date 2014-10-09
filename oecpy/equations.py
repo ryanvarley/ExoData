@@ -54,13 +54,16 @@ def scaleHeight(T_eff_p, mu_p, g_p):
     return H.rescale(aq.m)
 
 
-def meanPlanetTemp(A_p, T_s, R_s, a):
+def meanPlanetTemp(A_p, T_s, R_s, a, e=0.7):
     """ Calculate the equilibrium planet temperature
 
-    assumes epsilon = 0.7 http://arxiv.org/pdf/1111.1455v2.pdf
+    .. math::
+
+
+    assumes epsilon = 0.7 by default http://arxiv.org/pdf/1111.1455v2.pdf
     """
 
-    T_p = T_s * ((1-A_p)/0.7)**(1/4) * sqrt(R_s/(2*a))
+    T_p = T_s * ((1-A_p)/e)**(1/4) * sqrt(R_s/(2*a))
 
     return T_p.rescale(aq.degK)
 
@@ -84,7 +87,7 @@ def starLuminosity(R_s, T_eff):
     return L_s.rescale(aq.W)
 
 
-def ratioTerminatorToStar(H_p, R_p, R_s):  # TODO use this in code with scale height calc
+def ratioTerminatorToStar(H_p, R_p, R_s):  # TODO add into planet class
     """ Calculates the ratio of the terminator to the star assuming 5 scale heights large. If you dont know all of the
     input try :py:func:`calcRatioTerminatorToStar`
 
@@ -92,7 +95,7 @@ def ratioTerminatorToStar(H_p, R_p, R_s):  # TODO use this in code with scale he
         \Delta F = \\frac{10 H R_p + 25 H^2}{R_\star^2}
 
     Where :math:`\Delta F` is the ration of the terminator to the star, H scale height planet atmosphere,
-    :math:`R_p` radius of the planet, :math:`R_s` raidus of the star
+    :math:`R_p` radius of the planet, :math:`R_s` radius of the star
 
     :param H_p:
     :param R_p:
@@ -142,11 +145,11 @@ def surfaceGravity(M_p, R_p):
     return g_p.rescale(aq.m / aq.s**2)
 
 
-def calcRatioTerminatorToStar(params):
+def calcRatioTerminatorToStar(params):  # TODO update with new format
     """ Calculates the ratio of the Terminator to the Star using :py:func:`ratioTerminatorToStar` but calculates all
     intermediary params on route.
 
-    This is a conveince function which will largely be used over the others as the intermediary params arent often given
+    This is a convenience function which will largely be used over the others as the intermediary params arent often given
     in detection papers.
 
     :param params: dict containing ...
@@ -180,7 +183,7 @@ def transitDuration(P, R_s, R_p, a, i):
         T_\\text{dur} = \\frac{P}{\pi}\sin^{-1} \left[\\frac{R_\star}{a}\\frac{\sqrt{(1+k)^2 + b^2}}{\sin{a}} \\right]
 
     Where :math:`T_\\text{dur}` transit duration, P orbital period, :math:`R_\star` radius of the star,
-    a is the semi-major axis, k is :math:`\\frac{R_p}{R_s}`, b is :math:`(a*\\cos{i})/R_s` (Seager & Mallen-Ornelas 2003)
+    a is the semi-major axis, k is :math:`\\frac{R_p}{R_s}`, b is :math:`\frac{a}{R_*} \cos{i}` (Seager & Mallen-Ornelas 2003)
 
     :param i: orbital inclination
     :return:
@@ -211,8 +214,9 @@ def logg(M_p, R_p):
 
 
 def estimateStarTemperature(M_s):
-    """ Estimates stellar temperature using the main sequence relationship T ~ 5800*M^0.65
+    """ Estimates stellar temperature using the main sequence relationship T ~ 5800*M^0.65 (Cox 2000)??
     """
+    # TODO improve with more x and k values from Cox 2000
     return (5800*aq.K * float(M_s.rescale(aq.M_s)**0.65)).rescale(aq.K)
 
 
@@ -281,28 +285,28 @@ def calcSemiMajorAxis2(T_p, T_s, A_p, R_s, epsilon=0.7):
     """ Calculates the semi-major axis of the orbit using the planet temperature
 
     .. math::
-        a = \text{tbc}
+        a = \sqrt\frac{1-A_p}{\epsilon} \frac{R_\star}{2} \left(\frac{T_\star}{T_p}\right)^2
     """
     a = sqrt((1-A_p)/epsilon) * (R_s/2) * (T_s/T_p)**2
 
     return a.rescale(aq.au)
 
 
-def calcPeriod(a, M_s):
-    """ Calculates the period of the orbit using the stellar mass and sma
+def calcPeriod(a, M_s, M_p=0.*aq.M_e):
+    """ Calculates the period of the orbit using the stellar mass, planet mass and sma using keplers Third Law
     :return:
 
     .. math::
-        a = \text{tbc}
+        P = \sqrt{\frac{4\pi^2a^3}{G \left(M_\star + M_p \right)}}
     """
 
-    P = 2 * pi * sqrt(a**3 / (G * M_s))
+    P = 2 * pi * sqrt(a**3 / (G * (M_s + M_p)))
 
     return P.rescale(aq.day)
 
 
 def impactParameter(a, R_s, i):
-    """ project distance between the planet and star centers during mid transit
+    """ projected distance between the planet and star centers during mid transit
     .. math::
         b \equiv \frac{a}{R_*} \cos{i}
     (Seager & Mallen-Ornelas 2003).
