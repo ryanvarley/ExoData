@@ -69,7 +69,7 @@ class estimateMissingValuesStar(estimateMissingValues):
 
     def test_magVEstimatedWhenTrue(self):
         del self.star.params['magV']
-        self.assertAlmostEqual(self.star.magV, 8.8799, 3)
+        self.assertAlmostEqual(self.star.magV, 9.14, 3)
         self.assertTrue('Estimated magV' in self.star.flags.flags)
 
     def test_magVNotEstimatedWhenFalse(self):

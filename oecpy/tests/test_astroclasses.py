@@ -11,7 +11,8 @@ else:
 import numpy as np
 
 from .. import astroquantities as aq
-from ..astroclasses import Parameters, Star, Planet, Binary, System, _findNearest, SpectralType, _BaseObject
+from ..astroclasses import Parameters, Star, Planet, Binary, System, _findNearest, SpectralType, _BaseObject,\
+    Magnitude, isNanOrNone
 from ..example import genExamplePlanet
 from .patches import TestCase
 
@@ -161,9 +162,9 @@ class TestStarParameters(TestCase):
     def test_magV_when_absent_converts_k(self):
         planet = genExamplePlanet()
         star = planet.star
-        star.params.pop('magV')
+        star.params.pop('magV')  # remove magV
 
-        self.assertAlmostEqual(star.magV, 8.88, 2)
+        self.assertAlmostEqual(star.magV, 9.14, 2)
         self.assertTrue('Estimated magV' in star.flags.flags)
 
 
@@ -359,6 +360,52 @@ class Test_Planet_Parameter_Estimation(TestCase):
         planet.params.pop('semimajoraxis')
 
         self.assertAlmostEqual(planet.a, 0.449636494929 * aq.au, 5)
+
+
+class Test_Magnitude(TestCase):
+
+    def test_convert_works_magV_to_magK_auto(self):  # simple case
+        mag = Magnitude('B6', magV=12.)
+        self.assertEqual(mag.convert('K'), 12+.43)
+
+    def test_convert_works_magK_to_magJ_auto(self):  # complex case K -> V -> J
+        mag = Magnitude('F5', magK=10.)
+        self.assertEqual(mag.convert('J'), 10+1.1-0.83)
+
+    def test_convert_works_magK_to_magB_explicit(self):  # complex case K -> V -> B, auto option would be V
+        mag = Magnitude('B6', magH=19., magK=9.)
+        self.assertEqual(mag.convert('B', 'K'), 9.-0.43-0.13)
+        self.assertEqual(mag.convert('B'), 19.-0.37-0.13)  # Auto case should be from H
+
+    def test_convert_works_magK_to_magB_auto(self):  # contrasts with previous test to test the auto example is different
+        mag = Magnitude('B6', magH=19., magK=9.)
+        self.assertEqual(mag.convert('B'), 19.-0.37-0.13)  # Auto case should be from H
+
+    def test_convert_works_magK_to_magV_auto(self):  # tests conversion to V work
+        mag = Magnitude('B6', magH=19., magK=9.)
+        self.assertEqual(mag.convert('V'), 19.-0.37)  # Auto case should be from H
+
+    def test_convert_works_magK_to_magB_explicit_with_lumtype(self):  # complex case K -> V -> B, auto option would be V
+        mag = Magnitude('B6V', magH=19., magK=9.)
+        self.assertEqual(mag.convert('B', 'K'), 9.-0.43-0.13)
+
+
+class Test_isNanOrNone(TestCase):
+
+    def test_np_nan(self):
+        self.assertTrue(isNanOrNone(np.nan))
+
+    def test_math_nan(self):
+        self.assertTrue(isNanOrNone(float('nan')))
+
+    def test_float(self):
+        self.assertFalse(isNanOrNone(-1.))
+
+    def test_int(self):
+        self.assertFalse(isNanOrNone(1))
+
+    def test_str(self):
+        self.assertFalse(isNanOrNone('nan'))
 
 
 

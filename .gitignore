@@ -14,3 +14,7 @@ runtest.py
 run.py
 
 *.eps
+
+# Coverage
+.coveragerc
+cover/

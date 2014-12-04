@@ -286,16 +286,5 @@ class Test_createMagConversionDict(TestCase):
         self.assertEqual(magTable['B0'][0], '30000')
         self.assertEqual(magTable['M6'][14], 'nan')
 
-
-class Test_MagConversion(TestCase):
-
-    def test_magKtoMagV_works(self):
-        self.assertAlmostEqual(eq.magKtoMagV('F2', 8.66), 9.48, 2)
-
-    def test_bad_spectraltypes(self):
-        self.assertAlmostEqual(eq.magKtoMagV('F2V', 8.66), 9.48, 2)
-        self.assertAlmostEqual(eq.magKtoMagV('F', 8.66), 9.36, 2)
-
-
 if __name__ == '__main__':
     unittest.main()
