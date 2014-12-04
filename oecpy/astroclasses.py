@@ -342,7 +342,10 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
         mag_val = self.getParam(mag_str)
 
         if isNanOrNone(mag_val) and params.estimateMissingValues:  # then we need to estimate it!
-            mag_dict = {'mag'+letter:self.getParam('mag'+letter) for letter in catalogue_mags}
+            if sys.hexversion < 0x02070000:  # 2.6 doesnt support dict comprehensions
+                mag_dict = dict(('mag'+letter, self.getParam('mag'+letter)) for letter in catalogue_mags)
+            else:
+                mag_dict = {'mag'+letter:self.getParam('mag'+letter) for letter in catalogue_mags}
             mag_class = Magnitude(self.spectralType, **mag_dict)
             try:
                 mag_conversion = mag_class.convert(mag_letter)
