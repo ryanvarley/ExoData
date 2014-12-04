@@ -418,25 +418,10 @@ def _createMagConversionDict():
 magDict = _createMagConversionDict()
 
 
-def magKtoMagV(spectralType, magK):
+def magKtoMagV(*args, **kwargs):
     """ Converts K magnitude to V magnitude
     """
-    if not isinstance(spectralType, str):
-        return np.nan
-
-    # format key for spectral type can be F, F2, F2V
-    if len(spectralType) == 1:
-        spectralType += '0'
-    else:
-        spectralType = spectralType[:2]
-
-    try:
-        offset = float(magDict[spectralType][10])  # 10 is the V-K row
-        if math.isnan(offset):
-            return np.nan
-        else:
-            return magK + offset
-    except KeyError:
-        return np.nan
+    raise DeprecationWarning("This function has is been phased out in favour of the astroclasses.Magnitude class which can"
+                             " convert between many magnitudes")
 
 # TODO more orbital equations

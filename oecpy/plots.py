@@ -303,7 +303,8 @@ class _BaseDataPerClass(_AstroObjectFigs):  # hangover from ETLOS's multiple chi
         plt.draw()
 
     def plotPieChart(self, title=None):
-        self.fig.set_tight_layout(True)
+        if sys.hexversion >= 0x02700000:
+            self.fig.set_tight_layout(True)
 
         # Generate plot data
         labels, ydata = self._getPlotData()

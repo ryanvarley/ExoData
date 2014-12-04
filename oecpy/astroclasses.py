@@ -1,14 +1,19 @@
 """ Contains structural classes ie binary, star, planet etc which mimic the xml structure with objects
 """
-import numpy as np
+import sys
 import math
 from pkg_resources import resource_stream
+import logging
+
+import numpy as np
 
 from . import equations as eq
 from . import astroquantities as aq
 from . import assumptions as assum
 from . import flags
 from . import params
+
+logger = logging.getLogger('')
 
 
 class _BaseObject(object):
@@ -296,24 +301,7 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
 
     def __init__(self, *args, **kwargs):
         StarAndPlanetCommon.__init__(self, *args, **kwargs)
-        StarAndBinaryCommon.__init__(self, *args, **kwargs)
         self.classType = 'Star'
-
-    @property
-    def magV(self):
-        magV = self.getParam('magV')
-        if math.isnan(magV) and params.estimateMissingValues:
-            if not math.isnan(self.magK):
-                self.flags.addFlag('Estimated magV')
-                magV = eq.magKtoMagV(self.spectralType, self.magK)
-                if magV is None:  # eq sometimes outputs this
-                    return np.nan
-                else:
-                    return magV
-        if magV is None:  # if value is missing (particularly binaries) will return None for some reason
-            return np.nan
-        else:
-            return magV
 
     @property
     def d(self):
@@ -339,6 +327,77 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
         """ uses equations.starTemperature to estimate temperature based on main sequence relationship
         """
         return eq.estimateStarTemperature(self.M)
+
+    def _get_or_convert_magnitude(self, mag_letter):
+        """ Takes input of the magnitude letter and ouputs the magnitude fetched from the catalogue or a converted value
+        :return:
+        """
+        allowed_mags = "UBVJIHKLMN"
+        catalogue_mags = 'BVIJHK'
+
+        if mag_letter not in allowed_mags or not len(mag_letter) == 1:
+            raise ValueError("Magnitude letter must be a single letter in {0}".format(allowed_mags))
+
+        mag_str = 'mag'+mag_letter
+        mag_val = self.getParam(mag_str)
+
+        if isNanOrNone(mag_val) and params.estimateMissingValues:  # then we need to estimate it!
+            # old style dict comprehension for python 2.6
+            mag_dict = dict(('mag'+letter, self.getParam('mag'+letter)) for letter in catalogue_mags)
+            mag_class = Magnitude(self.spectralType, **mag_dict)
+            try:
+                mag_conversion = mag_class.convert(mag_letter)
+                logger.debug('Star Class: Conversion to {0} successful, got {1}'.format(mag_str, mag_conversion))
+                self.flags.addFlag('Estimated mag{0}'.format(mag_letter))
+                return mag_conversion
+            except ValueError as e:  # cant convert
+                logger.exception(e)
+                logger.debug('Cant convert to {0}'.format(mag_letter))
+                return np.nan
+        else:
+            logger.debug('returning {0}={1} from catalogue'.format(mag_str, mag_val))
+            return mag_val
+
+    @property
+    def magU(self):
+        return self._get_or_convert_magnitude('U')
+
+    @property
+    def magB(self):
+        return self._get_or_convert_magnitude('B')
+
+    @property
+    def magV(self):
+        return self._get_or_convert_magnitude('V')
+
+    @property
+    def magJ(self):
+        return self._get_or_convert_magnitude('J')
+
+    @property
+    def magI(self):
+        return self._get_or_convert_magnitude('I')
+
+    @property
+    def magH(self):
+        return self._get_or_convert_magnitude('H')
+
+    @property
+    def magK(self):
+        return self._get_or_convert_magnitude('K')
+
+    @property
+    def magL(self):
+        return self._get_or_convert_magnitude('L')
+
+    @property
+    def magM(self):
+        return self._get_or_convert_magnitude('M')
+
+    @property
+    def magN(self):
+        return self._get_or_convert_magnitude('N')
+
 
     @property
     def Z(self):
@@ -527,7 +586,10 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
 
     @property
     def discoveryYear(self):
-        return self.getParam('discoveryyear')
+        try:
+            return int(self.getParam('discoveryyear'))  # TODO should be read as int not float to being with
+        except ValueError:  # np.nan
+            return self.getParam('discoveryyear')
 
     @property
     def e(self):
@@ -616,7 +678,7 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
                 print('rejected duplicate {0}: {1} in {2}'.format(key, value, name))  # TODO: log rejected value
                 return False  # TODO Replace with exception
 
-        else:  # If the key dosnt already exist and isn't rejected
+        else:  # If the key doesn't already exist and isn't rejected
 
             # Some tags have no value but a upperlimit in the attributes
             if value is None and attrib is not None:
@@ -827,6 +889,168 @@ _possMultiLetterClasses = ('WNE', 'WNL', 'WCE', 'WCL', 'WO', 'WR', 'WN', 'WC',  
                           )
 
 _possSpectralClasses = _possMultiLetterClasses + _possSingleLetterClasses  # multi first
+
+
+class Magnitude(object):
+    """ Holds measured magnitudes and can convert between them given a spectral class.
+    """
+
+    def __init__(self, spectral_type, magU=None, magB=None, magV=None, magI=None, magJ=None, magH=None, magK=None, magL=None,
+                 magM=None, magN=None):
+
+        if isinstance(spectral_type, SpectralType):
+            self.spectral_type = spectral_type
+        else:
+            self.spectral_type = SpectralType(spectral_type)
+
+        self.magU = magU
+        self.magB = magB
+        self.magV = magV
+        self.magI = magI
+        self.magJ = magJ
+        self.magH = magH
+        self.magK = magK
+        self.magL = magL
+        self.magM = magM
+        self.magN = magN
+
+        # For magDict, these should probably be grouped together
+        self.column_for_V_conversion = {
+        #   mag  column,  sign (most are V-Mag (+1), some are Mag-V (-1))
+            'U': (2,  -1),
+            'B': (3,  -1),
+            'J': (8, +1),
+            'H': (9, +1),
+            'K': (10, +1),
+            'L': (11, +1),
+            'M': (12, +1),
+            'N': (13, +1),
+        }
+
+    def convert(self, to_mag, from_mag=None):
+        """ Converts magnitudes using UBVRIJHKLMNQ photometry in Taurus-Auriga (Kenyon+ 1995)
+         ReadMe+ftp1995ApJS..101..117K Colors for main-sequence stars
+
+         If from_mag isn't specified the program will cycle through provided magnitudes and choose one. Note that all
+         magnitudes are first converted to V, and then to the requested magnitude.
+
+        :param to_mag: magnitude to convert to
+        :param from_mag: magnitude to convert from
+        :return:
+        """
+        allowed_mags = "UBVJIHKLMN"
+
+        if from_mag:
+            if to_mag == 'V':  # If V mag is requested (1/3) - from mag specified
+                return self._convert_to_from('V', from_mag)
+            if from_mag == 'V':
+                magV = self.magV
+            else:
+                magV = self._convert_to_from('V', from_mag)
+
+            return self._convert_to_from(to_mag, 'V', magV)
+
+        # if we can convert from any magnitude, try V first
+        elif not isNanOrNone(self.magV):
+            if to_mag == 'V':  # If V mag is requested (2/3) - no need to convert
+                return self.magV
+            else:
+                return self._convert_to_from(to_mag, 'V', self.magV)
+        else:  # Otherwise lets try all other magnitudes in turn
+            order = "UBJHKLMN"  # V is the intermediate step from the others, done by default if possible
+            for mag_letter in order:
+                try:
+                    magV = self._convert_to_from('V', mag_letter)
+                    if to_mag == 'V':  # If V mag is requested (3/3) - try all other mags to convert
+                        logging.debug('Converted to magV from {0} got {1}'.format(mag_letter, magV))
+                        return magV
+                    else:
+                        mag_val = self._convert_to_from(to_mag, 'V', magV)
+                        logging.debug('Converted to mag{0} from {1} got {2}'.format(to_mag, mag_letter, mag_val))
+                        return mag_val
+                except ValueError:
+                    continue  # this conversion may not be possible, try another
+
+            raise ValueError('Could not convert from any provided magnitudes')
+
+    def _convert_to_from(self, to_mag, from_mag, fromVMag=None):
+        """ Converts from or to V mag using the conversion tables
+
+        :param to_mag: uppercase magnitude letter i.e. 'V' or 'K'
+        :param from_mag: uppercase magnitude letter i.e. 'V' or 'K'
+        :param fromVMag: MagV if from_mag is 'V'
+
+        :return:  estimated magnitude for to_mag from from_mag
+        """
+        lumtype = self.spectral_type.lumType
+        specClass = self.spectral_type.specClass
+
+        if lumtype not in ('V', ''):
+            raise ValueError("Can only convert for main sequence stars. Got {0} type".format(lumtype))
+
+        if to_mag == 'V':
+            col, sign = self.column_for_V_conversion[from_mag]
+            offset = float(magDict[specClass][col])
+
+            if math.isnan(offset):
+                raise ValueError('No data available to convert those magnitudes for that spectral type')
+            else:
+                from_mag_val = self.__dict__['mag'+from_mag]  # safer than eval
+                if isNanOrNone(from_mag_val):
+                    logger.debug('2 '+from_mag)
+                    raise ValueError('You cannot convert from a magnitude you have not specified in class')
+                return from_mag_val + (offset*sign)
+        elif from_mag == 'V':
+            if fromVMag is None:
+                # trying to second guess here could mess up a K->B calulation by using the intermediate measured V. While
+                # this would probably be preferable it is not was was asked and therefore could give unexpected results
+                raise ValueError('Must give fromVMag, even if it is self.magV')
+
+            col, sign = self.column_for_V_conversion[to_mag]
+            offset = float(magDict[specClass][col])
+
+            if math.isnan(offset):
+                raise ValueError('No data available to convert those magnitudes for that spectral type')
+            else:
+                return fromVMag + (offset*sign*-1)  # -1 as we are now converting the other way
+        else:
+            raise ValueError('Can only convert from and to V magnitude. Use .convert() instead')
+
+
+def _createMagConversionDict():
+    """ loads magnitude_conversion.dat which is table A% 1995ApJS..101..117K
+    """
+    magnitude_conversion_filepath = resource_stream(__name__, 'data/magnitude_conversion.dat')
+    raw_table = np.loadtxt(magnitude_conversion_filepath, '|S5')
+
+    magDict = {}
+    for row in raw_table:
+        if sys.hexversion >= 0x03000000:
+            starClass = row[1].decode("utf-8")  # otherwise we get byte ints or b' caused by 2to3
+            tableData = [x.decode("utf-8") for x in row[3:]]
+        else:
+            starClass = row[1]
+            tableData = row[3:]
+        magDict[starClass] = tableData
+
+    return magDict
+
+magDict = _createMagConversionDict()
+
+
+def isNanOrNone(val):
+    """ Tests if val is float('nan') or None using math.isnan and is None. Needed as isnan fails if a non float is given.
+    :param val:
+    :return:
+    """
+
+    if val is None:
+        return True
+    else:
+        try:
+            return math.isnan(val)
+        except TypeError:  # not a float
+            return False
 
 
 class HierarchyError(Exception):
