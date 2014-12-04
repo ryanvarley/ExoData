@@ -336,28 +336,26 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
         catalogue_mags = 'BVIJHK'
 
         if mag_letter not in allowed_mags or not len(mag_letter) == 1:
-            raise ValueError("Magnitude letter must be a single letter in {}".format(allowed_mags))
+            raise ValueError("Magnitude letter must be a single letter in {0}".format(allowed_mags))
 
         mag_str = 'mag'+mag_letter
         mag_val = self.getParam(mag_str)
 
         if isNanOrNone(mag_val) and params.estimateMissingValues:  # then we need to estimate it!
-            if sys.hexversion < 0x02070000:  # 2.6 doesnt support dict comprehensions
-                mag_dict = dict(('mag'+letter, self.getParam('mag'+letter)) for letter in catalogue_mags)
-            else:
-                mag_dict = {'mag'+letter:self.getParam('mag'+letter) for letter in catalogue_mags}
+            # old style dict comprehension for python 2.6
+            mag_dict = dict(('mag'+letter, self.getParam('mag'+letter)) for letter in catalogue_mags)
             mag_class = Magnitude(self.spectralType, **mag_dict)
             try:
                 mag_conversion = mag_class.convert(mag_letter)
-                logger.debug('Star Class: Conversion to {} successful, got {}'.format(mag_str, mag_conversion))
-                self.flags.addFlag('Estimated mag{}'.format(mag_letter))
+                logger.debug('Star Class: Conversion to {0} successful, got {1}'.format(mag_str, mag_conversion))
+                self.flags.addFlag('Estimated mag{0}'.format(mag_letter))
                 return mag_conversion
             except ValueError as e:  # cant convert
                 logger.exception(e)
-                logger.debug('Cant convert to {}'.format(mag_letter))
+                logger.debug('Cant convert to {0}'.format(mag_letter))
                 return np.nan
         else:
-            logger.debug('returning {}={} from catalogue'.format(mag_str, mag_val))
+            logger.debug('returning {0}={1} from catalogue'.format(mag_str, mag_val))
             return mag_val
 
     @property
@@ -964,11 +962,11 @@ class Magnitude(object):
                 try:
                     magV = self._convert_to_from('V', mag_letter)
                     if to_mag == 'V':  # If V mag is requested (3/3) - try all other mags to convert
-                        logging.debug('Converted to magV from {} got {}'.format(mag_letter, magV))
+                        logging.debug('Converted to magV from {0} got {1}'.format(mag_letter, magV))
                         return magV
                     else:
                         mag_val = self._convert_to_from(to_mag, 'V', magV)
-                        logging.debug('Converted to mag{} from {} got {}'.format(to_mag, mag_letter, mag_val))
+                        logging.debug('Converted to mag{0} from {1} got {2}'.format(to_mag, mag_letter, mag_val))
                         return mag_val
                 except ValueError:
                     continue  # this conversion may not be possible, try another
@@ -988,7 +986,7 @@ class Magnitude(object):
         specClass = self.spectral_type.specClass
 
         if lumtype not in ('V', ''):
-            raise ValueError("Can only convert for main sequence stars. Got {} type".format(lumtype))
+            raise ValueError("Can only convert for main sequence stars. Got {0} type".format(lumtype))
 
         if to_mag == 'V':
             col, sign = self.column_for_V_conversion[from_mag]
