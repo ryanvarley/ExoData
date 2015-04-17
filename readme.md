@@ -1,6 +1,6 @@
 # ExoData
-[![Build Status](https://api.travis-ci.org/ryanvarley/open-exoplanet-catalogue-python.png?branch=master)](https://travis-ci.org/ryanvarley/open-exoplanet-catalogue-python)
-[![Coverage Status](https://coveralls.io/repos/ryanvarley/open-exoplanet-catalogue-python/badge.png?branch=coveralls)](https://coveralls.io/r/ryanvarley/open-exoplanet-catalogue-python?branch=coveralls)
+[![Build Status](https://api.travis-ci.org/ryanvarley/ExoData.png?branch=master)](https://travis-ci.org/ryanvarley/ExoData)
+[![Coverage Status](https://coveralls.io/repos/ryanvarley/ExoData/badge.svg)](https://coveralls.io/r/ryanvarley/ExoData)
 
 This python interface (formerly oecpy) serves as a link between the raw XML of the [Open Exoplanet Catalogue](https://github.com/hannorein/open_exoplanet_catalogue). It allows:
 * Searching of planets (including alternate names)
@@ -11,7 +11,7 @@ This python interface (formerly oecpy) serves as a link between the raw XML of t
 * Easily navigate hierarchy (ie from planet to star or star to planets)
 * Availability of system parameters in planets (ie ra, dec, d (distance))
 
-Please note that this package is in active development. The Docs are incomplete, it is not fully unit tested and any and all methods and variables are subjected to change in the development process
+Please note that this package is in active development. The Docs are incomplete, it is not fully unit tested and any and all methods and variables are subject to change in the development process
 
 # Installation
 This module depends on
