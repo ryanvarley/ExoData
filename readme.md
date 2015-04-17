@@ -1,8 +1,8 @@
-# Open Exoplanet Catalogue Python
+# ExoData
 [![Build Status](https://api.travis-ci.org/ryanvarley/open-exoplanet-catalogue-python.png?branch=master)](https://travis-ci.org/ryanvarley/open-exoplanet-catalogue-python)
 [![Coverage Status](https://coveralls.io/repos/ryanvarley/open-exoplanet-catalogue-python/badge.png?branch=coveralls)](https://coveralls.io/r/ryanvarley/open-exoplanet-catalogue-python?branch=coveralls)
 
-This python interface serves as a link between the raw XML of the [Open Exoplanet Catalogue](https://github.com/hannorein/open_exoplanet_catalogue). It allows:
+This python interface (formerly oecpy) serves as a link between the raw XML of the [Open Exoplanet Catalogue](https://github.com/hannorein/open_exoplanet_catalogue). It allows:
 * Searching of planets (including alternate names)
 * Easy reference of planet parameters ie GJ1214b.ra, GJ1214b.T, GJ1214b.R
 * Calculation of values like the transit duration.
@@ -26,7 +26,7 @@ This module depends on
 
 Easiest way
 
-`pip install oecpy`
+`pip install exodata`
 
 Or from this repo
 
@@ -47,13 +47,13 @@ If you want to keep track of this repo in a GUI way, I recommend [sourcetree](ht
 
 # Usage
 
-	import oecpy
+	import exodata
 	databaseLocation = '/git/open_exoplanet_catalogue/systems/' # Your path here (to systems folder)
-	exocat = oecpy.OECDatabase(databaseLocation)
+	exocat = exodata.OECDatabase(databaseLocation)
 
 	# To automatically load the latest version from github you can instead use load_db_from_url() which fetches
 	# the latest version from https://github.com/OpenExoplanetCatalogue/oec_gzip/raw/master/systems.xml.gz
-	exocat = oecpy.load_db_from_url()
+	exocat = exodata.load_db_from_url()
 
 You can then access the lists
 
@@ -64,12 +64,12 @@ You can then access the lists
 
 The following code assumes the imports
 
-    import oecpy
+    import exodata
     import quantities as pq
-    import oecpy.astroquantities as aq
+    import exodata.astroquantities as aq
 
 You can now perform more advanced queries such as fetching all planets whose radius is less than 10 Earth Radii
-	
+
 	superEarths = [planet for planet in exocat.planets if planet.R < (10 * aq.R_e)]
 
 To choose a planet
@@ -107,7 +107,7 @@ units are handled by the quantities package
 
 You can then access most units and constants such as meters pq.m, astronomical units pq.au etc!
 
-Some astronomy units such as R_e, R_j, R_s (where e is Earth, j is Jupiter and s in the Sun) are not included (yet) in quantities so you need to refer to them as aq.R_e by importing oecpy.astroquantities as aq
+Some astronomy units such as R_e, R_j, R_s (where e is Earth, j is Jupiter and s in the Sun) are not included (yet) in quantities so you need to refer to them as aq.R_e by importing exodata.astroquantities as aq
 
 There are also M_e, M_s, M_j.
 
@@ -140,50 +140,50 @@ Please see assumptions.py for how to do this.
 # OECPY Global Parameters
 A few options can be set within OECPY to change the behaviour of the program. By default if a quantity is missing for a parameter it is calculated if possible. For example if you use .a for the semi-major axis and it is not present in the catalogue it will be calculated using the period and stellar mass and returned. this happens silently except for raising the `Calculated SMA` flag. (see flags). You can turn this behaviour off by typing
 
-`oecpy.params.estimateMissingValues = False`
+`exodata.params.estimateMissingValues = False`
 
 This will only take scope in the current project so if you close the interpreter it will reset to True.
 
 # Plotting
-OECPy features a plotting library for planet and stellar parameters in a scatter plot and per parameter bin. Please see the [plots section](https://github.com/ryanvarley/open-exoplanet-catalogue-python/wiki/Plotting) of the documentation for further information.
+ExoData features a plotting library for planet and stellar parameters in a scatter plot and per parameter bin. Please see the [plots section](https://github.com/ryanvarley/open-exoplanet-catalogue-python/wiki/Plotting) of the documentation for further information.
 
 ### Planet Mass with Planet Radius ###
 ```python
-oecpy.plots.GeneralPlotter(exocat.planets, 'R', 'M', yaxislog=True).plot()
+exodata.plots.GeneralPlotter(exocat.planets, 'R', 'M', yaxislog=True).plot()
 ```
-![Planet Mass with Planet Radius](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-planet-mass-radius.png "Planet Mass with Planet Radius Plot")
+![Planet Mass with Planet Radius](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/exodata-planet-mass-radius.png "Planet Mass with Planet Radius Plot")
 
 ### Stellar V Magnitude with Planet Radius ###
 ```python
-oecpy.plots.GeneralPlotter(exocat.planets, 'R', 'star.magV',
+exodata.plots.GeneralPlotter(exocat.planets, 'R', 'star.magV',
                             xunit=aq.R_e, xaxislog=True).plot()
 ```
 
-![Stellar V Magnitude with Planet Radius](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-vmag-planetradius.png "Stellar V Magnitude with Planet Radius Plot")
+![Stellar V Magnitude with Planet Radius](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/exodata-vmag-planetradius.png "Stellar V Magnitude with Planet Radius Plot")
 
 ### Planet Eccentricity ###
 ```python
-oecpy.plots.DataPerParameterBin(exocat.planets, 'e',
+exodata.plots.DataPerParameterBin(exocat.planets, 'e',
       (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotBarChart(label_rotation=45)
 ```
-![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-orbital-eccentricity-3.png "Planet Eccentricity Plot")
+![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/exodata-orbital-eccentricity-3.png "Planet Eccentricity Plot")
 
 You can also plot this as a pie chart
 
 ```python
-oecpy.plots.DataPerParameterBin(exocat.planets, 'e',
+exodata.plots.DataPerParameterBin(exocat.planets, 'e',
       (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotPieChart)
 ```
 
-![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-orbital-eccentricity-pie.png "Planet Eccentricity Pie Chart")
+![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/exodata-orbital-eccentricity-pie.png "Planet Eccentricity Pie Chart")
 
 Plots can also be large (i.e. for presentations), and you can change the color easily with normal *matplotlib* syntax
 
 ```python
-oecpy.plots.DataPerParameterBin(exocat.planets, 'M',
+exodata.plots.DataPerParameterBin(exocat.planets, 'M',
     (0, 0.2, 0.5, 1, 2, 3, 6, 12, float('inf')), size='large').plotBarChart(c='r')
 ```
-![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/oecpy-orbital-eccentricity-large-2.png "Planet Eccentricity Plot Large")
+![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/open-exoplanet-catalogue-python/images/exodata-orbital-eccentricity-large-2.png "Planet Eccentricity Plot Large")
 
 # Licence
 

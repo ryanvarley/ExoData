@@ -1,2 +1,2 @@
-include oecpy/data/*.dat
+include exodata/data/*.dat
 include readme.md
