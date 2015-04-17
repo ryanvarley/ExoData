@@ -18,3 +18,5 @@ run.py
 # Coverage
 .coveragerc
 cover/
+.tox
+*.egg*

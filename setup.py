@@ -38,17 +38,17 @@ if sys.hexversion < 0x02070000:
     install_requires.append('ordereddict')
 
 if sys.hexversion < 0x02070000:
-    test_suite = 'oecpy.tests.testsuite'  # otherwise skiptests dont work with 2.6, TODO plugin?
+    test_suite = 'exodata.tests.testsuite'  # otherwise skiptests dont work with 2.6, TODO plugin?
 else:
     test_suite = 'nose.collector'
 
 
 setup(
-    name="OECPy",
-    version=find_version('oecpy', '__init__.py'),
-    description="CURRENTLY WORKING ON THIS PACKAGE",
+    name="exodata",
+    version=find_version('exodata', '__init__.py'),
+    description="Exoplanet catalogue interface",
     long_description=long_description,
-    url='https://github.com/ryanvarley/open-exoplanet-catalogue-python',
+    url='https://github.com/ryanvarley/exodata',
     author='Ryan Varley',
     author_email='oecpy@ryanvarley.uk',
     license='GPLv3',
@@ -76,7 +76,7 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages.
-    packages=['oecpy'],
+    packages=['exodata'],
 
     # List run-time dependencies here.  These will be installed by pip when your
     # project is installed.
