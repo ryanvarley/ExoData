@@ -1,7 +1,7 @@
 """
 Help?
 """
-__version__ = '1.1.1'
+__version__ = '1.1.1.2'
 
 
 def test():
@@ -20,6 +20,3 @@ import sys
 from . import assumptions, astroclasses, astroquantities, equations, example, flags, plots
 # import OEC database
 from .database import OECDatabase, load_db_from_url
-
-
-
