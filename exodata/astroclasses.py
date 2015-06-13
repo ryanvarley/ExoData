@@ -1053,5 +1053,5 @@ def isNanOrNone(val):
             return False
 
 
-class HierarchyError(Exception):
+class HierarchyError(params.ExoDataError):
     pass

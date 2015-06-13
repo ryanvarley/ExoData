@@ -7,16 +7,37 @@ else:
 
 import math
 
+from hypothesis import given, example, assume
+from hypothesis.strategies import floats
+
 from .. import astroquantities as aq
-from ..equations import scaleHeight, meanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
+from ..equations import ScaleHeight, meanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
     surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis, calcSemiMajorAxis2, calcPeriod, \
-    estimateDistance, estimateAbsoluteMagnitude
+    estimateDistance, estimateAbsoluteMagnitude, ExoDataEqn
 
 from .. import equations as eq
 from .patches import TestCase
 
 
+class Test_ExoDataEqn(TestCase):
+
+    def test__repr__(self):
+
+        eqn = ExoDataEqn()
+
+        self.assertEqual(eqn.__repr__(), 'ExoDataEqn()')
+
+
 class Test_scaleHeight(TestCase):
+
+    def test__repr__works(self):
+
+        eqn = ScaleHeight(100*aq.K, 1*aq.atomic_mass_unit, 9.81 * aq.m / aq.s ** 2)
+
+        answer = 'ScaleHeight(H=None, T_eff=100.0 K, mu=1.0 u, g=9.81 m/s**2)'
+
+        self.assertEqual(eqn.__repr__(), answer)
+
     def test_works_earth(self):
 
         mu_p = 28.964 * aq.u
@@ -24,9 +45,29 @@ class Test_scaleHeight(TestCase):
         g_p = 9.81 * aq.m / aq.s ** 2
 
         answer = 8486.04 * aq.m
-        result = scaleHeight(T_eff_p, mu_p, g_p)
+        result = ScaleHeight(T_eff_p, mu_p, g_p).H
 
         self.assertAlmostEqual(answer, result, 2)
+
+    @given(floats(0,), floats(0,), floats(0,))
+    def test_can_derive_other_vars_from_one_calculated(self, T_eff, mu, g):
+        """ We calculate H from a range of values given by hypothesis and then see if we can accurately calculate the
+         other variables given this calculated value. This tests the rearrangements of the equation are correct.
+        :return:
+        """
+        assume(T_eff > 0 and mu > 0 and g > 0)
+        inf = float('inf')
+        assume(T_eff < inf and mu < inf and g < inf)
+
+        T_eff *= aq.K
+        mu *= aq.atomic_mass_unit
+        g *= aq.m / aq.s ** 2
+
+        H = ScaleHeight(T_eff, mu, g, None).H
+
+        self.assertAlmostEqual(ScaleHeight(T_eff, mu, None, H).g, g, 4)
+        self.assertAlmostEqual(ScaleHeight(T_eff, None, g, H).mu, mu, 4)
+        self.assertAlmostEqual(ScaleHeight(None, mu, g, H).T_eff, T_eff, 4)
 
 
 class Test_meanPlanetTemp(TestCase):

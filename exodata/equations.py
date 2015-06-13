@@ -1,7 +1,19 @@
 """
 Contains code for simulating observations and calculating signal to noise of various targets.
 
+I have changed the logic of equations in this module. Each equation is now a class in which you can give it n-1 of
+the parameters and then ask for the remaining one via the variable.
+
+Equations are named based on their main purpose or common name. I.e the equation scale height is
+H = \\frac{k T_eff}{\mu g} even though we could use it to calculate g, given the other parameters.
+
+Equations are designed to be user friendly and accurate, not fast. This means if you are using this as part of a large
+simulation and use exodata to generate initial parameter you'll be fine, if however you are running a certain equation
+millions of times it may be worth looking at for optimisation, without all the checking and overhead we do here.
+
 **Abbreviations used in this module**
+
+Where abbreviations are ambiguous, i.e R could be the radius of anything, we use subscript p for planet and s for star
 
 * R_p - Planetary Radius
 * M_p - Planetary Mass
@@ -26,6 +38,7 @@ import math
 
 import quantities.constants as const
 from . import astroquantities as aq
+import params
 
 
 pi = const.pi
@@ -34,24 +47,95 @@ G = const.Newtonian_constant_of_gravitation
 
 _rootdir = os.path.dirname(__file__)
 
+class ExoDataEqn(object):
 
-def scaleHeight(T_eff_p, mu_p, g_p):
-    """ Calculate the scale height H of the atmosphere
+    def __init__(self):
+        self.vars = (None,)
 
-    .. math::
-        H = \\frac{k T_eff}{\mu g}
+    def __repr__(self):
+        vs = ['{}={}'.format(v, eval('self._{}'.format(v))) for v in self.vars if v is not None]
+        return '{}({})'.format(self.__class__.__name__, ', '.join(vs))  # skip final ', '
 
-    Where H is the scale height of the planets atmosphere, :math:`T_{eff}` is the planetary effective temperature,
-    :math:`\mu` is the mean molecular weight of the planetary atmosphere and g is the planets surface gravity.
+class ScaleHeight(ExoDataEqn):
 
-    :param T_eff_p: Effective temperature
-    :param mu: mean molecular weight
-    :param g: surface gravity
-    :return: H (scale Height)
-    """
+    def __init__(self, T_eff=None, mu=None, g=None, H=None):
+        """ Uses the scale height equation to calculate a parameter given the others.
 
-    H = (const.k * T_eff_p) / (mu_p * g_p)
-    return H.rescale(aq.m)
+        .. math::
+            H = \\frac{k T_eff}{\mu g}
+
+        Where H is the scale height of the planets atmosphere, :math:`T_{eff}` is the planetary effective temperature,
+        :math:`\mu` is the mean molecular weight of the planetary atmosphere and g is the planets surface gravity.
+
+        :param T_eff: Effective temperature of the planet
+        :param mu: mean molecular weight for the atmosphere
+        :param g: surface gravity of the planet
+        :return: H (scale Height) of the atmosphere
+        """
+
+        ExoDataEqn.__init__(self)
+
+        self._T_eff = T_eff
+        self._mu = mu
+        self._g = g
+        self._H = H
+
+        self.vars = ('H', 'T_eff', 'mu', 'g')  # list of input variables
+
+        if (T_eff, mu, g, H).count(None) > 1:
+            raise EqnInputError("You must give all parameters bar one")
+
+    @property
+    def H(self):
+
+        H = self._H
+        mu = self._mu
+        g = self._g
+        T_eff = self._T_eff
+
+        if H is None:
+            H = (const.k * T_eff) / (mu * g)
+
+        return H.rescale(aq.m)
+
+    @property
+    def T_eff(self):
+
+        H = self._H
+        mu = self._mu
+        g = self._g
+        T_eff = self._T_eff
+
+        if T_eff is None:
+            T_eff = (H * mu * g)/const.k
+
+        return T_eff.rescale(aq.K)
+
+    @property
+    def mu(self):
+
+        H = self._H
+        mu = self._mu
+        g = self._g
+        T_eff = self._T_eff
+
+        if mu is None:
+            mu = (const.k * T_eff) / (H * g)
+
+        return mu.rescale(aq.atomic_mass_unit)
+
+    @property
+    def g(self):
+
+        H = self._H
+        mu = self._mu
+        g = self._g
+        T_eff = self._T_eff
+
+        if g is None:
+            g = (const.k * T_eff) / (H * mu)
+
+        return g.rescale(aq.m / aq.s**2)
 
 
 def meanPlanetTemp(A_p, T_s, R_s, a, e=0.7):
@@ -425,3 +509,6 @@ def magKtoMagV(*args, **kwargs):
                              " convert between many magnitudes")
 
 # TODO more orbital equations
+
+class EqnInputError(params.ExoDataError):
+    pass

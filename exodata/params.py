@@ -2,3 +2,8 @@
 """
 
 estimateMissingValues = True
+
+
+# here be dragons
+class ExoDataError(Exception):
+    pass
