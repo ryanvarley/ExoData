@@ -7,17 +7,18 @@ else:
 
 import math
 
-from hypothesis import given, example, assume
+from hypothesis import given, example, assume, Settings, Verbosity
 from hypothesis.strategies import floats
 
 from .. import astroquantities as aq
-from ..equations import ScaleHeight, meanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
+from ..equations import ScaleHeight, MeanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
     surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis, calcSemiMajorAxis2, calcPeriod, \
     estimateDistance, estimateAbsoluteMagnitude, ExoDataEqn
 
 from .. import equations as eq
 from .patches import TestCase
 
+Settings.default.verbosity = Verbosity.verbose
 
 class Test_ExoDataEqn(TestCase):
 
@@ -70,19 +71,36 @@ class Test_scaleHeight(TestCase):
         self.assertAlmostEqual(ScaleHeight(None, mu, g, H).T_eff, T_eff, 4)
 
 
-class Test_meanPlanetTemp(TestCase):
+class Test_MeanPlanetTemp(TestCase):
     def test_works_mars(self):
 
         a = 1.524 * aq.au
-        A_p = 0.25
+        A = 0.25
         T_s = 5800 * aq.K
         R_s = 1 * aq.R_s
 
         answer = 231.1 * aq.K  # TODO actual answer 227.17
-        result = meanPlanetTemp(A_p, T_s, R_s, a)
+        result = MeanPlanetTemp(A, T_s, R_s, a, 0.7).T_p
 
         self.assertAlmostEqual(answer, result, 1)
 
+    @given(A=floats(0.0001, 1), T_s=floats(0.0001,), R_s=floats(0.001,), a=floats(0.0001,), epsilon=floats(0.0001, 1))
+    def test_can_derive_other_vars_from_one_calculated(self, A, T_s, R_s, a, epsilon):
+        assume(T_s > 0 and R_s > 0 and a > 0 and epsilon > 0)
+        inf = float('inf')
+        assume(T_s < inf and R_s < inf and a < inf)
+
+        T_s *= aq.K
+        R_s *= aq.R_s
+        a *= aq.au
+
+        T_p = MeanPlanetTemp(A, T_s, R_s, a, epsilon).T_p
+
+        self.assertAlmostEqual(MeanPlanetTemp(A, T_s, R_s, a, None, T_p).epsilon, epsilon, 4)
+        self.assertAlmostEqual(MeanPlanetTemp(A, T_s, R_s, None, epsilon, T_p).a, a, 4)
+        self.assertAlmostEqual(MeanPlanetTemp(A, T_s, None, a, epsilon, T_p).R_s, R_s, 4)
+        self.assertAlmostEqual(MeanPlanetTemp(A, None, R_s, a, epsilon, T_p).T_s, T_s, 4)
+        self.assertAlmostEqual(MeanPlanetTemp(None, T_s, R_s, a, epsilon, T_p).A, A, 4)
 
 class Test_starLuminosity(TestCase):
     def test_works_sun(self):

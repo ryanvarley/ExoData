@@ -38,7 +38,7 @@ import math
 
 import quantities.constants as const
 from . import astroquantities as aq
-import params
+from . import params
 
 
 pi = const.pi
@@ -137,20 +137,118 @@ class ScaleHeight(ExoDataEqn):
 
         return g.rescale(aq.m / aq.s**2)
 
+class MeanPlanetTemp(ExoDataEqn):
 
-def meanPlanetTemp(A_p, T_s, R_s, a, e=0.7):
-    """ Calculate the equilibrium planet temperature
+    def __init__(self, A, T_s, R_s, a, epsilon=0.7, T_p=None):
+        """ Calculate the equilibrium planet temperature
 
-    .. math::
+        .. math::
 
+        assumes epsilon = 0.7 by default http://arxiv.org/pdf/1111.1455v2.pdf
+        """
+        ExoDataEqn.__init__(self)
 
-    assumes epsilon = 0.7 by default http://arxiv.org/pdf/1111.1455v2.pdf
-    """
+        self._A = A
+        self._T_s = T_s
+        self._T_p = T_p
+        self._R_s = R_s
+        self._a = a
+        self._epsilon = epsilon
 
-    T_p = T_s * ((1-A_p)/e)**(1/4) * sqrt(R_s/(2*a))
+        self.vars = ('A', 'T_s', 'T_p', 'R_s', 'a', 'epsilon')  # list of input variables
 
-    return T_p.rescale(aq.degK)
+        if (A, T_s, R_s, a, epsilon, T_p).count(None) > 1:
+            raise EqnInputError("You must give all parameters bar one")
 
+    @property
+    def T_p(self):
+
+        T_p = self._T_p
+        A = self._A
+        T_s = self._T_s
+        R_s = self._R_s
+        a = self._a
+        epsilon = self._epsilon
+
+        if T_p is None:
+            T_p = T_s * ((1-A)/epsilon)**(1/4) * sqrt(R_s/(2*a))
+
+        return T_p.rescale(aq.degK)
+
+    @property
+    def A(self):
+
+        T_p = self._T_p
+        A = self._A
+        T_s = self._T_s
+        R_s = self._R_s
+        a = self._a
+        epsilon = self._epsilon
+
+        if A is None:
+            A = 1 - epsilon * (T_p / (T_s * sqrt(R_s/(2*a))))**4
+
+        return A.rescale(aq.dimensionless)
+
+    @property
+    def T_s(self):
+
+        T_p = self._T_p
+        A = self._A
+        T_s = self._T_s
+        R_s = self._R_s
+        a = self._a
+        epsilon = self._epsilon
+
+        if T_s is None:
+            T_s = T_p / (((1-A)/epsilon)**(1/4) * sqrt(R_s/(2*a)))
+
+        return T_s.rescale(aq.K)
+
+    @property
+    def R_s(self):
+
+        T_p = self._T_p
+        A = self._A
+        T_s = self._T_s
+        R_s = self._R_s
+        a = self._a
+        epsilon = self._epsilon
+
+        if R_s is None:
+           R_s = 2*a*(T_p / (T_s * ((1-A)/epsilon)**(1/4)))**2
+
+        return R_s.rescale(aq.R_s)
+
+    @property
+    def a(self):
+
+        T_p = self._T_p
+        A = self._A
+        T_s = self._T_s
+        R_s = self._R_s
+        a = self._a
+        epsilon = self._epsilon
+
+        if a is None:
+            a = R_s/(2*(T_p / (T_s * ((1-A)/epsilon)**(1/4)))**2)
+
+        return a.rescale(aq.au)
+
+    @property
+    def epsilon(self):
+
+        T_p = self._T_p
+        A = self._A
+        T_s = self._T_s
+        R_s = self._R_s
+        a = self._a
+        epsilon = self._epsilon
+
+        if epsilon is None:
+            epsilon = (1-A)/(T_p / (T_s * sqrt(R_s/(2*a))))**4
+
+        return epsilon.rescale(aq.dimensionless)
 
 def starLuminosity(R_s, T_eff):
     """ Calculate stellar luminosity
