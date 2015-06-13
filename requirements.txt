@@ -2,3 +2,4 @@ numpy
 quantities
 nose
 matplotlib
+hypothesis
