@@ -53,7 +53,7 @@ class ExoDataEqn(object):
         self.vars = (None,)
 
     def __repr__(self):
-        vs = ['{}={}'.format(v, eval('self._{}'.format(v))) for v in self.vars if v is not None]
+        vs = ['{}={}'.format(v, eval('self._{}'.format(v)), self) for v in self.vars if v is not None]
         return '{}({})'.format(self.__class__.__name__, ', '.join(vs))  # skip final ', '
 
 class ScaleHeight(ExoDataEqn):
