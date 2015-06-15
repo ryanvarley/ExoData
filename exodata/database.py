@@ -5,15 +5,9 @@ import re
 import xml.etree.ElementTree as ET
 import glob
 import os.path
-import sys
 import io
 import gzip
 import requests
-
-# 2.6 patch for ExpatError being raised over ParseError (which didn't exist)
-if sys.hexversion < 0x02070000:
-    import xml.parsers.expat
-    ET.ParseError = xml.parsers.expat.ExpatError
 
 from .astroclasses import System, Binary, Star, Planet, Parameters, BinaryParameters, StarParameters, PlanetParameters
 

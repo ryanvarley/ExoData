@@ -1,8 +1,9 @@
 """ This module contains some plotting functions and plot types for easy plot creation
 """
 import os
+import sys
 import math
-
+from collections import OrderedDict
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,11 +12,6 @@ from matplotlib import rcParams
 from . import astroquantities as aq
 from . import astroclasses as ac
 
-import sys
-if sys.hexversion < 0x02070000:
-    from ordereddict import OrderedDict
-else:
-    from collections import OrderedDict
 
 rcParams.update({'figure.autolayout': True})
 
