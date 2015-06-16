@@ -6,7 +6,7 @@ from hypothesis import given, example, assume, Settings, Verbosity
 from hypothesis.strategies import floats
 
 from .. import astroquantities as aq
-from ..equations import ScaleHeight, MeanPlanetTemp, starLuminosity, ratioTerminatorToStar, SNRPlanet,\
+from ..equations import ScaleHeight, MeanPlanetTemp, StellarLuminosity, ratioTerminatorToStar, SNRPlanet,\
     surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis, calcSemiMajorAxis2, calcPeriod, \
     estimateDistance, estimateAbsoluteMagnitude, ExoDataEqn
 
@@ -97,6 +97,7 @@ class Test_MeanPlanetTemp(TestCase):
         self.assertAlmostEqual(MeanPlanetTemp(A, None, R_s, a, epsilon, T_p).T_s, T_s, 4)
         self.assertAlmostEqual(MeanPlanetTemp(None, T_s, R_s, a, epsilon, T_p).A, A, 4)
 
+
 class Test_starLuminosity(TestCase):
     def test_works_sun(self):
 
@@ -104,9 +105,23 @@ class Test_starLuminosity(TestCase):
         T_eff_s = 5780 * aq.degK
 
         answer = 3.89144e+26 * aq.W
-        result = starLuminosity(R_s, T_eff_s)
+        result = StellarLuminosity(R_s, T_eff_s).L
 
         self.assertAlmostEqual(answer, result, delta=0.0001e27)
+
+    @given(T=floats(0.0001), R=floats(0.0001))
+    def test_can_derive_other_vars_from_one_calculated(self, T, R):
+        assume(T > 0 and R > 0)
+        inf = float('inf')
+        assume(T < inf and R < inf)
+
+        T *= aq.K
+        R *= aq.R_s
+
+        L = StellarLuminosity(R, T).L
+
+        self.assertAlmostEqual(StellarLuminosity(R, None, L).T, T, 4)
+        self.assertAlmostEqual(StellarLuminosity(None, T, L).R, R, 4)
 
 
 class Test_ratioTerminatorToStar(TestCase):

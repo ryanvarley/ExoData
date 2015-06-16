@@ -250,23 +250,69 @@ class MeanPlanetTemp(ExoDataEqn):
 
         return epsilon.rescale(aq.dimensionless)
 
-def starLuminosity(R_s, T_eff):
-    """ Calculate stellar luminosity
+class StellarLuminosity(ExoDataEqn):
 
-    .. math::
-        L_\star = 4\pi R^2_\star \sigma T^4_\star
+    def __init__(self, R=None, T=None, L=None):
+        """ Calculate stellar luminosity
 
-    Where :math:`L_\star` is the Stellar luminosity, :math:`R_\star` stellar radius, :math:`\sigma` Stefan-Boltzman
-    constant, :math:`T_\star` the temperature of the star
+        .. math::
+            L_\star = 4\pi R^2_\star \sigma T^4_\star
 
-    :param R: stellar radius
-    :param T_eff: effective surface temperature of the star
-    :return: :math:`L_\star`
-    """
+        Where :math:`L_\star` is the Stellar luminosity, :math:`R_\star` stellar radius, :math:`\sigma` Stefan-Boltzman
+        constant, :math:`T_\star` the temperature of the star
 
-    L_s = 4 * pi * R_s**2 * sigma * T_eff**4
+        :param R: stellar radius
+        :param T: effective surface temperature of the star
+        :param L: Stellar luminosity
+        """
 
-    return L_s.rescale(aq.W)
+        ExoDataEqn.__init__(self)
+
+        self._L = L
+        self._R = R
+        self._T = T
+
+        self.vars = ('R', 'T', 'L')  # list of input variables
+
+        if (R, T, L).count(None) > 1:
+            raise EqnInputError("You must give all parameters bar one")
+
+    @property
+    def L(self):
+
+        L = self._L
+        R = self._R
+        T = self._T
+
+        if L is None:
+            L = 4 * pi * R**2 * sigma * T**4
+
+        return L.rescale(aq.W)
+
+    @property
+    def R(self):
+
+        L = self._L
+        R = self._R
+        T = self._T
+
+        if R is None:
+            R = sqrt(L / (4 * pi * sigma * T**4))
+
+        return R.rescale(aq.R_s)
+
+    @property
+    def T(self):
+
+        L = self._L
+        R = self._R
+        T = self._T
+
+        if T is None:
+            T = (L / (4 * pi * sigma * R**2))**0.25
+
+        return T.rescale(aq.K)
+
 
 
 def ratioTerminatorToStar(H_p, R_p, R_s):  # TODO add into planet class

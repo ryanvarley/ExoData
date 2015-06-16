@@ -321,7 +321,7 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
 
     def calcLuminosity(self):
 
-        return eq.starLuminosity(self.R, self.T)
+        return eq.StellarLuminosity(self.R, self.T).L
 
     def calcTemperature(self):
         """ uses equations.starTemperature to estimate temperature based on main sequence relationship
