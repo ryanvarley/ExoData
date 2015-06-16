@@ -600,7 +600,7 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
         return self.getParam('lastupdate')
 
     @property
-    def desdescription(self):
+    def description(self):
         return self.getParam('description')
 
     @property
