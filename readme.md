@@ -2,7 +2,7 @@
 [![Build Status](https://api.travis-ci.org/ryanvarley/ExoData.png?branch=master)](https://travis-ci.org/ryanvarley/ExoData)
 [![Coverage Status](https://coveralls.io/repos/ryanvarley/ExoData/badge.svg)](https://coveralls.io/r/ryanvarley/ExoData)
 
-This python interface (formerly oecpy) serves as a link between the raw XML of the [Open Exoplanet Catalogue](https://github.com/hannorein/open_exoplanet_catalogue). It allows:
+This python interface (formerly oecpy) serves as a link between the raw XML of the [Open Exoplanet Catalogue](https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue). It allows:
 * Searching of planets (including alternate names)
 * Easy reference of planet parameters ie GJ1214b.ra, GJ1214b.T, GJ1214b.R
 * Calculation of values like the transit duration.
