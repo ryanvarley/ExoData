@@ -780,9 +780,25 @@ class SpectralType(object):
         return self.classLetter + str(self.classNumber)
 
     @property
+    def roundedSpecClass(self):
+        """ Spectral class with rounded class number ie A8.5V is A9 """
+        try:
+            classnumber = str(int(round(self.classNumber)))
+        except TypeError:
+            classnumber = str(self.classNumber)
+
+        return self.classLetter + classnumber
+
+    @property
     def specType(self):
         """ Spectral class ie A8V is A8V """
         return self.classLetter + str(self.classNumber) + self.lumType
+
+    @property
+    def roundedSpecType(self):
+        """ Spectral class with rounded class number ie A8.5V is A9V """
+
+        return self.roundedSpecClass + self.lumType
 
     def __repr__(self):
         return self.specType
@@ -790,7 +806,14 @@ class SpectralType(object):
     def _parseSpecType(self, classString):
         """ This class attempts to parse the spectral type. It should probably use more advanced matching use regex
         """
-        classString = str(classString)
+
+        try:
+            classString = str(classString)
+        except UnicodeEncodeError:
+            # This is for the benefit of 1RXS1609 which currently has the spectral type K7\pm 1V
+            # TODO add unicode support and handling for this case / ammend the target
+            return False
+
         # some initial cases
         if classString == '' or classString == 'nan':
             return False
@@ -983,14 +1006,23 @@ class Magnitude(object):
         :return:  estimated magnitude for to_mag from from_mag
         """
         lumtype = self.spectral_type.lumType
-        specClass = self.spectral_type.specClass
+
+        # rounds decimal types, TODO perhaps we should interpolate?
+        specClass = self.spectral_type.roundedSpecClass
+
+        if not specClass:  # TODO investigate implications of this
+            raise ValueError('Can not convert when no spectral class is given')
 
         if lumtype not in ('V', ''):
             raise ValueError("Can only convert for main sequence stars. Got {0} type".format(lumtype))
 
         if to_mag == 'V':
             col, sign = self.column_for_V_conversion[from_mag]
-            offset = float(magDict[specClass][col])
+
+            try:  # TODO replace with pandas table
+                offset = float(magDict[specClass][col])
+            except KeyError:
+                raise ValueError('No data available to convert those magnitudes for that spectral type')
 
             if math.isnan(offset):
                 raise ValueError('No data available to convert those magnitudes for that spectral type')
@@ -1007,7 +1039,10 @@ class Magnitude(object):
                 raise ValueError('Must give fromVMag, even if it is self.magV')
 
             col, sign = self.column_for_V_conversion[to_mag]
-            offset = float(magDict[specClass][col])
+            try:
+                offset = float(magDict[specClass][col])
+            except KeyError:
+                raise ValueError('No data available to convert those magnitudes for that spectral type')
 
             if math.isnan(offset):
                 raise ValueError('No data available to convert those magnitudes for that spectral type')
