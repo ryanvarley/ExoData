@@ -384,6 +384,141 @@ class KeplersThirdLaw(ExoDataEqn):
 
         return M_p.rescale(aq.M_j)
 
+class SurfaceGravity(ExoDataEqn):
+
+    def __init__(self, M=None, R=None, g=None):
+        """ Calculates the surface acceleration due to gravity on the planet
+
+        .. math::
+            g_p = \\frac{GM_p}{R_p^2}
+
+        where :math:`g_p` is the acceleration ude to gravity on the planet surface, G is the gravitational constant,
+        :math:`M_p` planetary mass, :math:`R_p` radius of the planet
+
+        :param params: dict containing 'M_p', 'R_p' with units
+
+        :return: g - acceleration due to gravity * m / s**2
+        """
+
+        ExoDataEqn.__init__(self)
+
+        self._M = M
+        self._R = R
+        self._g = g
+
+        if (M, R, g).count(None) > 1:
+            raise EqnInputError("You must give all parameters bar one")
+
+    @property
+    def g(self):
+
+        M = self._M
+        R = self._R
+        g = self._g
+
+        if g is None:
+            g = (G * M)/(R**2)
+
+        return g.rescale(aq.m / aq.s**2)
+
+    @property
+    def M(self):
+
+        M = self._M
+        R = self._R
+        g = self._g
+
+        if M is None:
+            M = (g * R**2) / G
+
+        return M.rescale(aq.M_j)
+
+    @property
+    def R(self):
+
+        M = self._M
+        R = self._R
+        g = self._g
+
+        if R is None:
+            R = sqrt(M * G / g)
+
+        return R.rescale(aq.R_j)
+
+class Logg(ExoDataEqn):
+
+    def __init__(self, M=None, R=None, logg=None):
+        """ Calculates the surface acceleration due to gravity on the planet as logg, the base 10 logarithm of g in cgs
+        units. This function uses :py:func:`surfaceGravity` and then rescales it to cgs and takes the log
+        """
+
+        ExoDataEqn.__init__(self)
+
+        self._M = M
+        self._R = R
+        self._logg = logg
+
+        if (M, R, logg).count(None) > 1:
+            raise EqnInputError("You must give all parameters bar one")
+
+    @property
+    def logg(self):
+
+        M = self._M
+        R = self._R
+        logg = self._logg
+
+        if logg is None:
+            g = SurfaceGravity(M, R).g
+            logg = log10(float(g.rescale(aq.cm / aq.s**2)))  # the float wrapper is needed to remove dimensionality
+
+        return logg
+
+    @property
+    def M(self):
+
+        M = self._M
+        R = self._R
+        logg = self._logg
+
+        if M is None:
+            g = (10**logg) * aq.cm / aq.s**2
+            M = SurfaceGravity(None, R, g).M
+
+        return M.rescale(aq.M_j)
+
+    @property
+    def R(self):
+
+        M = self._M
+        R = self._R
+        logg = self._logg
+
+        if R is None:
+            g = (10**logg) * aq.cm / aq.s**2
+            R = SurfaceGravity(M, None, g).R
+
+        return R.rescale(aq.R_j)
+
+def transitDepth(R_s, R_p):
+    """ Calculates the transit depth
+    """
+
+    depth = (R_p / R_s)**2
+
+    return depth.rescale(aq.dimensionless)
+
+def density(M, R):
+    """ Calculates the density in g/cm**3
+    :param R: radius
+    :param M: mass
+    :return:
+    """
+
+    volume = 4 / 3 * pi * R**3
+
+    return (M/volume).rescale(aq.g / aq.cm**3)
+
 def ratioTerminatorToStar(H_p, R_p, R_s):  # TODO add into planet class
     """ Calculates the ratio of the terminator to the star assuming 5 scale heights large. If you dont know all of the
     input try :py:func:`calcRatioTerminatorToStar`
@@ -422,24 +557,6 @@ def SNRPlanet(SNRStar, starPlanetFlux, Nobs, pixPerbin, NVisits=1):
     SNRplanet = SNRStar * starPlanetFlux * sqrt(Nobs) * sqrt(pixPerbin) * sqrt(NVisits)
 
     return SNRplanet
-
-
-def surfaceGravity(M_p, R_p):
-    """ Calculates the surface acceleration due to gravity on the planet
-
-    .. math::
-        g_p = \\frac{GM_p}{R_p^2}
-
-    where :math:`g_p` is the acceleration ude to gravity on the planet surface, G is the gravitational constant,
-    :math:`M_p` planetary mass, :math:`R_p` radius of the planet
-
-    :param params: dict containing 'M_p', 'R_p' with units
-
-    :return: g - acceleration due to gravity * m / s**2
-    """
-
-    g_p = (G * M_p)/(R_p**2)
-    return g_p.rescale(aq.m / aq.s**2)
 
 
 def calcRatioTerminatorToStar(params):  # TODO update with new format
@@ -498,43 +615,11 @@ def transitDuration(P, R_s, R_p, a, i):
     return duration.rescale(aq.min)
 
 
-def logg(M_p, R_p):
-    """ Calculates the surface acceleration due to gravity on the planet as logg, the base 10 logarithm of g in cgs
-    units. This function uses :py:func:`surfaceGravity` and then rescales it to cgs and takes the log
-    """
-
-    g = surfaceGravity(M_p, R_p)
-    logg = log10(float(g.rescale(aq.cm / aq.s**2)))  # the float wrapper is needed to remove dimensionality
-
-    return logg
-
-
 def estimateStarTemperature(M_s):
     """ Estimates stellar temperature using the main sequence relationship T ~ 5800*M^0.65 (Cox 2000)??
     """
     # TODO improve with more x and k values from Cox 2000
     return (5800*aq.K * float(M_s.rescale(aq.M_s)**0.65)).rescale(aq.K)
-
-
-def transitDepth(R_s, R_p):
-    """ Calculates the transit depth
-    """
-
-    depth = (R_p / R_s)**2
-
-    return depth.rescale(aq.dimensionless)
-
-
-def density(M, R):
-    """ Calculates the density in g/cm**3
-    :param R: radius
-    :param M: mass
-    :return:
-    """
-
-    volume = 4 / 3 * pi * R**3
-
-    return (M/volume).rescale(aq.g / aq.cm**3)
 
 
 def estimateMass(R, density):

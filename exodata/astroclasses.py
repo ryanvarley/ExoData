@@ -265,11 +265,11 @@ class StarAndPlanetCommon(_BaseObject):
 
     def calcSurfaceGravity(self):
 
-        return eq.surfaceGravity(self.M, self.R)
+        return eq.SurfaceGravity(self.M, self.R).g
 
     def calcLogg(self):
 
-        return eq.logg(self.M, self.R)
+        return eq.Logg(self.M, self.R).logg
 
     def calcDensity(self):
 

@@ -7,7 +7,7 @@ from hypothesis.strategies import floats
 
 from .. import astroquantities as aq
 from ..equations import ScaleHeight, MeanPlanetTemp, StellarLuminosity, ratioTerminatorToStar, SNRPlanet,\
-    surfaceGravity, transitDuration, density, estimateMass, KeplersThirdLaw, \
+    SurfaceGravity, transitDuration, density, estimateMass, KeplersThirdLaw, \
     estimateDistance, estimateAbsoluteMagnitude, ExoDataEqn
 
 from .. import equations as eq
@@ -153,6 +153,58 @@ class Test_KeplersThirdLaw(TestCase):
         self.assertAlmostEqual(KeplersThirdLaw(a, M_s, P, None).M_p, M_p, 4)
 
 
+class Test_SurfaceGravity(TestCase):
+    def test_works_earth(self):
+
+        R = 1 * aq.R_e
+        M = 1 * aq.M_e
+
+        answer = 9.823 * aq.m / aq.s**2
+        result = SurfaceGravity(M, R).g
+
+        self.assertAlmostEqual(answer, result, 2)
+
+    @given(M=floats(0.0001), R=floats(0.0001))
+    def test_can_derive_other_vars_from_one_calculated(self, M, R):
+        assume(M > 0 and R > 0)
+        inf = float('inf')
+        assume(M < inf and R < inf)
+
+        R *= aq.R_j
+        M *= aq.M_j
+
+        g = SurfaceGravity(M, R).g
+
+        self.assertAlmostEqual(SurfaceGravity(M, R, None).g, g, 4)
+        self.assertAlmostEqual(SurfaceGravity(M, None, g).R, R, 4)
+        self.assertAlmostEqual(SurfaceGravity(None, R, g).M, M, 4)
+
+
+class Test_logg(TestCase):
+    def test_works_wasp10(self):
+        """ Christian et al. 2009 values
+        """
+        answer = 4.51
+        result = eq.Logg(0.703*aq.M_s, 0.775*aq.R_s).logg
+
+        self.assertAlmostEqual(answer, result, 1)
+
+    @given(M=floats(0.0001), R=floats(0.0001))
+    def test_can_derive_other_vars_from_one_calculated(self, M, R):
+        assume(M > 0 and R > 0)
+        inf = float('inf')
+        assume(M < inf and R < inf)
+
+        R *= aq.R_j
+        M *= aq.M_j
+
+        logg = eq.Logg(M, R).logg
+
+        self.assertAlmostEqual(eq.Logg(M, R, None).logg, logg, 4)
+        self.assertAlmostEqual(eq.Logg(M, None, logg).R, R, 4)
+        self.assertAlmostEqual(eq.Logg(None, R, logg).M, M, 4)
+
+
 class Test_ratioTerminatorToStar(TestCase):
     def test_works_earth(self):
 
@@ -182,18 +234,6 @@ class Test_SNRPlanet(TestCase):
         self.assertAlmostEqual(answer, result, 5)
 
 
-class Test_surfaceGravity(TestCase):
-    def test_works_earth(self):
-
-        R_p = 1 * aq.R_e
-        M_p = 1 * aq.M_e
-
-        answer = 9.823 * aq.m / aq.s**2
-        result = surfaceGravity(M_p, R_p)
-
-        self.assertAlmostEqual(answer, result, 2)
-
-
 class Test_transitDuration(TestCase):
     def test_works_gj1214(self):
 
@@ -207,16 +247,6 @@ class Test_transitDuration(TestCase):
         result = transitDuration(P, R_s, R_p, a, i)
 
         self.assertAlmostEqual(answer, result, 3)
-
-
-class Test_logg(TestCase):
-    def test_works_wasp10(self):
-        """ Christian et al. 2009 values
-        """
-        answer = 4.51
-        result = eq.logg(0.703*aq.M_s, 0.775*aq.R_s)
-
-        self.assertAlmostEqual(answer, result, 1)
 
 
 class Test_starTemperature(TestCase):
