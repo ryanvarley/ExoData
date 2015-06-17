@@ -123,7 +123,8 @@ class OECDatabase(object):
 
             for filename in databaseXML:
                 try:
-                    tree = ET.parse(open(filename, 'r'))
+                    with open(filename, 'r') as f:
+                        tree = ET.parse(f)
                 except ET.ParseError as e:  # this is sometimes raised rather than the root.tag system check
                     raise LoadDataBaseError(e)
 
