@@ -578,7 +578,7 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
         """ calculates period using a and stellar mass
         """
 
-        return eq.calcPeriod(self.a, self.star.M)
+        return eq.KeplersThirdLaw(self.a, self.star.M).P
 
     @property
     def discoveryMethod(self):

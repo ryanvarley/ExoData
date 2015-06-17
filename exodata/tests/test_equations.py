@@ -7,7 +7,7 @@ from hypothesis.strategies import floats
 
 from .. import astroquantities as aq
 from ..equations import ScaleHeight, MeanPlanetTemp, StellarLuminosity, ratioTerminatorToStar, SNRPlanet,\
-    surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis, calcSemiMajorAxis2, calcPeriod, \
+    surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis, calcSemiMajorAxis2, KeplersThirdLaw, \
     estimateDistance, estimateAbsoluteMagnitude, ExoDataEqn
 
 from .. import equations as eq
@@ -24,7 +24,7 @@ class Test_ExoDataEqn(TestCase):
         self.assertEqual(eqn.__repr__(), 'ExoDataEqn()')
 
 
-class Test_scaleHeight(TestCase):
+class Test_ScaleHeight(TestCase):
 
     def test__repr__works(self):
 
@@ -98,7 +98,7 @@ class Test_MeanPlanetTemp(TestCase):
         self.assertAlmostEqual(MeanPlanetTemp(None, T_s, R_s, a, epsilon, T_p).A, A, 4)
 
 
-class Test_starLuminosity(TestCase):
+class Test_StellarLuminosity(TestCase):
     def test_works_sun(self):
 
         R_s = 1 * aq.R_s
@@ -122,6 +122,35 @@ class Test_starLuminosity(TestCase):
 
         self.assertAlmostEqual(StellarLuminosity(R, None, L).T, T, 4)
         self.assertAlmostEqual(StellarLuminosity(None, T, L).R, R, 4)
+
+
+class Test_KeplersThirdLaw(TestCase):
+
+    def test_works_gj1214(self):
+
+        a = 0.014 * aq.au
+        M_s = 0.153 * aq.M_s
+
+        result = KeplersThirdLaw(a, M_s).P
+        answer = 1.546 * aq.day
+
+        self.assertAlmostEqual(answer, result, 3)
+
+    @given(a=floats(0.0001), M_s=floats(0.0001), M_p=floats(0,))
+    def test_can_derive_other_vars_from_one_calculated(self, a, M_s, M_p):
+        assume(M_s > 0 and a > 0)
+        inf = float('inf')
+        assume(a < inf and M_s < inf and M_p < inf)
+
+        a *= aq.au
+        M_s *= aq.M_s
+        M_p *= aq.M_j
+
+        P = KeplersThirdLaw(a, M_s, None, M_p).P
+
+        self.assertAlmostEqual(KeplersThirdLaw(None, M_s, P, M_p).a, a, 4)
+        self.assertAlmostEqual(KeplersThirdLaw(a, None, P, M_p).M_s, M_s, 4)
+        self.assertAlmostEqual(KeplersThirdLaw(a, M_s, P, None).M_p, M_p, 4)
 
 
 class Test_ratioTerminatorToStar(TestCase):
@@ -275,18 +304,6 @@ class Test_calcSemiMajorAxis2(TestCase):
 
         result = calcSemiMajorAxis2(T_p, T_s, A_p, R_s)
         answer = 0.01665 * aq.au
-
-        self.assertAlmostEqual(answer, result, 3)
-
-
-class Test_calcPeriod(TestCase):
-    def test_works_gj1214(self):
-
-        a = 0.014 * aq.au
-        M_s = 0.153 * aq.M_s
-
-        result = calcPeriod(a, M_s)
-        answer = 1.546 * aq.day
 
         self.assertAlmostEqual(answer, result, 3)
 

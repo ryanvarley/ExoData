@@ -314,6 +314,77 @@ class StellarLuminosity(ExoDataEqn):
         return T.rescale(aq.K)
 
 
+class KeplersThirdLaw(ExoDataEqn):
+
+    def __init__(self, a=None, M_s=None, P=None, M_p=0. * aq.M_j):
+        """ Calculates the period of the orbit using the stellar mass, planet mass and sma using keplers Third Law
+
+        .. math::
+            P = \sqrt{\frac{4\pi^2a^3}{G \left(M_\star + M_p \right)}}
+        """
+
+        ExoDataEqn.__init__(self)
+
+        self._a = a
+        self._M_s = M_s
+        self._P = P
+        self._M_p = M_p
+
+        if (a, M_s, P).count(None) > 1:
+            raise EqnInputError("You must give all parameters bar one")
+
+    @property
+    def P(self):
+
+        a = self._a
+        M_s = self._M_s
+        M_p = self._M_p
+        P = self._P
+
+        if P is None:
+            P = 2 * pi * sqrt(a**3 / (G * (M_s + M_p)))
+
+        return P.rescale(aq.day)
+
+    @property
+    def a(self):
+
+        a = self._a
+        M_s = self._M_s
+        M_p = self._M_p
+        P = self._P
+
+        if a is None:
+            a = ((P**2 * G*(M_s + M_p))/(4*pi**2))**(1./3)
+
+        return a.rescale(aq.au)
+
+    @property
+    def M_s(self):
+
+        a = self._a
+        M_s = self._M_s
+        M_p = self._M_p
+        P = self._P
+
+        if M_s is None:
+            M_s  = ((4*pi**2 * a**3)/(G*P**2)) - M_p
+
+        return M_s.rescale(aq.M_s)
+
+    @property
+    def M_p(self):
+
+        a = self._a
+        M_s = self._M_s
+        M_p = self._M_p
+        P = self._P
+
+        if M_p is None:
+            M_p = ((4*pi**2 * a**3)/(G*P**2)) - M_s
+
+        return M_p.rescale(aq.M_j)
+
 
 def ratioTerminatorToStar(H_p, R_p, R_s):  # TODO add into planet class
     """ Calculates the ratio of the terminator to the star assuming 5 scale heights large. If you dont know all of the
@@ -417,7 +488,6 @@ def transitDuration(P, R_s, R_p, a, i):
     :return:
     """
 
-    # TODO use non circular orbit version?
     if i is nan:
         i = 90 * aq.deg
 
@@ -518,19 +588,6 @@ def calcSemiMajorAxis2(T_p, T_s, A_p, R_s, epsilon=0.7):
     a = sqrt((1-A_p)/epsilon) * (R_s/2) * (T_s/T_p)**2
 
     return a.rescale(aq.au)
-
-
-def calcPeriod(a, M_s, M_p=0.*aq.M_e):
-    """ Calculates the period of the orbit using the stellar mass, planet mass and sma using keplers Third Law
-    :return:
-
-    .. math::
-        P = \sqrt{\frac{4\pi^2a^3}{G \left(M_\star + M_p \right)}}
-    """
-
-    P = 2 * pi * sqrt(a**3 / (G * (M_s + M_p)))
-
-    return P.rescale(aq.day)
 
 
 def impactParameter(a, R_s, i):
