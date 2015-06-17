@@ -8,6 +8,8 @@ if sys.hexversion < 0x02070000:
 else:
     import unittest
 
+import math
+
 import numpy as np
 
 from .. import astroquantities as aq
@@ -235,34 +237,43 @@ class TestSpectralType(TestCase):
         self.assertEqual(test1.lumType, '')
         self.assertEqual(test1.classLetter, 'K')
         self.assertEqual(test1.classNumber, 0)
+        self.assertEqual(test1.roundedSpecType, 'K0')
 
         test2 = SpectralType('GIV/V')
         self.assertEqual(test2.lumType, 'IV')
         self.assertEqual(test2.classLetter, 'G')
         self.assertEqual(test2.classNumber, '')
+        self.assertEqual(test2.roundedSpecType, 'GIV')
 
         test3 = SpectralType('F8-G0')
         self.assertEqual(test3.lumType, '')
         self.assertEqual(test3.classLetter, 'F')
         self.assertEqual(test3.classNumber, 8)
+        self.assertEqual(test3.roundedSpecType, 'F8')
 
     def test_works_spaces(self):
         test1 = SpectralType('K1 III')
         self.assertEqual(test1.lumType, 'III')
         self.assertEqual(test1.classLetter, 'K')
         self.assertEqual(test1.classNumber, 1)
+        self.assertEqual(test1.roundedSpecClass, 'K1')
+        self.assertEqual(test1.roundedSpecType, 'K1III')
 
     def test_works_decimal(self):
         test1 = SpectralType('K1.5III')
         self.assertEqual(test1.classLetter, 'K')
         self.assertEqual(test1.classNumber, 1.5)
         self.assertEqual(test1.lumType, 'III')
+        self.assertEqual(test1.roundedSpecClass, 'K2')
+        self.assertEqual(test1.roundedSpecType, 'K2III')
 
     def test_works_decmial_no_L_class(self):
         test2 = SpectralType('M8.5')
         self.assertEqual(test2.classLetter, 'M')
         self.assertEqual(test2.classNumber, 8.5)
         self.assertEqual(test2.lumType, '')
+        self.assertEqual(test2.roundedSpecClass, 'M9')
+        self.assertEqual(test2.roundedSpecType, 'M9')
 
     def test_works_2_decimal_places(self):
         test2 = SpectralType('A9.67V')
@@ -388,6 +399,22 @@ class Test_Magnitude(TestCase):
     def test_convert_works_magK_to_magB_explicit_with_lumtype(self):  # complex case K -> V -> B, auto option would be V
         mag = Magnitude('B6V', magH=19., magK=9.)
         self.assertEqual(mag.convert('B', 'K'), 9.-0.43-0.13)
+
+    def test_convert_works_magK_to_magB_with_decimal_spec_type(self):
+        mag = Magnitude('M2.5', magH=19., magK=9.)
+        self.assertAlmostEqual(mag.convert('B', 'K'), 15.2, 5)
+
+    def test_raises_ValueError_if_spectral_type_not_in_table(self):
+        mag = Magnitude('M9', magH=19., magK=9.)
+
+        with self.assertRaises(ValueError):
+            mag.convert('B', 'K')
+
+    def test_raises_ValueError_if_null_spectral_type(self):
+        mag = Magnitude('', magH=19., magK=9.)
+
+        with self.assertRaises(ValueError):
+            mag.convert('B', 'K')
 
 
 class Test_isNanOrNone(TestCase):
