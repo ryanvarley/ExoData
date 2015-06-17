@@ -313,7 +313,6 @@ class StellarLuminosity(ExoDataEqn):
 
         return T.rescale(aq.K)
 
-
 class KeplersThirdLaw(ExoDataEqn):
 
     def __init__(self, a=None, M_s=None, P=None, M_p=0. * aq.M_j):
@@ -384,7 +383,6 @@ class KeplersThirdLaw(ExoDataEqn):
             M_p = ((4*pi**2 * a**3)/(G*P**2)) - M_s
 
         return M_p.rescale(aq.M_j)
-
 
 def ratioTerminatorToStar(H_p, R_p, R_s):  # TODO add into planet class
     """ Calculates the ratio of the terminator to the star assuming 5 scale heights large. If you dont know all of the
@@ -565,29 +563,6 @@ def estimateStellarRadius(M_s):
     R = k * M_s^x
 
     return NotImplementedError
-
-
-def calcSemiMajorAxis(Period, M_s):
-    """ Calculates the semi-major axis of the orbit using the period and stellar mass
-
-    .. math::
-        a = \left( \frac{P^2 G M_*}{4*\pi^2} \right))^{1/3}
-
-    """
-    a = ((Period**2 * G * M_s)/(4 * pi**2))**(1/3)
-
-    return a.rescale(aq.au)
-
-
-def calcSemiMajorAxis2(T_p, T_s, A_p, R_s, epsilon=0.7):
-    """ Calculates the semi-major axis of the orbit using the planet temperature
-
-    .. math::
-        a = \sqrt\frac{1-A_p}{\epsilon} \frac{R_\star}{2} \left(\frac{T_\star}{T_p}\right)^2
-    """
-    a = sqrt((1-A_p)/epsilon) * (R_s/2) * (T_s/T_p)**2
-
-    return a.rescale(aq.au)
 
 
 def impactParameter(a, R_s, i):

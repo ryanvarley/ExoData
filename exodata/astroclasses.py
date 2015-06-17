@@ -563,16 +563,16 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
         return eq.estimateMass(self.R, density)
 
     def calcSMA(self):
-        """ Calculates the semi-major axis based on star mass and period
+        """ Calculates the semi-major axis from Keplers Third Law
         """
 
-        return eq.calcSemiMajorAxis(self.P, self.star.M)
+        return eq.KeplersThirdLaw(None, self.star.M, self.P).a
 
-    def calcSMAfromT(self):
+    def calcSMAfromT(self, epsilon=0.7):
         """ Calculates the semi-major axis based on planet temperature
         """
 
-        return eq.calcSemiMajorAxis2(self.T, self.star.T, self.albedo(), self.star.R)
+        return eq.MeanPlanetTemp(self.albedo(), self.star.T, self.star.R, epsilon, self.T).a
 
     def calcPeriod(self):
         """ calculates period using a and stellar mass

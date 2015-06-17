@@ -7,7 +7,7 @@ from hypothesis.strategies import floats
 
 from .. import astroquantities as aq
 from ..equations import ScaleHeight, MeanPlanetTemp, StellarLuminosity, ratioTerminatorToStar, SNRPlanet,\
-    surfaceGravity, transitDuration, density, estimateMass, calcSemiMajorAxis, calcSemiMajorAxis2, KeplersThirdLaw, \
+    surfaceGravity, transitDuration, density, estimateMass, KeplersThirdLaw, \
     estimateDistance, estimateAbsoluteMagnitude, ExoDataEqn
 
 from .. import equations as eq
@@ -280,32 +280,6 @@ class Test_estimateMass(TestCase):
 class Test_estimateStellarMass(TestCase):
     def test_works_gj1214(self):
         assert False
-
-
-class Test_calcSemiMajorAxis(TestCase):
-    def test_works_earth(self):
-
-        M_s = aq.M_s
-        P = 1 * aq.year
-
-        result = calcSemiMajorAxis(P, M_s)
-        answer = 1 * aq.au
-
-        self.assertAlmostEqual(answer, result, 3)
-
-
-class Test_calcSemiMajorAxis2(TestCase):
-    def test_works_gj1214(self):
-
-        T_p = 520 * aq.K
-        T_s = 3026 * aq.K
-        R_s = 0.21 * aq.R_s
-        A_p = 0.3
-
-        result = calcSemiMajorAxis2(T_p, T_s, A_p, R_s)
-        answer = 0.01665 * aq.au
-
-        self.assertAlmostEqual(answer, result, 3)
 
 
 class Test_impactParameter(TestCase):
