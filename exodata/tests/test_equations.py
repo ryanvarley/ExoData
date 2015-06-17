@@ -7,8 +7,8 @@ from hypothesis.strategies import floats
 
 from .. import astroquantities as aq
 from ..equations import ScaleHeight, MeanPlanetTemp, StellarLuminosity, ratioTerminatorToStar, SNRPlanet,\
-    SurfaceGravity, transitDuration, density, estimateMass, KeplersThirdLaw, \
-    estimateDistance, estimateAbsoluteMagnitude, ExoDataEqn
+    SurfaceGravity, transitDuration, Density, KeplersThirdLaw, TransitDepth, estimateDistance, \
+    estimateAbsoluteMagnitude, ExoDataEqn
 
 from .. import equations as eq
 from .patches import TestCase
@@ -205,6 +205,75 @@ class Test_logg(TestCase):
         self.assertAlmostEqual(eq.Logg(None, R, logg).M, M, 4)
 
 
+class Test_transitDepth(TestCase):
+    def test_works_gj1214(self):
+        """Charbonneau et. al. 2009 values"""
+        answer = 0.1162**2
+        result = TransitDepth(0.2110*aq.R_s, 2.678*aq.R_e).depth
+        self.assertAlmostEqual(answer, result, 3)
+
+    @given(R_p=floats(0.0001), R_s=floats(0.0001))
+    def test_can_derive_other_vars_from_one_calculated(self, R_p, R_s):
+        assume(R_p > 0 and R_s > 0)
+        inf = float('inf')
+        assume(R_p < inf and R_s < inf)
+
+        R_p *= aq.R_j
+        R_s *= aq.R_s
+
+        depth = TransitDepth(R_s, R_p).depth
+
+        self.assertAlmostEqual(TransitDepth(R_s, R_p).depth, depth, 4)
+        self.assertAlmostEqual(TransitDepth(R_s, None, depth).R_p, R_p, 4)
+        self.assertAlmostEqual(TransitDepth(None, R_p, depth).R_s, R_s, 4)
+
+
+class Test_density(TestCase):
+    def test_works_water(self):  # Doesnt work as its not a sphere
+
+        M = 1 * aq.kg
+        R = 1 * aq.m
+
+        answer = 0.2387 * aq.kg / aq.m**3  # TODO calcluate this result manually
+        result = Density(M, R).density.rescale(aq.kg / aq.m**3)
+
+        self.assertAlmostEqual(answer, result, 3)
+
+    def test_works_hd189(self):
+
+        M = 1.144 * aq.M_j
+        R = 1.138 * aq.R_j
+
+        answer = 1.0296 * aq.g / aq.cm**3  # real answer 0.963
+        result = Density(M, R).density
+
+        self.assertAlmostEqual(answer, result, 3)
+
+    def test_works_jupiter(self):
+
+        R = 6.9911 * (10**7) * aq.m
+        d = 1.326 * aq.g / aq.cm**3
+
+        result = Density(None, R, d).M.rescale(aq.kg)
+        answer = 1.898*(10**27)*aq.kg
+
+        self.assertAlmostEqual(answer, result, delta=1e24)
+
+    @given(M=floats(0.0001), R=floats(0.0001))
+    def test_can_derive_other_vars_from_one_calculated(self, M, R):
+        assume(R > 0 and M > 0)
+        inf = float('inf')
+        assume(R < inf and M < inf)
+
+        M *= aq.kg
+        R *= aq.m
+
+        density = Density(M, R).density
+
+        self.assertAlmostEqual(Density(M, None, density).R, R, 4)
+        self.assertAlmostEqual(Density(None, R, density).M, M, 4)
+
+
 class Test_ratioTerminatorToStar(TestCase):
     def test_works_earth(self):
 
@@ -262,49 +331,6 @@ class Test_starTemperature(TestCase):
         result = eq.estimateStarTemperature(0.846*aq.M_s)
 
         self.assertTrue(result-answer < 300)
-
-
-class Test_transitDepth(TestCase):
-    def test_works_gj1214(self):
-        """Charbonneau et. al. 2009 values"""
-        answer = 0.1162**2
-        result = eq.transitDepth(0.2110*aq.R_s, 2.678*aq.R_e)
-        self.assertAlmostEqual(answer, result, 3)
-
-
-class Test_density(TestCase):
-    def test_works_water(self):  # Doesnt work as its not a sphere
-
-        M = 1 * aq.kg
-        R = 1 * aq.m
-
-        answer = 0.2387 * aq.kg / aq.m**3  # TODO calcluate this result manually
-        result = density(M, R).rescale(aq.kg / aq.m**3)
-
-        self.assertAlmostEqual(answer, result, 3)
-
-    def test_works_hd189(self):
-
-        M = 1.144 * aq.M_j
-        R = 1.138 * aq.R_j
-
-        answer = 1.0296 * aq.g / aq.cm**3  # real answer 0.963
-        result = density(M, R)
-
-        self.assertAlmostEqual(answer, result, 3)
-
-
-class Test_estimateMass(TestCase):
-    def test_works_jupiter(self):
-
-        R = 6.9911 * (10**7) * aq.m
-        d = 1.326 * aq.g / aq.cm**3
-
-        result = estimateMass(R, d).rescale(aq.kg)
-        answer = 1.898*(10**27)*aq.kg
-
-        self.assertAlmostEqual(answer, result, delta=1e24)
-
 
 @unittest.skip("Not written")
 class Test_estimateStellarMass(TestCase):

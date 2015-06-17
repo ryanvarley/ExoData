@@ -500,24 +500,122 @@ class Logg(ExoDataEqn):
 
         return R.rescale(aq.R_j)
 
-def transitDepth(R_s, R_p):
-    """ Calculates the transit depth
+class TransitDepth(ExoDataEqn):
+
+    def __init__(self, R_s=None, R_p=None, depth=None):
+
+        ExoDataEqn.__init__(self)
+
+        self._R_s = R_s
+        self._R_p = R_p
+        self._depth = depth
+
+        if (R_s, R_p, depth).count(None) > 1:
+            raise EqnInputError("You must give all parameters bar one")
+
+    @property
+    def depth(self):
+
+        R_s = self._R_s
+        R_p = self._R_p
+        depth = self._depth
+
+        if depth is None:
+            depth = (R_p / R_s)**2
+
+        return depth.rescale(aq.dimensionless)
+
+    @property
+    def R_s(self):
+
+        R_s = self._R_s
+        R_p = self._R_p
+        depth = self._depth
+
+        if R_s is None:
+            R_s = R_p / sqrt(depth)
+
+        return R_s
+
+    @property
+    def R_p(self):
+
+        R_s = self._R_s
+        R_p = self._R_p
+        depth = self._depth
+
+        if R_p is None:
+            R_p = R_s * sqrt(depth)
+
+        return R_p.rescale(aq.R_j)
+
+
+class Density(ExoDataEqn):
+
+    def __init__(self, M=None, R=None, density=None):
+        """ Calculates the density in g/cm**3
+        :param R: radius
+        :param M: mass
+        :return:
+        """
+
+        ExoDataEqn.__init__(self)
+
+        self._M = M
+        self._R = R
+        self._density = density
+
+        if (M, R, density).count(None) > 1:
+            raise EqnInputError("You must give all parameters bar one")
+
+    @property
+    def density(self):
+
+        M = self._M
+        R = self._R
+        density = self._density
+
+        if density is None:
+            volume = 4. / 3 * pi * R**3
+            density = (M/volume)
+
+        return density.rescale(aq.g / aq.cm**3)
+
+    @property
+    def M(self):
+
+        M = self._M
+        R = self._R
+        density = self._density
+
+        if M is None:
+            volume = 4. / 3 * pi * R**3
+            M = density * volume
+
+        return M.rescale(aq.M_j)
+
+    @property
+    def R(self):
+
+        M = self._M
+        R = self._R
+        density = self._density
+
+        if R is None:
+            R = (M/(density * 4. / 3 * pi))**(1./3)
+
+        return R.rescale(aq.R_j)
+
+def impactParameter(a, R_s, i):
+    """ projected distance between the planet and star centers during mid transit
+    .. math::
+        b \equiv \frac{a}{R_*} \cos{i}
+    (Seager & Mallen-Ornelas 2003).
     """
+    b = (a/R_s) * cos(i.rescale(aq.rad))
 
-    depth = (R_p / R_s)**2
+    return b.rescale(aq.dimensionless)
 
-    return depth.rescale(aq.dimensionless)
-
-def density(M, R):
-    """ Calculates the density in g/cm**3
-    :param R: radius
-    :param M: mass
-    :return:
-    """
-
-    volume = 4 / 3 * pi * R**3
-
-    return (M/volume).rescale(aq.g / aq.cm**3)
 
 def ratioTerminatorToStar(H_p, R_p, R_s):  # TODO add into planet class
     """ Calculates the ratio of the terminator to the star assuming 5 scale heights large. If you dont know all of the
@@ -622,18 +720,6 @@ def estimateStarTemperature(M_s):
     return (5800*aq.K * float(M_s.rescale(aq.M_s)**0.65)).rescale(aq.K)
 
 
-def estimateMass(R, density):
-    """ Estimates mass based on radius and a density
-    :param R: Radius
-    :param density: density to calculate mass from
-    :return: mass
-    """
-
-    volume = 4 / 3 * pi * R**3
-
-    return (density * volume).rescale(aq.M_j)
-
-
 def estimateStellarRadius(M_s):
     """ Estimates radius from mass based on stellar type
     .. math::
@@ -648,17 +734,6 @@ def estimateStellarRadius(M_s):
     R = k * M_s^x
 
     return NotImplementedError
-
-
-def impactParameter(a, R_s, i):
-    """ projected distance between the planet and star centers during mid transit
-    .. math::
-        b \equiv \frac{a}{R_*} \cos{i}
-    (Seager & Mallen-Ornelas 2003).
-    """
-    b = (a/R_s) * cos(i.rescale(aq.rad))
-
-    return b.rescale(aq.dimensionless)
 
 
 def estimateDistance(m, M, Av=0.0):

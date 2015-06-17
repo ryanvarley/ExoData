@@ -276,7 +276,7 @@ class StarAndPlanetCommon(_BaseObject):
         if self.M is np.nan or self.R is np.nan:
             return np.nan
         else:
-            return eq.density(self.M, self.R)
+            return eq.Density(self.M, self.R).density
 
 
 class Binary(PlanetAndBinaryCommon, StarAndPlanetCommon):  # TODO add binary methods and variables, remove unused one from starcommon
@@ -505,7 +505,7 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
         # return eq.scaleHeight(self.T, , self.g)  # TODO mu based on assumptions
 
     def calcTransitDepth(self):
-        return eq.transitDepth(self.star.R, self.R)
+        return eq.TransitDepth(self.star.R, self.R).depth
 
     def type(self):
         return assum.planetType(self.T, self.M, self.R)
@@ -560,7 +560,7 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
 
         density = assum.planetDensity(self.radiusType())
 
-        return eq.estimateMass(self.R, density)
+        return eq.Density(None, self.R, density).M
 
     def calcSMA(self):
         """ Calculates the semi-major axis from Keplers Third Law
