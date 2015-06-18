@@ -145,13 +145,13 @@ A few options can be set within OECPY to change the behaviour of the program. By
 This will only take scope in the current project so if you close the interpreter it will reset to True.
 
 # Plotting
-ExoData features a plotting library for planet and stellar parameters in a scatter plot and per parameter bin. Please see the [plots section](https://github.com/ryanvarley/open-exoplanet-catalogue-python/wiki/Plotting) of the documentation for further information.
+ExoData features a plotting library for planet and stellar parameters in a scatter plot and per parameter bin. Please see the [plots section](https://github.com/ryanvarley/open-exoplanet-catalogue-python/wiki/Plotting) of the documentation for further information. Note that all plots are shown here were produced after `import seaborn` which changes the plot style.
 
 ### Planet Mass with Planet Radius ###
 ```python
 exodata.plots.GeneralPlotter(exocat.planets, 'R', 'M', yaxislog=True).plot()
 ```
-![Planet Mass with Planet Radius](https://raw.githubusercontent.com/ryanvarley/ExoData/images/exodata-planet-mass-radius.png "Planet Mass with Planet Radius Plot")
+![Planet Mass with Planet Radius](https://github.com/ryanvarley/ExoData/blob/images/planetR-M-4.png?raw=true "Planet Mass with Planet Radius Plot")
 
 ### Stellar V Magnitude with Planet Radius ###
 ```python
@@ -159,14 +159,14 @@ exodata.plots.GeneralPlotter(exocat.planets, 'R', 'star.magV',
                             xunit=aq.R_e, xaxislog=True).plot()
 ```
 
-![Stellar V Magnitude with Planet Radius](https://raw.githubusercontent.com/ryanvarley/ExoData/images/exodata-vmag-planetradius.png "Stellar V Magnitude with Planet Radius Plot")
+![Stellar V Magnitude with Planet Radius](https://github.com/ryanvarley/ExoData/blob/images/planetR-starMagV-4.png "Stellar V Magnitude with Planet Radius Plot")
 
 ### Planet Eccentricity ###
 ```python
 exodata.plots.DataPerParameterBin(exocat.planets, 'e',
       (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotBarChart(label_rotation=45)
 ```
-![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/ExoData/images/exodata-orbital-eccentricity-3.png "Planet Eccentricity Plot")
+![Planet Eccentricity](https://github.com/ryanvarley/ExoData/blob/images/exodata-orbital-eccentricity-4.png "Planet Eccentricity Plot")
 
 You can also plot this as a pie chart
 
@@ -175,7 +175,7 @@ exodata.plots.DataPerParameterBin(exocat.planets, 'e',
       (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotPieChart)
 ```
 
-![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/ExoData/images/exodata-orbital-eccentricity-pie.png "Planet Eccentricity Pie Chart")
+![Planet Eccentricity](https://github.com/ryanvarley/ExoData/blob/images/exodata-orbital-eccentricity-pie-4.png?raw=true "Planet Eccentricity Pie Chart")
 
 Plots can also be large (i.e. for presentations), and you can change the color easily with normal *matplotlib* syntax
 
@@ -183,11 +183,11 @@ Plots can also be large (i.e. for presentations), and you can change the color e
 exodata.plots.DataPerParameterBin(exocat.planets, 'M',
     (0, 0.2, 0.5, 1, 2, 3, 6, 12, float('inf')), size='large').plotBarChart(c='r')
 ```
-![Planet Eccentricity](https://raw.githubusercontent.com/ryanvarley/ExoData/images/exodata-orbital-eccentricity-large-2.png "Planet Eccentricity Plot Large")
+![Planet Eccentricity](https://github.com/ryanvarley/ExoData/blob/images/exodata-orbital-eccentricity-large-4.png?raw=true "Planet Eccentricity Plot Large")
 
 # Licence
 
-Copyright (C) 2013  Ryan Varley <ryanjvarley@gmail.com>
+Copyright (C) 2015  Ryan Varley <ryanjvarley@gmail.com>
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
 
