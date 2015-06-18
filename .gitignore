@@ -1,0 +1,6 @@
+.tox
+__pycache__
+build
+dist
+exodata
+*.egg*
