@@ -272,8 +272,8 @@ class TestSpectralType(TestCase):
         self.assertEqual(test2.classLetter, 'M')
         self.assertEqual(test2.classNumber, 8.5)
         self.assertEqual(test2.lumType, '')
-        self.assertEqual(test2.roundedSpecClass, 'M9')
-        self.assertEqual(test2.roundedSpecType, 'M9')
+        self.assertEqual(test2.roundedSpecClass, 'M8')
+        self.assertEqual(test2.roundedSpecType, 'M8')
 
     def test_works_2_decimal_places(self):
         test2 = SpectralType('A9.67V')
@@ -402,7 +402,7 @@ class Test_Magnitude(TestCase):
 
     def test_convert_works_magK_to_magB_with_decimal_spec_type(self):
         mag = Magnitude('M2.5', magH=19., magK=9.)
-        self.assertAlmostEqual(mag.convert('B', 'K'), 15.2, 5)
+        self.assertAlmostEqual(mag.convert('B', 'K'), 14.63, 2)
 
     def test_raises_ValueError_if_spectral_type_not_in_table(self):
         mag = Magnitude('M9', magH=19., magK=9.)
