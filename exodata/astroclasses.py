@@ -100,13 +100,26 @@ class System(_BaseObject):
     def ra(self):
         return self.getParam('rightascension')
 
+    @ra.setter
+    def ra(self, ra):
+        self.params['rightascension'] = ra
+
     @property
     def dec(self):
         return self.getParam('declination')
 
+    @dec.setter
+    def dec(self, dec):
+        self.params['declination'] = dec
+
     @property
     def d(self):
         return self.getParam('distance')
+
+    @d.setter
+    def d(self, d):
+        d = d.rescale(aq.pc)
+        self.params['distance'] = d
 
     @property
     def stars(self):
@@ -115,6 +128,10 @@ class System(_BaseObject):
     @property
     def epoch(self):
         return self.getParam('epoch')
+
+    @epoch.setter
+    def epoch(self, epoch):
+        self.params['epoch'] = epoch
 
 
 class PlanetAndBinaryCommon(_BaseObject):
@@ -126,6 +143,12 @@ class PlanetAndBinaryCommon(_BaseObject):
     def i(self):
         return self.getParam('inclination')
 
+    @i.setter
+    def i(self, i):
+        i = i.rescale(aq.deg)
+        self.params['inclination'] = i
+
+
     @property
     def P(self):
         period = self.getParam('period')
@@ -136,6 +159,11 @@ class PlanetAndBinaryCommon(_BaseObject):
             return self.calcPeriod()
         else:
             return np.nan
+
+    @P.setter
+    def P(self, P):
+        P = P.rescale(aq.day)
+        params['period'] = P
 
     def calcPeriod(self):
         raise NotImplementedError('Only implemented for Binary and Planet child classes')
@@ -153,6 +181,11 @@ class PlanetAndBinaryCommon(_BaseObject):
         else:
             return sma
 
+    @a.setter
+    def a(self, a):
+        a = a.rescale(aq.au)
+        self.params['a'] = a
+
     def calcSMA(self):
         raise NotImplementedError('Only implemented for Binary and Planet child classes')
 
@@ -160,21 +193,41 @@ class PlanetAndBinaryCommon(_BaseObject):
     def transittime(self):
         return self.getParam('transittime')
 
+    @transittime.setter
+    def transittime(self, transittime):
+        self.params['transittime'] = transittime
+
     @property
     def periastron(self):
         return self.getParam('periastron')
+
+    @periastron.setter
+    def periastron(self, periastron):
+        self.params['periastron'] = periastron
 
     @property
     def longitude(self):
         return self.getParam('longitude')
 
+    @longitude.setter
+    def longitude(self, longitude):
+        self.params['longitude'] = longitude
+
     @property
     def ascendingnode(self):
         return self.getParam('ascendingnode')
 
+    @ascendingnode.setter
+    def ascendingnode(self, ascendingnode):
+        self.params['ascendingnode'] = ascendingnode
+
     @property
     def separation(self):
         return self.getParam('separation')
+
+    @separation.setter
+    def seperation(self, seperation):
+        self.params['seperation'] = seperation
 
 
 class StarAndBinaryCommon(_BaseObject):
@@ -186,25 +239,49 @@ class StarAndBinaryCommon(_BaseObject):
     def magB(self):
         return self.getParam('magB')
 
+    @magB.setter
+    def magB(self, mag):
+        self.params['magB'] = mag
+
     @property
     def magH(self):
         return self.getParam('magH')
+
+    @magH.setter
+    def magH(self, mag):
+        self.params['magH'] = mag
 
     @property
     def magI(self):
         return self.getParam('magI')
 
+    @magI.setter
+    def magI(self, mag):
+        self.params['magI'] = mag
+
     @property
     def magJ(self):
         return self.getParam('magJ')
+
+    @magJ.setter
+    def magJ(self, mag):
+        self.params['magJ'] = mag
 
     @property
     def magK(self):
         return self.getParam('magK')
 
+    @magK.setter
+    def magK(self, mag):
+        self.params['magK'] = mag
+
     @property
     def magV(self):
         return self.getParam('magV')
+
+    @magV.setter
+    def magV(self, mag):
+        self.params['magV'] = mag
 
 
 class StarAndPlanetCommon(_BaseObject):
@@ -216,21 +293,43 @@ class StarAndPlanetCommon(_BaseObject):
     def age(self):
         return self.getParam('age')
 
+    @age.setter
+    def age(self, age):
+        age = age.rescale(aq.Gyear)
+        self.params['age'] = age
+
     @property  # allows stars and planets to access system values by propagating up
     def ra(self):
         return self.parent.ra
+
+    @ra.setter
+    def ra(self, ra):
+        self.parent.ra = ra
 
     @property
     def dec(self):
         return self.parent.dec
 
+    @dec.setter
+    def dec(self, dec):
+        self.parent.dec = dec
+
     @property
     def d(self):
         return self.parent.d
 
+    @d.setter
+    def d(self, d):
+        self.parent.d = d
+
     @property
     def R(self):
         return self.getParam('radius')
+
+    @R.setter
+    def R(self, R):
+        R = R * aq.R_j
+        self.params['radius'] = R
 
     @property
     def T(self):
@@ -248,9 +347,19 @@ class StarAndPlanetCommon(_BaseObject):
         else:
             return np.nan
 
+    @T.setter
+    def T(self, T):
+        T = T.rescale(aq.K)
+        self.params['temperature'] = T
+
     @property
     def M(self):
         return self.getParam('mass')
+    
+    @M.setter
+    def M(self, M):
+        M = M.rescale(aq.M_j)
+        self.params['mass'] = M
 
     def calcTemperature(self):
         raise NotImplementedError('Only implemented for Stars and Planet child classes')
