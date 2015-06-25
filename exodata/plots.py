@@ -620,7 +620,7 @@ _planetPars = {
     # 'radiusType()': ('Planet Radius Class', None),
     # 'temptype()': ('Planet Temp Class', None),
     'mu': ('Mean Molecular Weight', None),
-    'albedo()': ('Planet Albedo', None),
+    'albedo': ('Planet Albedo', None),
     #'calcTemperature()': ('Mean Planet Temperature (Calculated)', aq.K),
     #'estimateMass()': ('Planet Mass Estimated From Radius', aq.M_j),
     # 'calcSMA()': ('Semi-Major Axis', aq.au),

@@ -687,6 +687,7 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
         mu = mu.rescale(aq.atomic_mass_unit)
         self.params['moleight'] = mu
 
+    @property
     def albedo(self):
         albedo = self.getParam('albedo')
         if albedo is not np.nan:
@@ -713,7 +714,7 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
         - you cant get the albedo assumption without temp but you need it to calculate the temp.
         """
         try:
-            return eq.MeanPlanetTemp(self.albedo(), self.star.T, self.star.R, self.a).T_p
+            return eq.MeanPlanetTemp(self.albedo, self.star.T, self.star.R, self.a).T_p
         except ValueError:  # ie missing value (.a) returning nan
             return np.nan
 
@@ -765,7 +766,7 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
         return self.getParam('eccentricity')
 
     @e.setter
-    def discoveryYear(self, e):
+    def e(self, e):
         self.params['eccentricity'] = e
 
     @property
