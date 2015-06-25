@@ -234,6 +234,14 @@ class StarAndBinaryCommon(_BaseObject):
     def __init__(self, *args, **kwargs):
         _BaseObject.__init__(self, *args, **kwargs)
         self.classType = 'StarAndBinaryCommon'
+        
+    @property
+    def magU(self):
+        return self.getParam('magU')
+    
+    @magU.setter
+    def magU(self, mag):
+        self.params['magU'] = mag
 
     @property
     def magB(self):
@@ -282,6 +290,30 @@ class StarAndBinaryCommon(_BaseObject):
     @magV.setter
     def magV(self, mag):
         self.params['magV'] = mag
+        
+    @property
+    def magL(self):
+        return self.getParam('magL')
+    
+    @magL.setter
+    def magL(self, mag):
+        self.params['magL'] = mag
+        
+    @property
+    def magM(self):
+        return self.getParam('magM')
+    
+    @magM.setter
+    def magM(self, mag):
+        self.params['magM'] = mag
+        
+    @property
+    def magN(self):
+        return self.getParam('magN')
+    
+    @magN.setter
+    def magN(self, mag):
+        self.params['magN'] = mag
 
 
 class StarAndPlanetCommon(_BaseObject):
@@ -355,7 +387,7 @@ class StarAndPlanetCommon(_BaseObject):
     @property
     def M(self):
         return self.getParam('mass')
-    
+
     @M.setter
     def M(self, M):
         M = M.rescale(aq.M_j)
@@ -417,7 +449,7 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
         """ Note this should work from child parents as .d propergates, calculates using the star estimation method
         estimateDistance and estimateAbsoluteMagnitude
         """
-        # TODO this will only work from star or below. good thing?
+        # TODO this will only work from a star or below. good thing?
         d = self.parent.d
         if params.estimateMissingValues:
             if d is np.nan:
@@ -507,20 +539,27 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
     def magN(self):
         return self._get_or_convert_magnitude('N')
 
-
     @property
     def Z(self):
         return self.getParam('metallicity')
+    
+    @Z.setter
+    def Z(self, Z):
+        self.params['metallicity'] = Z
 
     @property
     def spectralType(self):
         return self.getParam('spectraltype')
+    
+    @spectralType.setter
+    def spectralType(self, spectraltype):
+        self.params['spectraltype'] = spectraltype
 
     @property
     def planets(self):
         return self.children
 
-    def getLimbdarkeningCoeff(self, wavelength=1.22):
+    def getLimbdarkeningCoeff(self, wavelength=1.22):  # TODO replace with pylightcurve
         """ Looks up quadratic limb darkening parameter from the star based on T, logg and metalicity.
 
         :param wavelength: microns
@@ -643,8 +682,16 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
         else:
             return molweight
 
+    @mu.setter
+    def mu(self, mu):
+        mu = mu.rescale(aq.atomic_mass_unit)
+        self.params['moleight'] = mu
+
     def albedo(self):
-        if self.getParam('temperature') is not np.nan:
+        albedo = self.getParam('albedo')
+        if albedo is not np.nan:
+            return albedo
+        elif self.getParam('temperature') is not np.nan:
             planetClass = self.tempType()
         elif self.M is not np.nan:
             planetClass = self.massType()
@@ -652,6 +699,11 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
             planetClass = self.radiusType()
 
         return assum.planetAlbedo(planetClass)
+
+    @albedo.setter
+    def albedo(self, albedo):
+        albedo = albedo
+        self.params['albedo'] = albedo
 
     def calcTemperature(self):
         """ Calculates the temperature using which uses equations.MeanPlanetTemp, albedo assumption and potentially
@@ -693,16 +745,28 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
     def discoveryMethod(self):
         return self.getParam('discoverymethod')
 
+    @discoveryMethod.setter
+    def discoveryMethod(self, discoverymethod):
+        self.params['discoverymethod'] = discoverymethod
+
     @property
     def discoveryYear(self):
         try:
-            return int(self.getParam('discoveryyear'))  # TODO should be read as int not float to being with
+            return int(self.getParam('discoveryyear'))
         except ValueError:  # np.nan
             return self.getParam('discoveryyear')
+
+    @discoveryYear.setter
+    def discoveryYear(self, discoveryYear):
+        self.params['discoveryyear'] = discoveryYear
 
     @property
     def e(self):
         return self.getParam('eccentricity')
+
+    @e.setter
+    def discoveryYear(self, e):
+        self.params['eccentricity'] = e
 
     @property
     def lastUpdate(self):
