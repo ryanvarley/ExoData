@@ -175,7 +175,7 @@ exodata.plots.DataPerParameterBin(exocat.planets, 'e',
       (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotPieChart)
 ```
 
-![Planet Eccentricity](https://github.com/ryanvarley/ExoData/blob/images/exodata-orbital-eccentricity-pie-4.png?raw=true "Planet Eccentricity Pie Chart")
+![Planet Eccentricity](https://github.com/ryanvarley/ExoData/blob/images/exodata-orbital-eccentricity-pie-5.png?raw=true "Planet Eccentricity Pie Chart")
 
 Plots can also be large (i.e. for presentations), and you can change the color easily with normal *matplotlib* syntax
 
