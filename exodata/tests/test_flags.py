@@ -1,9 +1,3 @@
-import sys
-if sys.hexversion < 0x02070000:
-    import unittest2 as unittest
-else:
-    import unittest
-
 from .. import flags
 from .patches import TestCase
 

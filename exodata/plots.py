@@ -1,8 +1,9 @@
 """ This module contains some plotting functions and plot types for easy plot creation
 """
 import os
+import sys
 import math
-
+from collections import OrderedDict
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,11 +12,6 @@ from matplotlib import rcParams
 from . import astroquantities as aq
 from . import astroclasses as ac
 
-import sys
-if sys.hexversion < 0x02070000:
-    from ordereddict import OrderedDict
-else:
-    from collections import OrderedDict
 
 rcParams.update({'figure.autolayout': True})
 
@@ -302,7 +298,7 @@ class _BaseDataPerClass(_AstroObjectFigs):  # hangover from ETLOS's multiple chi
         plt.xlim([min(ind)-gap, max(ind)+(gap*2)])
         plt.draw()
 
-    def plotPieChart(self, title=None):
+    def plotPieChart(self, title=None, cmap_name='Pastel2'):
         if sys.hexversion >= 0x02700000:
             self.fig.set_tight_layout(True)
 
@@ -314,7 +310,7 @@ class _BaseDataPerClass(_AstroObjectFigs):  # hangover from ETLOS's multiple chi
         explode = np.zeros(len(fracs))  # non zero makes the slices come out of the pie
 
         # plot pie chart
-        cmap = plt.cm.get_cmap('hsv')
+        cmap = plt.cm.get_cmap(cmap_name)
         colors = cmap(np.linspace(0., 0.9, len(fracs)))
         plt.pie(fracs, explode=explode, labels=labels, autopct='%1.1f%%', shadow=False, startangle=90,
                 colors=colors)
@@ -624,7 +620,7 @@ _planetPars = {
     # 'radiusType()': ('Planet Radius Class', None),
     # 'temptype()': ('Planet Temp Class', None),
     'mu': ('Mean Molecular Weight', None),
-    'albedo()': ('Planet Albedo', None),
+    'albedo': ('Planet Albedo', None),
     #'calcTemperature()': ('Mean Planet Temperature (Calculated)', aq.K),
     #'estimateMass()': ('Planet Mass Estimated From Radius', aq.M_j),
     # 'calcSMA()': ('Semi-Major Axis', aq.au),

@@ -1,14 +1,12 @@
 """
 Help?
 """
-__version__ = '1.1.1.2.3'
+
+__version__ = '2.0a150617c'
 
 
 def test():
-    if sys.hexversion < 0x02070000:
-        import unittest2 as unittest
-    else:
-        import unittest
+    import unittest
 
     from tests import testsuite as _testsuite
     unittest.TextTestRunner(verbosity=2).run(_testsuite)

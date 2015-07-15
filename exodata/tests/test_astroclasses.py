@@ -2,11 +2,7 @@
 planets from which the tests can be ran. In future some xml could be included here for the same purpose.
 """
 
-import sys
-if sys.hexversion < 0x02070000:
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 
 import math
 

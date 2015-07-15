@@ -1,8 +1,4 @@
-import sys
-if sys.hexversion < 0x02070000:
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 from tempfile import mkdtemp, mkstemp
 import shutil
 
