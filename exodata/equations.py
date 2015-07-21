@@ -615,12 +615,14 @@ class TransitDuration(ExoDataEqn):
         are non trivial
 
         .. math::
-            T_{14} = \frac{P}{\pi} \frac{\varrho^2_c}{\sqrt{1-e^2}}
-            \arcsin{\left( \frac{\sqrt{1-a_R^2\varrho_c^2\cos^2{i}}}{a_R\varrho_c\sin{i}} \right)}
+            T_{14} = \frac{P}{\pi} \frac{\varrho_{P,T}^2}{\sqrt{1-e^2}}
+            \arcsin{\left( \sqrt{\frac{S^2_{P*} - b^2_{P,T}}{(a_P/R_\star)^2\varrho^2_{P,T} -b^2_{P,T}}}\right)}
 
             a_R = (a / R_\star)
 
-            \varrho_{c} = \frac{1-e^2}{1+e \sin(\omega)}
+            \varrho_{P,T}(f_p) = \frac{1-e^2_P}{1+e_P \sin(\omega)}
+
+            b_{P,T} = (a_P / R_\star)\varrho_{P,T}\cos{i}
 
         :param P:
         :param a:
@@ -652,17 +654,21 @@ class TransitDuration(ExoDataEqn):
     @property
     def Td(self):
 
-        a_rs = (self.a / self.Rs).rescale(aq.dimensionless)
+        a = (self.a / self.Rs).rescale(aq.dimensionless)
         i = self.i.rescale(aq.rad)
         w = self.w.rescale(aq.rad)
         P = self.P
+        RpRs = (self.Rp / self.Rs).rescale(aq.dimensionless)
         e = self.e
 
-        rho = (1 - e**2)/(1 + e * np.sin(w))
-        df = np.arcsin(np.sqrt(1. - ((a_rs**2) * (rho**2) * (np.cos(i)**2)))) / (a_rs * rho * np.sin(i))
-        duration = (P * rho**2)/(np.pi * np.sqrt(1 - e**2))*df
+        ro_pt = (1-e**2)/(1+e*np.sin(w))
+        b_pt = a*ro_pt*np.cos(i)
+        s_ps = 1.0 + RpRs
+        df = np.arcsin(np.sqrt((s_ps**2-b_pt**2)/((a**2)*(ro_pt**2)-b_pt**2)))
 
-        return duration.rescale(aq.min)
+        duration = (P*(ro_pt**2))/(np.pi*np.sqrt(1-e**2))*df
+
+        return duration
 
 def impactParameter(a, R_s, i):
     """ projected distance between the planet and star centers during mid transit
