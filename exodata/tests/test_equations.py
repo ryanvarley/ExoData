@@ -7,7 +7,7 @@ from hypothesis.strategies import floats
 
 from .. import astroquantities as aq
 from ..equations import ScaleHeight, MeanPlanetTemp, StellarLuminosity, ratioTerminatorToStar, SNRPlanet,\
-    SurfaceGravity, transitDuration, Density, KeplersThirdLaw, TransitDepth, estimateDistance, \
+    SurfaceGravity, transitDurationCircular, Density, KeplersThirdLaw, TransitDepth, estimateDistance, \
     estimateAbsoluteMagnitude, ExoDataEqn
 
 from .. import equations as eq
@@ -313,7 +313,7 @@ class Test_transitDuration(TestCase):
         P = 1.58040482 * aq.day
 
         answer = 45.8329 * aq.min
-        result = transitDuration(P, R_s, R_p, a, i)
+        result = transitDurationCircular(P, R_s, R_p, a, i)
 
         self.assertAlmostEqual(answer, result, 3)
 

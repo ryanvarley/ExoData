@@ -606,6 +606,63 @@ class Density(ExoDataEqn):
 
         return R.rescale(aq.R_j)
 
+class TransitDuration(ExoDataEqn):
+
+    def __init__(self, P=None, a=None, Rp=None, Rs=None, i=None, e=None, w=None, Td=None):
+        """ Eccentric transit duration equation from Kipping (2012)?
+        :param P:
+        :param a:
+        :param Rp:
+        :param Rs:
+        :param i:
+        :param e:
+        :param w:
+        :param Td:
+        :return:
+        """
+
+        ExoDataEqn.__init__(self)
+
+        self._P = P
+        self._a = a
+        self._Rp = Rp
+        self._Rs = Rs
+        self._e = e
+        self._i = i
+        self._w = w
+        self._Td = Td
+
+
+        if (P, a, Rp, Rs, i, e, w, Td).count(None) > 1:
+            raise EqnInputError("You must give all parameters bar one")
+
+        # parameters
+        # P = period
+        # ars = semi-major axis / stellar radius
+        # rprs = planetary radius / stellar radius
+        # i = inclination
+        # e = eccentricity
+        # w = argument of periastron
+
+    @property
+    def Td(self):
+
+        a = self._a
+        i = self._i.rescale(aq.rad)
+        w = self._w.rescale(aq.rad)
+        P = self._P
+        RpRs = (self._Rp / self.Rs).rescale(aq.dimensionless)
+        e = self._e
+
+        ro_pt = (1-e**2)/(1+e*np.sin(w))
+        b_pt = a*ro_pt*np.cos(i)
+        s_ps = 1.0 + RpRs
+        df = np.arcsin(np.sqrt((s_ps**2-b_pt**2)/((a**2)*(ro_pt**2)-b_pt**2)))
+
+        duration = (P*(ro_pt**2))/(np.pi*np.sqrt(1-e**2))*df
+
+        return duration
+
 def impactParameter(a, R_s, i):
     """ projected distance between the planet and star centers during mid transit
     .. math::
@@ -685,8 +742,7 @@ def calcRatioTerminatorToStar(params):  # TODO update with new format
 
     return params['delta_F_p_s']
 
-
-def transitDuration(P, R_s, R_p, a, i):
+def transitDurationCircular(P, R_s, R_p, a, i):
     """ Estimation of the primary transit time. Assumes a circular orbit.
 
     .. Note: This code could do with reverifing and perhaps using the eccentricity version

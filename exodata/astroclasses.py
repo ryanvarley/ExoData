@@ -89,6 +89,10 @@ class _BaseObject(object):
         else:
             return False
 
+    @property
+    def system(self):
+        return self._getParentClass(self.parent, 'System')
+
 
 class System(_BaseObject):
 
@@ -148,6 +152,13 @@ class PlanetAndBinaryCommon(_BaseObject):
         i = i.rescale(aq.deg)
         self.params['inclination'] = i
 
+    @property
+    def e(self):
+        return self.getParam('eccentricity')
+
+    @e.setter
+    def e(self, e):
+        self.params['eccentricity'] = e
 
     @property
     def P(self):
@@ -397,10 +408,6 @@ class StarAndPlanetCommon(_BaseObject):
         raise NotImplementedError('Only implemented for Stars and Planet child classes')
 
     @property
-    def system(self):
-        return self._getParentClass(self.parent, 'System')
-
-    @property
     def binary(self):
         return self._getParentClass(self, 'Binary')
 
@@ -420,10 +427,10 @@ class StarAndPlanetCommon(_BaseObject):
             return eq.Density(self.M, self.R).density
 
 
-class Binary(PlanetAndBinaryCommon, StarAndPlanetCommon):  # TODO add binary methods and variables, remove unused one from starcommon
+class Binary(PlanetAndBinaryCommon, StarAndBinaryCommon):  # TODO add binary methods and variables, remove unused one from starcommon
 
     def __init__(self, *args, **kwargs):
-        StarAndPlanetCommon.__init__(self, *args, **kwargs)
+        StarAndBinaryCommon.__init__(self, *args, **kwargs)
         PlanetAndBinaryCommon.__init__(self, *args, **kwargs)
         self.classType = 'Binary'
 
@@ -644,7 +651,7 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
         """ Estimation of the primary transit time assuming a circular orbit (see :py:func:`equations.transitDuration`)
         """
         try:
-            return eq.transitDuration(self.P, self.parent.R, self.R, self.a, self.i)
+            return eq.transitDurationCircular(self.P, self.parent.R, self.R, self.a, self.i)
         except ValueError:
             return np.nan
 
@@ -760,14 +767,6 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
     @discoveryYear.setter
     def discoveryYear(self, discoveryYear):
         self.params['discoveryyear'] = discoveryYear
-
-    @property
-    def e(self):
-        return self.getParam('eccentricity')
-
-    @e.setter
-    def e(self, e):
-        self.params['eccentricity'] = e
 
     @property
     def lastUpdate(self):
