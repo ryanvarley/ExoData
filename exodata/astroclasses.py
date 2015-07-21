@@ -210,7 +210,10 @@ class PlanetAndBinaryCommon(_BaseObject):
 
     @property
     def periastron(self):
-        return self.getParam('periastron')
+        peri = self.getParam('periastron')
+        if math.isnan(peri) and self.e == 0:
+            peri = 0 * aq.deg
+        return peri
 
     @periastron.setter
     def periastron(self, periastron):
@@ -647,12 +650,18 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
         else:
             return False
 
-    def calcTransitDuration(self):
+    def calcTransitDuration(self, circular=False):
         """ Estimation of the primary transit time assuming a circular orbit (see :py:func:`equations.transitDuration`)
         """
+
         try:
-            return eq.transitDurationCircular(self.P, self.parent.R, self.R, self.a, self.i)
-        except ValueError:
+            if circular:
+                return eq.transitDurationCircular(self.P, self.star.R, self.R, self.a, self.i)
+            else:
+                return eq.TransitDuration(self.P, self.a, self.R, self.star.R, self.i, self.e, self.periastron).Td
+        except (ValueError,
+                AttributeError,  # caused by trying to rescale nan i.e. missing i value
+                HierarchyError):  # i.e. planets that dont orbit stars
             return np.nan
 
     def calcScaleHeight(self):
@@ -879,6 +888,7 @@ class BinaryParameters(Parameters):
 
         self._defaultUnits.update({
             'separation': aq.au,  # TODO there is actually 2 different measurements (other is arcsec)
+            'periastron': aq.deg,
         })
 
 
@@ -907,6 +917,7 @@ class PlanetParameters(Parameters):
             'radius': aq.R_j,
             'inclination': aq.deg,
             'eccentricity': 1,
+            'periastron': aq.deg,
             'period': aq.day,
             'semimajoraxis': aq.au,
             'transittime': aq.JD,  # TODO specific JD, MJF etc

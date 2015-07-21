@@ -8,7 +8,7 @@ from hypothesis.strategies import floats
 from .. import astroquantities as aq
 from ..equations import ScaleHeight, MeanPlanetTemp, StellarLuminosity, ratioTerminatorToStar, SNRPlanet,\
     SurfaceGravity, transitDurationCircular, Density, KeplersThirdLaw, TransitDepth, estimateDistance, \
-    estimateAbsoluteMagnitude, ExoDataEqn
+    estimateAbsoluteMagnitude, ExoDataEqn, TransitDuration
 
 from .. import equations as eq
 from .patches import TestCase
@@ -303,7 +303,7 @@ class Test_SNRPlanet(TestCase):
         self.assertAlmostEqual(answer, result, 5)
 
 
-class Test_transitDuration(TestCase):
+class Test_transitDurationCircular(TestCase):
     def test_works_gj1214(self):
 
         R_p = 0.02 * aq.R_j
@@ -316,6 +316,40 @@ class Test_transitDuration(TestCase):
         result = transitDurationCircular(P, R_s, R_p, a, i)
 
         self.assertAlmostEqual(answer, result, 3)
+
+
+class Test_transitDuration(TestCase):
+    def test_works_gj1214(self):
+
+        R_p = 0.02 * aq.R_j
+        R_s = 0.21 * aq.R_s
+        i = 88.17 * aq.deg
+        a = 0.014 * aq.au
+        P = 1.58040482 * aq.day
+
+        answer = 45.8329 * aq.min
+        result = TransitDuration(P, a, R_p, R_s, i, 0., 0.,).Td
+
+        self.assertAlmostEqual(answer, result, 3)
+
+    @given(Rp=floats(0.0001), Rs=floats(0.0001), i=floats(85, 95), a=floats(0.0001), P=floats(0.0001))
+    def test_matches_circular(self, Rp, Rs, i, a, P):
+        Rp *= aq.R_j
+        Rs *= aq.R_s
+        i *= aq.deg
+        a *= aq.au
+        P *= aq.day
+
+        result = TransitDuration(P, a, Rp, Rs, i, 0., 0.,).Td
+        resultCirc = transitDurationCircular(P, Rs, Rp, a, i)
+
+        if math.isnan(result):
+            self.assertTrue(math.isnan(resultCirc))
+        else:
+            self.assertAlmostEqual(result, resultCirc, 5)
+
+    def test_works_eccentric(self):
+        assert False
 
 
 class Test_starTemperature(TestCase):

@@ -608,8 +608,20 @@ class Density(ExoDataEqn):
 
 class TransitDuration(ExoDataEqn):
 
-    def __init__(self, P=None, a=None, Rp=None, Rs=None, i=None, e=None, w=None, Td=None):
-        """ Eccentric transit duration equation from Kipping (2012)?
+    def __init__(self, P=None, a=None, Rp=None, Rs=None, i=None, e=None, w=None):
+        """ Eccentric transit duration equation from Kipping (2011)
+
+        Currently only calculates TD given the other values. There is little demand for the rearangements and they
+        are non trivial
+
+        .. math::
+            T_{14} = \frac{P}{\pi} \frac{\varrho^2_c}{\sqrt{1-e^2}}
+            \arcsin{\left( \frac{\sqrt{1-a_R^2\varrho_c^2\cos^2{i}}}{a_R\varrho_c\sin{i}} \right)}
+
+            a_R = (a / R_\star)
+
+            \varrho_{c} = \frac{1-e^2}{1+e \sin(\omega)}
+
         :param P:
         :param a:
         :param Rp:
@@ -617,51 +629,40 @@ class TransitDuration(ExoDataEqn):
         :param i:
         :param e:
         :param w:
-        :param Td:
-        :return:
         """
 
         ExoDataEqn.__init__(self)
 
-        self._P = P
-        self._a = a
-        self._Rp = Rp
-        self._Rs = Rs
-        self._e = e
-        self._i = i
-        self._w = w
-        self._Td = Td
+        self.P = P
+        self.a = a
+        self.Rp = Rp
+        self.Rs = Rs
+        self.i = i
+        self.e = e
+        Td = None
 
+        if w == 0:
+            self.w = 0 * aq.rad
+        else:
+            self.w = w
 
         if (P, a, Rp, Rs, i, e, w, Td).count(None) > 1:
             raise EqnInputError("You must give all parameters bar one")
 
-        # parameters
-        # P = period
-        # ars = semi-major axis / stellar radius
-        # rprs = planetary radius / stellar radius
-        # i = inclination
-        # e = eccentricity
-        # w = argument of periastron
-
     @property
     def Td(self):
 
-        a = self._a
-        i = self._i.rescale(aq.rad)
-        w = self._w.rescale(aq.rad)
-        P = self._P
-        RpRs = (self._Rp / self.Rs).rescale(aq.dimensionless)
-        e = self._e
+        a_rs = (self.a / self.Rs).rescale(aq.dimensionless)
+        i = self.i.rescale(aq.rad)
+        w = self.w.rescale(aq.rad)
+        P = self.P
+        e = self.e
 
-        ro_pt = (1-e**2)/(1+e*np.sin(w))
-        b_pt = a*ro_pt*np.cos(i)
-        s_ps = 1.0 + RpRs
-        df = np.arcsin(np.sqrt((s_ps**2-b_pt**2)/((a**2)*(ro_pt**2)-b_pt**2)))
+        rho = (1 - e**2)/(1 + e * np.sin(w))
+        df = np.arcsin(np.sqrt(1. - ((a_rs**2) * (rho**2) * (np.cos(i)**2)))) / (a_rs * rho * np.sin(i))
+        duration = (P * rho**2)/(np.pi * np.sqrt(1 - e**2))*df
 
-        duration = (P*(ro_pt**2))/(np.pi*np.sqrt(1-e**2))*df
-
-        return duration
+        return duration.rescale(aq.min)
 
 def impactParameter(a, R_s, i):
     """ projected distance between the planet and star centers during mid transit
@@ -744,8 +745,6 @@ def calcRatioTerminatorToStar(params):  # TODO update with new format
 
 def transitDurationCircular(P, R_s, R_p, a, i):
     """ Estimation of the primary transit time. Assumes a circular orbit.
-
-    .. Note: This code could do with reverifing and perhaps using the eccentricity version
 
     .. math::
         T_\\text{dur} = \\frac{P}{\pi}\sin^{-1} \left[\\frac{R_\star}{a}\\frac{\sqrt{(1+k)^2 + b^2}}{\sin{a}} \\right]
