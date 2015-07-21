@@ -670,15 +670,68 @@ class TransitDuration(ExoDataEqn):
 
         return duration
 
-def impactParameter(a, R_s, i):
-    """ projected distance between the planet and star centers during mid transit
-    .. math::
-        b \equiv \frac{a}{R_*} \cos{i}
-    (Seager & Mallen-Ornelas 2003).
-    """
-    b = (a/R_s) * cos(i.rescale(aq.rad))
+class ImpactParameter(ExoDataEqn):
 
-    return b.rescale(aq.dimensionless)
+    def __init__(self, a=None, R_s=None, i=None, b=None):
+        """ projected distance between the planet and star centers during mid transit
+        .. math::
+            b \equiv \frac{a}{R_*} \cos{i}
+        (Seager & Mallen-Ornelas 2003).
+        """
+
+        ExoDataEqn.__init__(self)
+
+        self._a = a
+        self._R_s = R_s
+        self._i = i
+        self._b = b
+
+        if (a, R_s, i, b).count(None) > 1:
+            raise EqnInputError("You must give all parameters bar one")
+
+    @property
+    def b(self):
+
+        a = self._a
+        R_s = self._R_s
+        i = self._i
+
+        b = (a/R_s) * cos(i.rescale(aq.rad))
+
+        return b.rescale(aq.dimensionless)
+
+    @property
+    def a(self):
+
+        b = self._b
+        R_s = self._R_s
+        i = self._i
+
+        a = (b * R_s) / cos(i.rescale(aq.rad))
+
+        return a.rescale(aq.au)
+
+    @property
+    def R_s(self):
+
+        a = self._a
+        b = self._b
+        i = self._i
+
+        R_s = (a/b) * cos(i.rescale(aq.rad))
+
+        return R_s.rescale(aq.R_s)
+
+    @property
+    def i(self):
+
+        a = self._a
+        b = self._b
+        R_s = self._R_s
+
+        i = np.arccos((R_s * b / a).rescale(aq.dimensionless))
+
+        return i.rescale(aq.deg)
 
 
 def ratioTerminatorToStar(H_p, R_p, R_s):  # TODO add into planet class

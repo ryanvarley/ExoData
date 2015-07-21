@@ -348,6 +348,7 @@ class Test_transitDuration(TestCase):
         else:
             self.assertAlmostEqual(result, resultCirc, 5)
 
+    @unittest.skip  # TODO add example
     def test_works_eccentric(self):
         assert False
 
@@ -376,9 +377,31 @@ class Test_impactParameter(TestCase):
     def test_works_wasp10b(self):
         """ Christian et al. 2009 values
         """
-        result = eq.impactParameter(0.0369 * aq.au, 0.775 * aq.R_s, 86.9 * aq.deg)
+        result = eq.ImpactParameter(0.0369 * aq.au, 0.775 * aq.R_s, 86.9 * aq.deg).b
         answer = 0.568
         self.assertAlmostEqual(result, answer, 1)  # error bars are 0.05/0.08
+
+    @given(floats(0.001,), floats(0.001,), floats(0, 180))
+    def test_can_derive_other_vars_from_one_calculated(self, a, R_s, i):
+        """ We calculate H from a range of values given by hypothesis and then see if we can accurately calculate the
+         other variables given this calculated value. This tests the rearrangements of the equation are correct.
+        :return:
+        """
+
+        assume(a > 0 and R_s > 0)
+
+        a *= aq.au
+        R_s *= aq.R_s
+        i *= aq.deg
+
+        b = eq.ImpactParameter(a, R_s, i).b
+
+        print b
+
+        if not (math.isinf(b) or math.isnan(b) or b == 0):
+            self.assertAlmostEqual(eq.ImpactParameter(a, None, i, b).R_s, R_s, 4)
+            self.assertAlmostEqual(eq.ImpactParameter(None, R_s, i, b).a, a, 4)
+            self.assertAlmostEqual(eq.ImpactParameter(a, R_s, None, b).i, i, 4)
 
 
 class Test_estimateDistance(TestCase):
