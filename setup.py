@@ -32,7 +32,8 @@ def find_version(*file_paths):
 with codecs.open(os.path.join(here, 'readme.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-install_requires = ['numpy', 'quantities', 'nose>=1.0', 'matplotlib>=1.3.1', 'requests']
+install_requires = ['numpy', 'quantities', 'nose>=1.0', 'matplotlib>=1.3.1',
+                    'requests', 'astropy']
 if sys.hexversion < 0x02070000:
     install_requires.append('unittest2')
     install_requires.append('ordereddict')
@@ -85,9 +86,9 @@ setup(
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
-    include_package_data=True,
+    include_package_data=False,
     zip_safe=False,
-    test_suite = test_suite,
+    test_suite=test_suite,
 
     **kw
 )

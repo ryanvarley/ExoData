@@ -6,6 +6,8 @@ from pkg_resources import resource_stream
 import logging
 
 import numpy as np
+import astropy.coordinates
+import astropy.units as u
 
 from . import equations as eq
 from . import astroquantities as aq
@@ -872,7 +874,11 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
                     except KeyError:
                         return False
 
-            if key in self._defaultUnits:
+            if key == 'rightascension':
+                value = _ra_string_to_unit(value)
+            elif key == 'declination':
+                value = _dec_string_to_unit(value)
+            elif key in self._defaultUnits:
                 try:
                     value = float(value) * self._defaultUnits[key]
                 except:
@@ -1270,6 +1276,35 @@ def isNanOrNone(val):
             return math.isnan(val)
         except TypeError:  # not a float
             return False
+
+
+def _degree_string_to_astropy_format(degree_string):
+    """ Converts a degree string like '01 22 50.938' into
+    the format {}d{}m{}s (i.e. 01d22m50.938s) so it can be
+    initialised into astropy
+    """
+
+    deg_split = degree_string.split(' ')
+    deg, arcmin, arcsec = deg_split
+    deg_astropy_format = '{}d{}m{}s'.format(deg, arcmin, arcsec)
+
+    return deg_astropy_format
+
+
+def _ra_string_to_unit(ra_string):
+
+    ra_astropy_format = _degree_string_to_astropy_format(ra_string)
+    ra_unit = astropy.coordinates.Longitude(ra_astropy_format, unit=u.deg)
+
+    return ra_unit
+
+
+def _dec_string_to_unit(dec_string):
+
+    dec_astropy_format = _degree_string_to_astropy_format(dec_string)
+    dec_unit = astropy.coordinates.Latitude(dec_astropy_format, unit=u.deg)
+
+    return dec_unit
 
 
 class HierarchyError(params.ExoDataError):
