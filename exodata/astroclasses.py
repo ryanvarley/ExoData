@@ -1278,22 +1278,12 @@ def isNanOrNone(val):
             return False
 
 
-def _degree_string_to_astropy_format(degree_string):
-    """ Converts a degree string like '01 22 50.938' into
-    the format {}d{}m{}s (i.e. 01d22m50.938s) so it can be
-    initialised into astropy
-    """
-
-    deg_split = degree_string.split(' ')
-    deg, arcmin, arcsec = deg_split
-    deg_astropy_format = '{}d{}m{}s'.format(deg, arcmin, arcsec)
-
-    return deg_astropy_format
-
-
 def _ra_string_to_unit(ra_string):
 
-    ra_astropy_format = _degree_string_to_astropy_format(ra_string)
+    ra_split = ra_string.split(' ')
+    hour, min, sec = ra_split
+    ra_astropy_format = '{}h{}m{}s'.format(hour, min, sec)
+
     ra_unit = astropy.coordinates.Longitude(ra_astropy_format, unit=u.deg)
 
     return ra_unit
@@ -1301,8 +1291,11 @@ def _ra_string_to_unit(ra_string):
 
 def _dec_string_to_unit(dec_string):
 
-    dec_astropy_format = _degree_string_to_astropy_format(dec_string)
-    dec_unit = astropy.coordinates.Latitude(dec_astropy_format, unit=u.deg)
+    deg_split = dec_string.split(' ')
+    deg, arcmin, arcsec = deg_split
+    deg_astropy_format = '{}d{}m{}s'.format(deg, arcmin, arcsec)
+
+    dec_unit = astropy.coordinates.Latitude(deg_astropy_format, unit=u.deg)
 
     return dec_unit
 

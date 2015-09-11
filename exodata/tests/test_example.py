@@ -27,7 +27,7 @@ class TestExampleInstances(TestCase):
         self.assertEqual(exampleSystem.name, 'Example System 1')
         self.assertEqual(exampleSystem.d, 58 * aq.pc)
         self.assertEqual(exampleSystem.dec.to_string(unit=u.degree), '4d05m06s')
-        self.assertEqual(exampleSystem.ra.to_string(unit=u.degree), '1d02m03s')
+        self.assertEqual(exampleSystem.ra.to_string(unit=u.degree), '15d30m45s')
 
     # TODO test_binary object
 
