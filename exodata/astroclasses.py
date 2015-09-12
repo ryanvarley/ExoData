@@ -443,6 +443,10 @@ class Binary(PlanetAndBinaryCommon, StarAndBinaryCommon):  # TODO add binary met
     def stars(self):
         return self.children
 
+    @property
+    def d(self):
+        return self.parent.d
+
     def calcPeriod(self):
         raise NotImplementedError  # TODO
 
