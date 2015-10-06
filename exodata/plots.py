@@ -8,11 +8,12 @@ from collections import OrderedDict
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
+import seaborn
 
 from . import astroquantities as aq
 from . import astroclasses as ac
 
-
+seaborn.set_style('white_grid')
 rcParams.update({'figure.autolayout': True})
 
 

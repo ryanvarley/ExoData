@@ -3,3 +3,4 @@ quantities
 nose
 matplotlib
 hypothesis
+seaborn
