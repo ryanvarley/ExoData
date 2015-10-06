@@ -13,7 +13,7 @@ import seaborn
 from . import astroquantities as aq
 from . import astroclasses as ac
 
-seaborn.set_style('white_grid')
+seaborn.set_style('whitegrid')
 rcParams.update({'figure.autolayout': True})
 
 
