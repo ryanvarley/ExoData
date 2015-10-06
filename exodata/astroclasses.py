@@ -504,15 +504,15 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
             mag_class = Magnitude(self.spectralType, **mag_dict)
             try:
                 mag_conversion = mag_class.convert(mag_letter)
-                logger.debug('Star Class: Conversion to {0} successful, got {1}'.format(mag_str, mag_conversion))
+                # logger.debug('Star Class: Conversion to {0} successful, got {1}'.format(mag_str, mag_conversion))
                 self.flags.addFlag('Estimated mag{0}'.format(mag_letter))
                 return mag_conversion
             except ValueError as e:  # cant convert
                 logger.exception(e)
-                logger.debug('Cant convert to {0}'.format(mag_letter))
+                # logger.debug('Cant convert to {0}'.format(mag_letter))
                 return np.nan
         else:
-            logger.debug('returning {0}={1} from catalogue'.format(mag_str, mag_val))
+            # logger.debug('returning {0}={1} from catalogue'.format(mag_str, mag_val))
             return mag_val
 
     @property
@@ -720,6 +720,8 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
             planetClass = self.massType()
         elif self.R is not np.nan:
             planetClass = self.radiusType()
+        else:
+            return np.nan
 
         return assum.planetAlbedo(planetClass)
 
@@ -737,7 +739,7 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
         """
         try:
             return eq.MeanPlanetTemp(self.albedo, self.star.T, self.star.R, self.a).T_p
-        except ValueError:  # ie missing value (.a) returning nan
+        except (ValueError, HierarchyError):  # ie missing value (.a) returning nan
             return np.nan
 
     def estimateMass(self):
@@ -749,8 +751,10 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
     def calcSMA(self):
         """ Calculates the semi-major axis from Keplers Third Law
         """
-
-        return eq.KeplersThirdLaw(None, self.star.M, self.P).a
+        try:
+            return eq.KeplersThirdLaw(None, self.star.M, self.P).a
+        except HierarchyError:
+            return np.nan
 
     def calcSMAfromT(self, epsilon=0.7):
         """ Calculates the semi-major axis based on planet temperature
@@ -1223,7 +1227,7 @@ class Magnitude(object):
             else:
                 from_mag_val = self.__dict__['mag'+from_mag]  # safer than eval
                 if isNanOrNone(from_mag_val):
-                    logger.debug('2 '+from_mag)
+                    # logger.debug('2 '+from_mag)
                     raise ValueError('You cannot convert from a magnitude you have not specified in class')
                 return from_mag_val + (offset*sign)
         elif from_mag == 'V':

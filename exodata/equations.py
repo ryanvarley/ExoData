@@ -353,10 +353,12 @@ class KeplersThirdLaw(ExoDataEqn):
         M_p = self._M_p
         P = self._P
 
-        if a is None:
-            a = ((P**2 * G*(M_s + M_p))/(4*pi**2))**(1./3)
-
-        return a.rescale(aq.au)
+        try:
+            if a is None:
+                a = ((P**2 * G*(M_s + M_p))/(4*pi**2))**(1./3)
+            return a.rescale(aq.au)
+        except ValueError:
+            return np.nan
 
     @property
     def M_s(self):
