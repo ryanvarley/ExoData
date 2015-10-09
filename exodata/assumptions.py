@@ -22,7 +22,7 @@ planetAssumptions = {
             # the format of the tuples are (mass upperlimit, name). The current format dosn't allow overlaps and must be
             # in order. If you append a value run .sort() after.
             (10 * aq.M_e, 'Super-Earth'),
-            (50 * aq.M_e, 'Neptune'),
+            (20 * aq.M_e, 'Neptune'),
             (float('inf'), 'Jupiter')
         ],
 
@@ -35,8 +35,8 @@ planetAssumptions = {
 
     'tempType':
         [
-            (350 * aq.K, 'Temperate'),
-            (700 * aq.K, 'Warm'),
+            (800 * aq.K, 'Cold'),
+            (2000 * aq.K, 'Warm'),
             (float('inf'), 'Hot'),
         ],
 
@@ -49,7 +49,7 @@ planetAssumptions = {
 
     'albedo':  # depends on temperature so it takes tempType as the key and the albedo as the value
         {
-            'Temperate': 0.3,
+            'Cold': 0.3,
             'Warm': 0.3,
             'Hot': 0.1,
             'Super-Earth': 0.3,

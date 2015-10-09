@@ -1,17 +1,14 @@
 """ These test check the example system is working correctly but also that paramters are formated correctly with the
 right units.
 """
-import sys
-if sys.hexversion < 0x02070000:
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 
 
 from ..example import genExamplePlanet, examplePlanet, exampleSystem, exampleStar
 from .. import astroquantities as aq
 from .. import astroclasses as ac
 from .patches import TestCase
+import astropy.units as u
 
 secondExamplePlanet = genExamplePlanet()
 
@@ -29,8 +26,8 @@ class TestExampleInstances(TestCase):
 
         self.assertEqual(exampleSystem.name, 'Example System 1')
         self.assertEqual(exampleSystem.d, 58 * aq.pc)
-        self.assertEqual(exampleSystem.dec, '+04 05 06')
-        self.assertEqual(exampleSystem.ra, '01 02 03')
+        self.assertEqual(exampleSystem.dec.to_string(unit=u.degree), '4d05m06s')
+        self.assertEqual(exampleSystem.ra.to_string(unit=u.degree), '15d30m45s')
 
     # TODO test_binary object
 

@@ -6,6 +6,8 @@ from pkg_resources import resource_stream
 import logging
 
 import numpy as np
+import astropy.coordinates
+import astropy.units as u
 
 from . import equations as eq
 from . import astroquantities as aq
@@ -89,6 +91,10 @@ class _BaseObject(object):
         else:
             return False
 
+    @property
+    def system(self):
+        return self._getParentClass(self.parent, 'System')
+
 
 class System(_BaseObject):
 
@@ -100,13 +106,26 @@ class System(_BaseObject):
     def ra(self):
         return self.getParam('rightascension')
 
+    @ra.setter
+    def ra(self, ra):
+        self.params['rightascension'] = ra
+
     @property
     def dec(self):
         return self.getParam('declination')
 
+    @dec.setter
+    def dec(self, dec):
+        self.params['declination'] = dec
+
     @property
     def d(self):
         return self.getParam('distance')
+
+    @d.setter
+    def d(self, d):
+        d = d.rescale(aq.pc)
+        self.params['distance'] = d
 
     @property
     def stars(self):
@@ -115,6 +134,10 @@ class System(_BaseObject):
     @property
     def epoch(self):
         return self.getParam('epoch')
+
+    @epoch.setter
+    def epoch(self, epoch):
+        self.params['epoch'] = epoch
 
 
 class PlanetAndBinaryCommon(_BaseObject):
@@ -126,6 +149,19 @@ class PlanetAndBinaryCommon(_BaseObject):
     def i(self):
         return self.getParam('inclination')
 
+    @i.setter
+    def i(self, i):
+        i = i.rescale(aq.deg)
+        self.params['inclination'] = i
+
+    @property
+    def e(self):
+        return self.getParam('eccentricity')
+
+    @e.setter
+    def e(self, e):
+        self.params['eccentricity'] = e
+
     @property
     def P(self):
         period = self.getParam('period')
@@ -136,6 +172,11 @@ class PlanetAndBinaryCommon(_BaseObject):
             return self.calcPeriod()
         else:
             return np.nan
+
+    @P.setter
+    def P(self, P):
+        P = P.rescale(aq.day)
+        params['period'] = P
 
     def calcPeriod(self):
         raise NotImplementedError('Only implemented for Binary and Planet child classes')
@@ -153,6 +194,11 @@ class PlanetAndBinaryCommon(_BaseObject):
         else:
             return sma
 
+    @a.setter
+    def a(self, a):
+        a = a.rescale(aq.au)
+        self.params['a'] = a
+
     def calcSMA(self):
         raise NotImplementedError('Only implemented for Binary and Planet child classes')
 
@@ -160,51 +206,130 @@ class PlanetAndBinaryCommon(_BaseObject):
     def transittime(self):
         return self.getParam('transittime')
 
+    @transittime.setter
+    def transittime(self, transittime):
+        self.params['transittime'] = transittime
+
     @property
     def periastron(self):
-        return self.getParam('periastron')
+        peri = self.getParam('periastron')
+        if math.isnan(peri) and self.e == 0:
+            peri = 0 * aq.deg
+        return peri
+
+    @periastron.setter
+    def periastron(self, periastron):
+        self.params['periastron'] = periastron
 
     @property
     def longitude(self):
         return self.getParam('longitude')
 
+    @longitude.setter
+    def longitude(self, longitude):
+        self.params['longitude'] = longitude
+
     @property
     def ascendingnode(self):
         return self.getParam('ascendingnode')
 
+    @ascendingnode.setter
+    def ascendingnode(self, ascendingnode):
+        self.params['ascendingnode'] = ascendingnode
+
     @property
     def separation(self):
         return self.getParam('separation')
+
+    @separation.setter
+    def seperation(self, seperation):
+        self.params['seperation'] = seperation
 
 
 class StarAndBinaryCommon(_BaseObject):
     def __init__(self, *args, **kwargs):
         _BaseObject.__init__(self, *args, **kwargs)
         self.classType = 'StarAndBinaryCommon'
+        
+    @property
+    def magU(self):
+        return self.getParam('magU')
+    
+    @magU.setter
+    def magU(self, mag):
+        self.params['magU'] = mag
 
     @property
     def magB(self):
         return self.getParam('magB')
 
+    @magB.setter
+    def magB(self, mag):
+        self.params['magB'] = mag
+
     @property
     def magH(self):
         return self.getParam('magH')
+
+    @magH.setter
+    def magH(self, mag):
+        self.params['magH'] = mag
 
     @property
     def magI(self):
         return self.getParam('magI')
 
+    @magI.setter
+    def magI(self, mag):
+        self.params['magI'] = mag
+
     @property
     def magJ(self):
         return self.getParam('magJ')
+
+    @magJ.setter
+    def magJ(self, mag):
+        self.params['magJ'] = mag
 
     @property
     def magK(self):
         return self.getParam('magK')
 
+    @magK.setter
+    def magK(self, mag):
+        self.params['magK'] = mag
+
     @property
     def magV(self):
         return self.getParam('magV')
+
+    @magV.setter
+    def magV(self, mag):
+        self.params['magV'] = mag
+        
+    @property
+    def magL(self):
+        return self.getParam('magL')
+    
+    @magL.setter
+    def magL(self, mag):
+        self.params['magL'] = mag
+        
+    @property
+    def magM(self):
+        return self.getParam('magM')
+    
+    @magM.setter
+    def magM(self, mag):
+        self.params['magM'] = mag
+        
+    @property
+    def magN(self):
+        return self.getParam('magN')
+    
+    @magN.setter
+    def magN(self, mag):
+        self.params['magN'] = mag
 
 
 class StarAndPlanetCommon(_BaseObject):
@@ -216,21 +341,43 @@ class StarAndPlanetCommon(_BaseObject):
     def age(self):
         return self.getParam('age')
 
+    @age.setter
+    def age(self, age):
+        age = age.rescale(aq.Gyear)
+        self.params['age'] = age
+
     @property  # allows stars and planets to access system values by propagating up
     def ra(self):
         return self.parent.ra
+
+    @ra.setter
+    def ra(self, ra):
+        self.parent.ra = ra
 
     @property
     def dec(self):
         return self.parent.dec
 
+    @dec.setter
+    def dec(self, dec):
+        self.parent.dec = dec
+
     @property
     def d(self):
         return self.parent.d
 
+    @d.setter
+    def d(self, d):
+        self.parent.d = d
+
     @property
     def R(self):
         return self.getParam('radius')
+
+    @R.setter
+    def R(self, R):
+        R = R * aq.R_j
+        self.params['radius'] = R
 
     @property
     def T(self):
@@ -248,16 +395,22 @@ class StarAndPlanetCommon(_BaseObject):
         else:
             return np.nan
 
+    @T.setter
+    def T(self, T):
+        T = T.rescale(aq.K)
+        self.params['temperature'] = T
+
     @property
     def M(self):
         return self.getParam('mass')
 
+    @M.setter
+    def M(self, M):
+        M = M.rescale(aq.M_j)
+        self.params['mass'] = M
+
     def calcTemperature(self):
         raise NotImplementedError('Only implemented for Stars and Planet child classes')
-
-    @property
-    def system(self):
-        return self._getParentClass(self.parent, 'System')
 
     @property
     def binary(self):
@@ -265,30 +418,34 @@ class StarAndPlanetCommon(_BaseObject):
 
     def calcSurfaceGravity(self):
 
-        return eq.surfaceGravity(self.M, self.R)
+        return eq.SurfaceGravity(self.M, self.R).g
 
     def calcLogg(self):
 
-        return eq.logg(self.M, self.R)
+        return eq.Logg(self.M, self.R).logg
 
     def calcDensity(self):
 
         if self.M is np.nan or self.R is np.nan:
             return np.nan
         else:
-            return eq.density(self.M, self.R)
+            return eq.Density(self.M, self.R).density
 
 
-class Binary(PlanetAndBinaryCommon, StarAndPlanetCommon):  # TODO add binary methods and variables, remove unused one from starcommon
+class Binary(PlanetAndBinaryCommon, StarAndBinaryCommon):  # TODO add binary methods and variables, remove unused one from starcommon
 
     def __init__(self, *args, **kwargs):
-        StarAndPlanetCommon.__init__(self, *args, **kwargs)
+        StarAndBinaryCommon.__init__(self, *args, **kwargs)
         PlanetAndBinaryCommon.__init__(self, *args, **kwargs)
         self.classType = 'Binary'
 
     @property
     def stars(self):
         return self.children
+
+    @property
+    def d(self):
+        return self.parent.d
 
     def calcPeriod(self):
         raise NotImplementedError  # TODO
@@ -308,7 +465,7 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
         """ Note this should work from child parents as .d propergates, calculates using the star estimation method
         estimateDistance and estimateAbsoluteMagnitude
         """
-        # TODO this will only work from star or below. good thing?
+        # TODO this will only work from a star or below. good thing?
         d = self.parent.d
         if params.estimateMissingValues:
             if d is np.nan:
@@ -321,12 +478,12 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
 
     def calcLuminosity(self):
 
-        return eq.starLuminosity(self.R, self.T)
+        return eq.StellarLuminosity(self.R, self.T).L
 
     def calcTemperature(self):
         """ uses equations.starTemperature to estimate temperature based on main sequence relationship
         """
-        return eq.estimateStarTemperature(self.M)
+        return eq.estimateStellarTemperature(self.M)
 
     def _get_or_convert_magnitude(self, mag_letter):
         """ Takes input of the magnitude letter and ouputs the magnitude fetched from the catalogue or a converted value
@@ -347,15 +504,15 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
             mag_class = Magnitude(self.spectralType, **mag_dict)
             try:
                 mag_conversion = mag_class.convert(mag_letter)
-                logger.debug('Star Class: Conversion to {0} successful, got {1}'.format(mag_str, mag_conversion))
+                # logger.debug('Star Class: Conversion to {0} successful, got {1}'.format(mag_str, mag_conversion))
                 self.flags.addFlag('Estimated mag{0}'.format(mag_letter))
                 return mag_conversion
             except ValueError as e:  # cant convert
                 logger.exception(e)
-                logger.debug('Cant convert to {0}'.format(mag_letter))
+                # logger.debug('Cant convert to {0}'.format(mag_letter))
                 return np.nan
         else:
-            logger.debug('returning {0}={1} from catalogue'.format(mag_str, mag_val))
+            # logger.debug('returning {0}={1} from catalogue'.format(mag_str, mag_val))
             return mag_val
 
     @property
@@ -398,20 +555,27 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
     def magN(self):
         return self._get_or_convert_magnitude('N')
 
-
     @property
     def Z(self):
         return self.getParam('metallicity')
+    
+    @Z.setter
+    def Z(self, Z):
+        self.params['metallicity'] = Z
 
     @property
     def spectralType(self):
         return self.getParam('spectraltype')
+    
+    @spectralType.setter
+    def spectralType(self, spectraltype):
+        self.params['spectraltype'] = spectraltype
 
     @property
     def planets(self):
         return self.children
 
-    def getLimbdarkeningCoeff(self, wavelength=1.22):
+    def getLimbdarkeningCoeff(self, wavelength=1.22):  # TODO replace with pylightcurve
         """ Looks up quadratic limb darkening parameter from the star based on T, logg and metalicity.
 
         :param wavelength: microns
@@ -492,12 +656,18 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
         else:
             return False
 
-    def calcTransitDuration(self):
+    def calcTransitDuration(self, circular=False):
         """ Estimation of the primary transit time assuming a circular orbit (see :py:func:`equations.transitDuration`)
         """
+
         try:
-            return eq.transitDuration(self.P, self.parent.R, self.R, self.a, self.i)
-        except ValueError:
+            if circular:
+                return eq.transitDurationCircular(self.P, self.star.R, self.R, self.a, self.i)
+            else:
+                return eq.TransitDuration(self.P, self.a, self.R, self.star.R, self.i, self.e, self.periastron).Td
+        except (ValueError,
+                AttributeError,  # caused by trying to rescale nan i.e. missing i value
+                HierarchyError):  # i.e. planets that dont orbit stars
             return np.nan
 
     def calcScaleHeight(self):
@@ -505,7 +675,7 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
         # return eq.scaleHeight(self.T, , self.g)  # TODO mu based on assumptions
 
     def calcTransitDepth(self):
-        return eq.transitDepth(self.star.R, self.R)
+        return eq.TransitDepth(self.star.R, self.R).depth
 
     def type(self):
         return assum.planetType(self.T, self.M, self.R)
@@ -534,66 +704,88 @@ class Planet(StarAndPlanetCommon, PlanetAndBinaryCommon):
         else:
             return molweight
 
+    @mu.setter
+    def mu(self, mu):
+        mu = mu.rescale(aq.atomic_mass_unit)
+        self.params['moleight'] = mu
+
+    @property
     def albedo(self):
-        if self.getParam('temperature') is not np.nan:
+        albedo = self.getParam('albedo')
+        if albedo is not np.nan:
+            return albedo
+        elif self.getParam('temperature') is not np.nan:
             planetClass = self.tempType()
         elif self.M is not np.nan:
             planetClass = self.massType()
         elif self.R is not np.nan:
             planetClass = self.radiusType()
+        else:
+            return np.nan
 
         return assum.planetAlbedo(planetClass)
 
+    @albedo.setter
+    def albedo(self, albedo):
+        albedo = albedo
+        self.params['albedo'] = albedo
+
     def calcTemperature(self):
-        """ Calculates the temperature using which uses equations.meanPlanetTemp, albedo assumption and potentially
+        """ Calculates the temperature using which uses equations.MeanPlanetTemp, albedo assumption and potentially
         equations.starTemperature.
 
         issues
         - you cant get the albedo assumption without temp but you need it to calculate the temp.
         """
         try:
-            return eq.meanPlanetTemp(self.albedo(), self.star.T, self.star.R, self.a)
-        except ValueError:  # ie missing value (.a) returning nan
+            return eq.MeanPlanetTemp(self.albedo, self.star.T, self.star.R, self.a).T_p
+        except (ValueError, HierarchyError):  # ie missing value (.a) returning nan
             return np.nan
 
     def estimateMass(self):
 
         density = assum.planetDensity(self.radiusType())
 
-        return eq.estimateMass(self.R, density)
+        return eq.Density(None, self.R, density).M
 
     def calcSMA(self):
-        """ Calculates the semi-major axis based on star mass and period
+        """ Calculates the semi-major axis from Keplers Third Law
         """
+        try:
+            return eq.KeplersThirdLaw(None, self.star.M, self.P).a
+        except HierarchyError:
+            return np.nan
 
-        return eq.calcSemiMajorAxis(self.P, self.star.M)
-
-    def calcSMAfromT(self):
+    def calcSMAfromT(self, epsilon=0.7):
         """ Calculates the semi-major axis based on planet temperature
         """
 
-        return eq.calcSemiMajorAxis2(self.T, self.star.T, self.albedo(), self.star.R)
+        return eq.MeanPlanetTemp(self.albedo(), self.star.T, self.star.R, epsilon, self.T).a
 
     def calcPeriod(self):
         """ calculates period using a and stellar mass
         """
 
-        return eq.calcPeriod(self.a, self.star.M)
+        return eq.KeplersThirdLaw(self.a, self.star.M).P
 
     @property
     def discoveryMethod(self):
         return self.getParam('discoverymethod')
 
+    @discoveryMethod.setter
+    def discoveryMethod(self, discoverymethod):
+        self.params['discoverymethod'] = discoverymethod
+
     @property
     def discoveryYear(self):
         try:
-            return int(self.getParam('discoveryyear'))  # TODO should be read as int not float to being with
+            return int(self.getParam('discoveryyear'))
         except ValueError:  # np.nan
             return self.getParam('discoveryyear')
 
-    @property
-    def e(self):
-        return self.getParam('eccentricity')
+    @discoveryYear.setter
+    def discoveryYear(self, discoveryYear):
+        self.params['discoveryyear'] = discoveryYear
 
     @property
     def lastUpdate(self):
@@ -690,7 +882,11 @@ class Parameters(object):  # TODO would this subclassing dict be more preferable
                     except KeyError:
                         return False
 
-            if key in self._defaultUnits:
+            if key == 'rightascension':
+                value = _ra_string_to_unit(value)
+            elif key == 'declination':
+                value = _dec_string_to_unit(value)
+            elif key in self._defaultUnits:
                 try:
                     value = float(value) * self._defaultUnits[key]
                 except:
@@ -706,6 +902,7 @@ class BinaryParameters(Parameters):
 
         self._defaultUnits.update({
             'separation': aq.au,  # TODO there is actually 2 different measurements (other is arcsec)
+            'periastron': aq.deg,
         })
 
 
@@ -734,6 +931,7 @@ class PlanetParameters(Parameters):
             'radius': aq.R_j,
             'inclination': aq.deg,
             'eccentricity': 1,
+            'periastron': aq.deg,
             'period': aq.day,
             'semimajoraxis': aq.au,
             'transittime': aq.JD,  # TODO specific JD, MJF etc
@@ -1029,7 +1227,7 @@ class Magnitude(object):
             else:
                 from_mag_val = self.__dict__['mag'+from_mag]  # safer than eval
                 if isNanOrNone(from_mag_val):
-                    logger.debug('2 '+from_mag)
+                    # logger.debug('2 '+from_mag)
                     raise ValueError('You cannot convert from a magnitude you have not specified in class')
                 return from_mag_val + (offset*sign)
         elif from_mag == 'V':
@@ -1088,5 +1286,28 @@ def isNanOrNone(val):
             return False
 
 
-class HierarchyError(Exception):
+def _ra_string_to_unit(ra_string):
+
+    ra_split = ra_string.split(' ')
+    hour, min, sec = ra_split
+    ra_astropy_format = '{}h{}m{}s'.format(hour, min, sec)
+
+    ra_unit = astropy.coordinates.Longitude(ra_astropy_format, unit=u.deg)
+
+    return ra_unit
+
+
+def _dec_string_to_unit(dec_string):
+
+    deg_split = dec_string.split(' ')
+    deg, arcmin, arcsec = deg_split
+    deg_astropy_format = '{}d{}m{}s'.format(deg, arcmin, arcsec)
+
+    dec_unit = astropy.coordinates.Latitude(deg_astropy_format, unit=u.deg)
+
+    return dec_unit
+
+
+class HierarchyError(params.ExoDataError):
     pass
+

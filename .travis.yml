@@ -1,18 +1,42 @@
-language: python
+# New travis file adapted from https://github.com/soft-matter/trackpy/blob/master/.travis.yml
 
-before_install:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
+language: python
+sudo: false
+
+matrix:
+  include:
+    - python: "2.7"
+      env: DEPS="numpy nose matplotlib seaborn requests"
+    - python: "3.4"
+      env: DEPS="numpy nose matplotlib seaborn requests"
+    - python: "3.5"
+      env: DEPS="numpy nose matplotlib seaborn requests"
 
 install:
-  - pip install -r requirements.txt
-  - pip install coveralls
+  # See:
+  # https://groups.google.com/a/continuum.io/forum/#!topic/conda/RSFENqovnro
+  # - conda update --yes --no-deps conda
+  # OK, this used to *fix* the build, but now it *breaks* the build.
+  # If you're reading this, good luck out there. I'm not sure what to tell you.
+  - conda update --yes conda
+  - conda config --add channels soft-matter
+  - conda create -n testenv --yes $DEPS pip nose setuptools python=$TRAVIS_PYTHON_VERSION
+  - source activate testenv
+  - pip install coveralls hypothesis
+  # for debugging...
+  - echo $PATH
+  - which python
+  - conda info
+  - conda list
+  - python setup.py install
 
-python:
-  - "2.6"
-  - "2.7"
-  - "3.3"
-  - "3.4"
+before_install:
+  - if [ ${TRAVIS_PYTHON_VERSION:0:1} == "2" ]; then wget http://repo.continuum.io/miniconda/Miniconda-3.5.5-Linux-x86_64.sh -O miniconda.sh; else wget http://repo.continuum.io/miniconda/Miniconda3-3.5.5-Linux-x86_64.sh -O miniconda.sh; fi
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b -p /home/travis/mc
+  - export PATH=/home/travis/mc/bin:$PATH
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
 
 script:
   - python setup.py test
