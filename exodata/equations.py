@@ -829,7 +829,7 @@ def transitDurationCircular(P, R_s, R_p, a, i):
     return duration.rescale(aq.min)
 
 
-def estimateStarTemperature(M_s):
+def estimateStellarTemperature(M_s):
     """ Estimates stellar temperature using the main sequence relationship T ~ 5800*M^0.65 (Cox 2000)??
     """
     # TODO improve with more x and k values from Cox 2000

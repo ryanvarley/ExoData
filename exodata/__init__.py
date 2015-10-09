@@ -2,7 +2,7 @@
 Help?
 """
 
-__version__ = '2.0b151006'
+__version__ = '2.0'
 
 
 def test():

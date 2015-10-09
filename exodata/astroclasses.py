@@ -483,7 +483,7 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
     def calcTemperature(self):
         """ uses equations.starTemperature to estimate temperature based on main sequence relationship
         """
-        return eq.estimateStarTemperature(self.M)
+        return eq.estimateStellarTemperature(self.M)
 
     def _get_or_convert_magnitude(self, mag_letter):
         """ Takes input of the magnitude letter and ouputs the magnitude fetched from the catalogue or a converted value

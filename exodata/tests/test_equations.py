@@ -358,13 +358,13 @@ class Test_starTemperature(TestCase):
 
     def test_works_sun(self):
         answer = 5800 * aq.K
-        result = eq.estimateStarTemperature(1*aq.M_s)
+        result = eq.estimateStellarTemperature(1*aq.M_s)
 
         self.assertAlmostEqual(answer, result, 0)
 
     def test_works_hd189(self):
         answer = 4939 * aq.K
-        result = eq.estimateStarTemperature(0.846*aq.M_s)
+        result = eq.estimateStellarTemperature(0.846*aq.M_s)
 
         self.assertTrue(result-answer < 300)
 
