@@ -4,3 +4,4 @@ nose
 matplotlib
 hypothesis
 seaborn
+requests

@@ -2,16 +2,17 @@
 Help?
 """
 
-__version__ = '2.0'
+__version__ = '2.1b'
 
 
 def test():
     import unittest
+    from hypothesis import Settings, Verbosity
 
     from tests import testsuite as _testsuite
     unittest.TextTestRunner(verbosity=2).run(_testsuite)
 
-# OECPy Imports
+# Exodata Imports
 import sys
 
 # Import package modules
