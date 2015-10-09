@@ -7,6 +7,7 @@ __version__ = '2.0'
 
 def test():
     import unittest
+    from hypothesis import Settings, Verbosity
 
     from tests import testsuite as _testsuite
     unittest.TextTestRunner(verbosity=2).run(_testsuite)

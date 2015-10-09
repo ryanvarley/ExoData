@@ -39,7 +39,7 @@ if sys.hexversion < 0x02070000:
     install_requires.append('ordereddict')
 
 if sys.hexversion < 0x02070000:
-    test_suite = 'exodata.tests.testsuite'  # otherwise skiptests dont work with 2.6, TODO plugin?
+    test_suite = 'exodata.tests.testsuite'
 else:
     test_suite = 'nose.collector'
 
