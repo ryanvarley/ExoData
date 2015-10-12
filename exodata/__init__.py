@@ -2,7 +2,7 @@
 Help?
 """
 
-__version__ = '2.0'
+__version__ = '2.1'
 
 
 def test():
@@ -12,7 +12,7 @@ def test():
     from tests import testsuite as _testsuite
     unittest.TextTestRunner(verbosity=2).run(_testsuite)
 
-# OECPy Imports
+# Exodata Imports
 import sys
 
 # Import package modules
