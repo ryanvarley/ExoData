@@ -149,13 +149,21 @@ This will only take scope in the current project so if you close the interpreter
 # Plotting
 ExoData features a plotting library for planet and stellar parameters in a scatter plot and per parameter bin. Please see the [plots section](https://github.com/ryanvarley/open-exoplanet-catalogue-python/wiki/Plotting) of the documentation for further information. Note that all plots are shown here were produced after `import seaborn` which changes the plot style.
 
-### Planet Mass with Planet Radius ###
+### Discovery Method by Year
+
+```python
+dm_plot = exodata.plots.DiscoveryMethodByYear(exocat.planets, methods_to_plot=('RV', 'transit', 'Other'))
+dm_plot.plot(method_labels=('Radial Velocity', 'Transit Method', 'Other'))
+```
+![Discovery method by year](https://github.com/ryanvarley/ExoData/blob/images/discovery_year_method.png?raw=true "Discovery method by year")
+
+### Planet Mass with Planet Radius
 ```python
 exodata.plots.GeneralPlotter(exocat.planets, 'R', 'M', yaxislog=True).plot()
 ```
 ![Planet Mass with Planet Radius](https://github.com/ryanvarley/ExoData/blob/images/planetR-M-4.png?raw=true "Planet Mass with Planet Radius Plot")
 
-### Stellar V Magnitude with Planet Radius ###
+### Stellar V Magnitude with Planet Radius
 ```python
 exodata.plots.GeneralPlotter(exocat.planets, 'R', 'star.magV',
                             xunit=aq.R_e, xaxislog=True).plot()
@@ -163,7 +171,7 @@ exodata.plots.GeneralPlotter(exocat.planets, 'R', 'star.magV',
 
 ![Stellar V Magnitude with Planet Radius](https://github.com/ryanvarley/ExoData/blob/images/planetR-starMagV-4.png "Stellar V Magnitude with Planet Radius Plot")
 
-### Planet Eccentricity ###
+### Planet Eccentricity
 ```python
 exodata.plots.DataPerParameterBin(exocat.planets, 'e',
       (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotBarChart(label_rotation=45)
