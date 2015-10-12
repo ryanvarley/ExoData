@@ -43,7 +43,7 @@ planetAssumptions = {
     'mu':  # depends on masstype so takes the masstype as the key, and mu as the value
         {
             'Super-Earth': 18 * aq.atomic_mass_unit,  # TODO these should be more inherently linked to masstype
-            'Neptune': 2 * aq.atomic_mass_unit,
+            'Neptune': 2.3 * aq.atomic_mass_unit,
             'Jupiter': 2 * aq.atomic_mass_unit
         },
 
@@ -60,8 +60,8 @@ planetAssumptions = {
     'density':
     {
         'Super-Earth': 4 * aq.g / aq.cm**3,
-        'Neptune': 1.638 * aq.g / aq.cm**3,
-        'Jupiter': 1.326 * aq.g / aq.cm**3
+        'Neptune': 1.6 * aq.g / aq.cm**3,
+        'Jupiter': 1.3 * aq.g / aq.cm**3
     }
 }
 
