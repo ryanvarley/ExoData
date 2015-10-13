@@ -11,7 +11,9 @@ This python interface (formerly oecpy) serves as a link between the raw XML of t
 * Easily navigate hierarchy (ie from planet to star or star to planets)
 * Availability of system parameters in planets (ie ra, dec, d (distance))
 
-Please note that this package is in active development. The Docs are incomplete, it is not fully unit tested and any and all methods and variables are subject to change in the development process
+Please note that this package is in active development. The Docs are incomplete, it is not fully unit tested and any and all methods and variables are subject to change in the development process.
+
+If you use ExoData in a scientific publication, please include a reference to this paper [2015arXiv151002738V](http://arxiv.org/abs/1510.02738).
 
 # Installation
 This module depends on
