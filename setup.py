@@ -33,7 +33,7 @@ with codecs.open(os.path.join(here, 'readme.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 install_requires = ['numpy', 'quantities', 'nose>=1.0', 'matplotlib>=1.3.1',
-                    'requests', 'astropy', 'seaborn']
+                    'requests', 'astropy', 'seaborn', 'pandas']
 if sys.hexversion < 0x02070000:
     install_requires.append('unittest2')
     install_requires.append('ordereddict')
