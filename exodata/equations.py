@@ -608,6 +608,7 @@ class Density(ExoDataEqn):
 
         return R.rescale(aq.R_j)
 
+
 class TransitDuration(ExoDataEqn):
 
     def __init__(self, P=None, a=None, Rp=None, Rs=None, i=None, e=None, w=None):
@@ -670,7 +671,7 @@ class TransitDuration(ExoDataEqn):
 
         duration = (P*(ro_pt**2))/(np.pi*np.sqrt(1-e**2))*df
 
-        return duration
+        return duration.rescale(aq.min)
 
 class ImpactParameter(ExoDataEqn):
 
