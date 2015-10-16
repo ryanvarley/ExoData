@@ -11,8 +11,6 @@ This python interface (formerly oecpy) serves as a link between the raw XML of t
 * Easily navigate hierarchy (ie from planet to star or star to planets)
 * Availability of system parameters in planets (ie ra, dec, d (distance))
 
-Please note that this package is in active development. The Docs are incomplete, it is not fully unit tested and any and all methods and variables are subject to change in the development process.
-
 If you use ExoData in a scientific publication, please include a reference to this paper [2015arXiv151002738V](http://arxiv.org/abs/1510.02738).
 
 # Installation
@@ -66,44 +64,51 @@ You can then access the lists
 	exocat.planets
 	exocat.transitingPlanets
 
-The following code assumes the imports
+The following code assumes the imports (along with loading exocat as above)
 
     import exodata
-    import quantities as pq
     import exodata.astroquantities as aq
 
 You can now perform more advanced queries such as fetching all planets whose radius is less than 10 Earth Radii
 
-	superEarths = [planet for planet in exocat.planets if planet.R < (10 * aq.R_e)]
+	>>> superEarths = [planet for planet in exocat.planets if planet.R < (10 * aq.R_e)]
+	>>> len(superEarths)
+	1052
 
 To choose a planet
 
-	kepler60b = exocat.searchPlanet('kepler60b')
-	>>> Planet('Kepler-60 b')
-	kepler60planets = exocat.searchPlanet('kepler60') # or all the kepler 60 planets
-	>>> [Planet('Kepler-60 c'), Planet('Kepler-60 b'), Planet('Kepler-60 d')]
-	kepler60 = kepler60b.star #to get the star kepler-60
-	>>> Star('Kepler-60')
+	>>> kepler60b = exocat.searchPlanet('kepler60b')
+	>>> print kepler60b
+	Planet('Kepler-60 b')
+	
+	>>> exocat.searchPlanet('kepler60')  # or all the kepler 60 planets
+	[Planet('Kepler-60 c'), Planet('Kepler-60 b'), Planet('Kepler-60 d')]
+	
+	>>> kepler60b.star  # to get the star kepler-60
+	Star('Kepler-60')
 
-	kepler60b.R # get planet radius
-	>>> array(0.207777) * jupiter_radius # this works like an array in most functions
+	>>> kepler60b.R  # to get the planetary radius
+	array(0.207777) * R_j  # this works like an array in most functions
 
-	kepler60b.R.rescale(aq.R_e) # See Units section for more
-	>>> array(2.280002801287082) * earth_radius
+	>>> kepler60b.R.rescale(aq.R_e) # See Units section for more
+	array(2.280002801287082) * R_e
 
-	kepler60b.R.rescale(pq.m) # import quantities as pq (se units section)
-	>>> array(14525897.847) * m
+	>>> kepler60b.R.rescale(pq.m) # import quantities as pq (se units section)
+	array(14525897.847) * m
 
-	kepler60b.RA
-	>>> '20 02 28'
+	>>> kepler60b.dec
+	<Latitude 45.788888888888884 deg>
+	
+	>>> kepler60b.dec.dms  # or in degrees, minutes and seconds
+	dms_tuple(d=45.0, m=47.0, s=19.999999999983515)
+	
+	>>> gj1214b = exocat.searchPlanet('gj1214')
+	Planet('Gliese 1214 b')
+	
+	>>> exocat.planetDict['Gliese 1214 b']  # or with the exact name
+	Planet('Gliese 1214 b')
 
-    gj1214 = exocat.searchPlanet('gj1214')
-    # or with the exact name
-    exocat.planetDict['Gliese 1214 b']
-	gj1214.type()
-	>>> 'Warm Super-Earth' # Note: This depends on your asumptions, see later
-
-For a full list of planets, star and system parameters see COMING SOON
+For a full list of planets, star and system parameters see Appendix B (pg 16-19) of the [ExoData paper](http://arxiv.org/pdf/1510.02738v1.pdf).
 
 # Units
 units are handled by the quantities package
@@ -111,45 +116,61 @@ units are handled by the quantities package
 
 You can then access most units and constants such as meters pq.m, astronomical units pq.au etc!
 
-Some astronomy units such as R_e, R_j, R_s (where e is Earth, j is Jupiter and s in the Sun) are not included (yet) in quantities so you need to refer to them as aq.R_e by importing exodata.astroquantities as aq
+Some astronomy units such as R_e, R_j, R_s (where e is Earth, j is Jupiter and s in the Sun) are not included (yet) in quantities so you need to refer to them as aq.R_e by importing exodata.astroquantities
 
-There are also M_e, M_s, M_j.
+	import exodata.astroquantities as aq
+	
+exodata.astroquantities includes all pq units so only the *aq* import is necessary
 
-Please read more about [Quantities](https://github.com/python-quantities/python-quantities)
+There are also other units such as mass (M_e, M_s and M_j).
+
+You can read more about the Quantities package [here](https://github.com/python-quantities/python-quantities).
 
 # Equations
 
-The module contains several equations at the moment and I plan to add many more. If you want one why not write it yourself and send me a pull request or open an issue with a request.
+The equations module contains many exolanet equations that be be used independantly or called directly from a planet or star object. Most equations are classes that when given all parameters bar one will calculate the missing one.
 
+	>>> from exodata.equations import KeplersThirdLaw
+	>>> KeplersThirdLaw(a=0.01488*aq.au, M_s=0.176*aq.M_s).P
+	array(1.5796961419409112) * d
+	
+	>>> KeplersThirdLaw(a=0.015*aq.au, P=1.58*aq.d).M_s
+	array(0.18022315673929146) * M_s
+	
+	>>> gj1214b = exocat.planetDict['Gliese 1214 b']
+	>>> gj1214b.calcSurfaceGravity()
+	array(7.929735778087916) * m/s**2
 
-	kepler60b.calcSurfaceGravity()
-	>>> array(10.318715585166878) * m/s**2
+	>>> gj1214b.calcLogg()
+	2.8992587166958947
 
-	kepler60b.calcLogg()
-	>>> 6.93912947949421
-
-	gj1214.calcTansitDuration()
-	>>> array(54.73064331158644) * min
-
-see COMING SOON
+	>>>> gj1214b.calcTransitDuration(circular=True)
+	array(52.74732533968579) * min
 
 # Assumptions
 
-Currently they are stored in the dictionary exoplanetcatalogue.assumptions.planetAssumptions.
+These are how a planet is classified acoridng to mass, radius and temperature along with assumptions for the albedo and mean molecular weight based on these parameters. Currently they are stored in the dictionary `exodata.assumptions.planetAssumptions`.
 
-Overwriting these values (or adding new ones) will change the output.
+Overwriting these values (or adding new ones) will change the output. for example, looking at the mass types we can see a list defining the limits. Editing this list to change the values or add new classes will chnage how planet are classified in the program.
 
-Please see assumptions.py for how to do this.
+	>>> exodata.assumptions.planetAssumptions['massType']
+	[(array(10.0) * M_e, 'Super-Earth'), (array(20.0) * M_e, 'Neptune'), (inf, 'Jupiter')]
 
-# OECPY Global Parameters
-A few options can be set within OECPY to change the behaviour of the program. By default if a quantity is missing for a parameter it is calculated if possible. For example if you use .a for the semi-major axis and it is not present in the catalogue it will be calculated using the period and stellar mass and returned. this happens silently except for raising the `Calculated SMA` flag. (see flags). You can turn this behaviour off by typing
+# ExoData Global Parameters
+A few options can be set within ExoData to change the global behaviour of the program. By default if a quantity is missing for a parameter it is calculated if possible. For example if you use .a for the semi-major axis and it is not present in the catalogue it will be calculated using the period and stellar mass and returned. This happens silently except for raising the `Calculated SMA` flag. (see flags). You can turn this behaviour off by typing
 
-`exodata.params.estimateMissingValues = False`
+	exodata.params.estimateMissingValues = False
 
 This will only take scope in the current project so if you close the interpreter it will reset to True.
 
 # Plotting
+
 ExoData features a plotting library for planet and stellar parameters in a scatter plot and per parameter bin. Please see the [plots section](https://github.com/ryanvarley/open-exoplanet-catalogue-python/wiki/Plotting) of the documentation for further information. Note that all plots are shown here were produced after `import seaborn` which changes the plot style.
+
+Note if you want to replicate these plots in the default python interpretor you will need to **import pyplot and issue the show command after each plotting code** shown below. You will also need to close the open plot before typing any further commands.
+
+	import matplotlib.pyplot as plt
+	plt.show()
 
 ### Discovery Method by Year
 
@@ -184,7 +205,7 @@ You can also plot this as a pie chart
 
 ```python
 exodata.plots.DataPerParameterBin(exocat.planets, 'e',
-      (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotPieChart)
+      (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotPieChart()
 ```
 
 ![Planet Eccentricity](https://github.com/ryanvarley/ExoData/blob/images/exodata-orbital-eccentricity-pie-5.png?raw=true "Planet Eccentricity Pie Chart")
