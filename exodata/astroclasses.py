@@ -13,7 +13,7 @@ from . import equations as eq
 from . import astroquantities as aq
 from . import assumptions as assum
 from . import flags
-from . import params
+from . import params as ed_params
 
 logger = logging.getLogger('')
 
@@ -167,7 +167,7 @@ class PlanetAndBinaryCommon(_BaseObject):
         period = self.getParam('period')
         if period is not np.nan:
             return period
-        elif params.estimateMissingValues:
+        elif ed_params.estimateMissingValues:
             self.flags.addFlag('Calculated Period')
             return self.calcPeriod()
         else:
@@ -176,7 +176,7 @@ class PlanetAndBinaryCommon(_BaseObject):
     @P.setter
     def P(self, P):
         P = P.rescale(aq.day)
-        params['period'] = P
+        self.params['period'] = P
 
     def calcPeriod(self):
         raise NotImplementedError('Only implemented for Binary and Planet child classes')
@@ -184,7 +184,7 @@ class PlanetAndBinaryCommon(_BaseObject):
     @property
     def a(self):
         sma = self.getParam('semimajoraxis')
-        if sma is np.nan and params.estimateMissingValues:
+        if sma is np.nan and ed_params.estimateMissingValues:
             if self.getParam('period') is not np.nan:
                 sma = self.calcSMA()  # calc using period
                 self.flags.addFlag('Calculated SMA')
@@ -389,7 +389,7 @@ class StarAndPlanetCommon(_BaseObject):
 
         if not paramTemp is np.nan:
             return paramTemp
-        elif params.estimateMissingValues:
+        elif ed_params.estimateMissingValues:
             self.flags.addFlag('Calculated Temperature')
             return self.calcTemperature()
         else:
@@ -467,7 +467,7 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
         """
         # TODO this will only work from a star or below. good thing?
         d = self.parent.d
-        if params.estimateMissingValues:
+        if ed_params.estimateMissingValues:
             if d is np.nan:
                 d = self.estimateDistance()
                 if d is not np.nan:
@@ -498,7 +498,7 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
         mag_str = 'mag'+mag_letter
         mag_val = self.getParam(mag_str)
 
-        if isNanOrNone(mag_val) and params.estimateMissingValues:  # then we need to estimate it!
+        if isNanOrNone(mag_val) and ed_params.estimateMissingValues:  # then we need to estimate it!
             # old style dict comprehension for python 2.6
             mag_dict = dict(('mag'+letter, self.getParam('mag'+letter)) for letter in catalogue_mags)
             mag_class = Magnitude(self.spectralType, **mag_dict)
@@ -1308,6 +1308,6 @@ def _dec_string_to_unit(dec_string):
     return dec_unit
 
 
-class HierarchyError(params.ExoDataError):
+class HierarchyError(ed_params.ExoDataError):
     pass
 
