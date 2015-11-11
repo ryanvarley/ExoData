@@ -376,7 +376,6 @@ class StarAndPlanetCommon(_BaseObject):
 
     @R.setter
     def R(self, R):
-        R = R * aq.R_j
         self.params['radius'] = R
 
     @property
