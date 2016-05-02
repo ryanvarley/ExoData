@@ -2,6 +2,6 @@ numpy
 quantities
 nose
 matplotlib
-hypothesis
+hypothesis==1.10.1
 seaborn
 requests
