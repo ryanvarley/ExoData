@@ -2,7 +2,7 @@ import unittest
 
 import math
 
-from hypothesis import given, example, assume, Settings, Verbosity
+from hypothesis import given, example, assume
 from hypothesis.strategies import floats
 
 from .. import astroquantities as aq
@@ -12,8 +12,6 @@ from ..equations import ScaleHeight, MeanPlanetTemp, StellarLuminosity, ratioTer
 
 from .. import equations as eq
 from .patches import TestCase
-
-Settings.default.verbosity = Verbosity.verbose
 
 class Test_ExoDataEqn(TestCase):
 
@@ -45,7 +43,7 @@ class Test_ScaleHeight(TestCase):
 
         self.assertAlmostEqual(answer, result, 2)
 
-    @given(floats(0,20000), floats(0,1), floats(0,1000))
+    @given(floats(500,20000), floats(0.001,1), floats(0.1,1000))
     def test_can_derive_other_vars_from_one_calculated(self, T_eff, mu, g):
         """ We calculate H from a range of values given by hypothesis and then see if we can accurately calculate the
          other variables given this calculated value. This tests the rearrangements of the equation are correct.
