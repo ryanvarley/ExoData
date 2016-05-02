@@ -49,6 +49,8 @@ If you want to keep track of this repo in a GUI way, I recommend [sourcetree](ht
 
 # Usage
 
+This section was generated using the OEC version dc8c08a4ba0c64dd039e96c801d12f17c82a7ff3 (1st May 2016)
+
 	import exodata
 	databaseLocation = '/git/open_exoplanet_catalogue/systems/' # Your path here (to systems folder)
 	exocat = exodata.OECDatabase(databaseLocation)
@@ -73,38 +75,38 @@ You can now perform more advanced queries such as fetching all planets whose rad
 
 	>>> superEarths = [planet for planet in exocat.planets if planet.R < (10 * aq.R_e)]
 	>>> len(superEarths)
-	1052
+	1096
 
 To choose a planet
 
 	>>> kepler60b = exocat.searchPlanet('kepler60b')
 	>>> print kepler60b
 	Planet('Kepler-60 b')
-	
+
 	>>> exocat.searchPlanet('kepler60')  # or all the kepler 60 planets
 	[Planet('Kepler-60 c'), Planet('Kepler-60 b'), Planet('Kepler-60 d')]
-	
+
 	>>> kepler60b.star  # to get the star kepler-60
 	Star('Kepler-60')
 
 	>>> kepler60b.R  # to get the planetary radius
-	array(0.207777) * R_j  # this works like an array in most functions
+	array(0.196) * R_j  # this works like an array in most functions
 
 	>>> kepler60b.R.rescale(aq.R_e) # See Units section for more
-	array(2.280002801287082) * R_e
+	array(2.150770051797206) * R_e
 
-	>>> kepler60b.R.rescale(pq.m) # import quantities as pq (se units section)
-	array(14525897.847) * m
+	>>> kepler60b.R.rescale(aq.m)
+	array(13702556.0) * m
 
 	>>> kepler60b.dec
-	<Latitude 45.788888888888884 deg>
-	
+	<Latitude 42.265011111111114 deg>
+
 	>>> kepler60b.dec.dms  # or in degrees, minutes and seconds
-	dms_tuple(d=45.0, m=47.0, s=19.999999999983515)
-	
+	dms_tuple(d=42.0, m=15.0, s=54.040000000011901)
+
 	>>> gj1214b = exocat.searchPlanet('gj1214')
 	Planet('Gliese 1214 b')
-	
+
 	>>> exocat.planetDict['Gliese 1214 b']  # or with the exact name
 	Planet('Gliese 1214 b')
 
@@ -119,7 +121,7 @@ You can then access most units and constants such as meters pq.m, astronomical u
 Some astronomy units such as R_e, R_j, R_s (where e is Earth, j is Jupiter and s in the Sun) are not included (yet) in quantities so you need to refer to them as aq.R_e by importing exodata.astroquantities
 
 	import exodata.astroquantities as aq
-	
+
 exodata.astroquantities includes all pq units so only the *aq* import is necessary
 
 There are also other units such as mass (M_e, M_s and M_j).
@@ -132,11 +134,11 @@ The equations module contains many exolanet equations that be be used independan
 
 	>>> from exodata.equations import KeplersThirdLaw
 	>>> KeplersThirdLaw(a=0.01488*aq.au, M_s=0.176*aq.M_s).P
-	array(1.5796961419409112) * d
-	
+	array(1.579696141940911) * d
+
 	>>> KeplersThirdLaw(a=0.015*aq.au, P=1.58*aq.d).M_s
-	array(0.18022315673929146) * M_s
-	
+	array(0.18022315673929148) * M_s
+
 	>>> gj1214b = exocat.planetDict['Gliese 1214 b']
 	>>> gj1214b.calcSurfaceGravity()
 	array(7.929735778087916) * m/s**2
@@ -178,13 +180,14 @@ Note if you want to replicate these plots in the default python interpretor you 
 dm_plot = exodata.plots.DiscoveryMethodByYear(exocat.planets, methods_to_plot=('RV', 'transit', 'Other'))
 dm_plot.plot(method_labels=('Radial Velocity', 'Transit Method', 'Other'))
 ```
-![Discovery method by year](https://github.com/ryanvarley/ExoData/blob/images/discovery_year_method.png?raw=true "Discovery method by year")
+![Discovery method by year](https://github.com/ryanvarley/ExoData/blob/images/discovery_year_method_v2.png?raw=true "Discovery method by year")
 
 ### Planet Mass with Planet Radius
 ```python
 exodata.plots.GeneralPlotter(exocat.planets, 'R', 'M', yaxislog=True).plot()
+plt.xlim(0, 2.5)
 ```
-![Planet Mass with Planet Radius](https://github.com/ryanvarley/ExoData/blob/images/planetR-M-4.png?raw=true "Planet Mass with Planet Radius Plot")
+![Planet Mass with Planet Radius](https://github.com/ryanvarley/ExoData/blob/images/planetR-M_v5.png?raw=true "Planet Mass with Planet Radius Plot")
 
 ### Stellar V Magnitude with Planet Radius
 ```python
@@ -192,14 +195,14 @@ exodata.plots.GeneralPlotter(exocat.planets, 'R', 'star.magV',
                             xunit=aq.R_e, xaxislog=True).plot()
 ```
 
-![Stellar V Magnitude with Planet Radius](https://github.com/ryanvarley/ExoData/blob/images/planetR-starMagV-4.png "Stellar V Magnitude with Planet Radius Plot")
+![Stellar V Magnitude with Planet Radius](https://github.com/ryanvarley/ExoData/blob/images/planetR-starMagV_v5.png "Stellar V Magnitude with Planet Radius Plot")
 
 ### Planet Eccentricity
 ```python
 exodata.plots.DataPerParameterBin(exocat.planets, 'e',
       (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotBarChart(label_rotation=45)
 ```
-![Planet Eccentricity](https://github.com/ryanvarley/ExoData/blob/images/exodata-orbital-eccentricity-4.png "Planet Eccentricity Plot")
+![Planet Eccentricity](https://github.com/ryanvarley/ExoData/blob/images/exodata-orbital-eccentricity_v5.png "Planet Eccentricity Plot")
 
 You can also plot this as a pie chart
 
@@ -208,7 +211,7 @@ exodata.plots.DataPerParameterBin(exocat.planets, 'e',
       (0, 0, 0.05, 0.1, 0.2, 0.4, float('inf'))).plotPieChart()
 ```
 
-![Planet Eccentricity](https://github.com/ryanvarley/ExoData/blob/images/exodata-orbital-eccentricity-pie-5.png?raw=true "Planet Eccentricity Pie Chart")
+![Planet Eccentricity](https://github.com/ryanvarley/ExoData/blob/images/exodata-orbital-eccentricity-pie_v6.png?raw=true "Planet Eccentricity Pie Chart")
 
 Plots can also be large (i.e. for presentations), and you can change the color easily with normal *matplotlib* syntax
 
@@ -216,7 +219,7 @@ Plots can also be large (i.e. for presentations), and you can change the color e
 exodata.plots.DataPerParameterBin(exocat.planets, 'M',
     (0, 0.2, 0.5, 1, 2, 3, 6, 12, float('inf')), size='large').plotBarChart(c='r')
 ```
-![Planet Eccentricity](https://github.com/ryanvarley/ExoData/blob/images/exodata-orbital-eccentricity-large-4.png?raw=true "Planet Eccentricity Plot Large")
+![Planet Eccentricity](https://github.com/ryanvarley/ExoData/blob/images/exodata-orbital-eccentricity-large_v5.png?raw=true "Planet Eccentricity Plot Large")
 
 # Licence
 
