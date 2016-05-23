@@ -1,19 +1,25 @@
 """
-Contains code for simulating observations and calculating signal to noise of various targets.
+Contains code for simulating observations and calculating signal to noise of
+various targets.
 
-I have changed the logic of equations in this module. Each equation is now a class in which you can give it n-1 of
-the parameters and then ask for the remaining one via the variable.
+I have changed the logic of equations in this module. Each equation is now a
+class in which you can give it n-1 of the parameters and then ask for the
+ remaining one via the variable.
 
-Equations are named based on their main purpose or common name. I.e the equation scale height is
-H = \\frac{k T_eff}{\mu g} even though we could use it to calculate g, given the other parameters.
+Equations are named based on their main purpose or common name. I.e the equation
+scale height is H = \\frac{k T_eff}{\mu g} even though we could use it to
+calculate g, given the other parameters.
 
-Equations are designed to be user friendly and accurate, not fast. This means if you are using this as part of a large
-simulation and use exodata to generate initial parameter you'll be fine, if however you are running a certain equation
-millions of times it may be worth looking at for optimisation, without all the checking and overhead we do here.
+Equations are designed to be user friendly and accurate, not fast. This means
+if you are using this as part of a large simulation and use exodata to generate
+initial parameter you'll be fine, if however you are running a certain equation
+millions of times it may be worth looking at for optimisation, without all the
+ checking and overhead we do here.
 
 **Abbreviations used in this module**
 
-Where abbreviations are ambiguous, i.e R could be the radius of anything, we use subscript p for planet and s for star
+Where abbreviations are ambiguous, i.e R could be the radius of anything, we use
+subscript p for planet and s for star
 
 * R_p - Planetary Radius
 * M_p - Planetary Mass
@@ -47,25 +53,31 @@ G = const.Newtonian_constant_of_gravitation
 
 _rootdir = os.path.dirname(__file__)
 
+
 class ExoDataEqn(object):
 
     def __init__(self):
         self.vars = (None,)
 
     def __repr__(self):
-        vs = ['{}={}'.format(v, eval('self._{}'.format(v)), self) for v in self.vars if v is not None]
+        vs = ['{}={}'.format(v, eval('self._{}'.format(v)), self)
+              for v in self.vars if v is not None]
         return '{}({})'.format(self.__class__.__name__, ', '.join(vs))  # skip final ', '
+
 
 class ScaleHeight(ExoDataEqn):
 
     def __init__(self, T_eff=None, mu=None, g=None, H=None):
-        """ Uses the scale height equation to calculate a parameter given the others.
+        """ Uses the scale height equation to calculate a parameter given the
+        others.
 
         .. math::
             H = \\frac{k T_eff}{\mu g}
 
-        Where H is the scale height of the planets atmosphere, :math:`T_{eff}` is the planetary effective temperature,
-        :math:`\mu` is the mean molecular weight of the planetary atmosphere and g is the planets surface gravity.
+        Where H is the scale height of the planets atmosphere, :math:`T_{eff}`
+        is the planetary effective temperature,
+        :math:`\mu` is the mean molecular weight of the planetary atmosphere and
+        g is the planets surface gravity.
 
         :param T_eff: Effective temperature of the planet
         :param mu: mean molecular weight for the atmosphere
@@ -246,9 +258,10 @@ class MeanPlanetTemp(ExoDataEqn):
         epsilon = self._epsilon
 
         if epsilon is None:
-            epsilon = (1-A)/(T_p / (T_s * sqrt(R_s/(2*a))))**4
+            epsilon = (1 - A) / (T_p / (T_s * sqrt(R_s / (2 * a)))) ** 4
 
         return epsilon.rescale(aq.dimensionless)
+
 
 class StellarLuminosity(ExoDataEqn):
 
@@ -258,8 +271,9 @@ class StellarLuminosity(ExoDataEqn):
         .. math::
             L_\star = 4\pi R^2_\star \sigma T^4_\star
 
-        Where :math:`L_\star` is the Stellar luminosity, :math:`R_\star` stellar radius, :math:`\sigma` Stefan-Boltzman
-        constant, :math:`T_\star` the temperature of the star
+        Where :math:`L_\star` is the Stellar luminosity, :math:`R_\star` stellar
+        radius, :math:`\sigma` Stefan-Boltzman constant, :math:`T_\star` the
+        temperature of the star
 
         :param R: stellar radius
         :param T: effective surface temperature of the star
@@ -313,10 +327,12 @@ class StellarLuminosity(ExoDataEqn):
 
         return T.rescale(aq.K)
 
+
 class KeplersThirdLaw(ExoDataEqn):
 
     def __init__(self, a=None, M_s=None, P=None, M_p=0. * aq.M_j):
-        """ Calculates the period of the orbit using the stellar mass, planet mass and sma using keplers Third Law
+        """Calculates the period of the orbit using the stellar mass, planet
+        mass and sma using keplers Third Law
 
         .. math::
             P = \sqrt{\frac{4\pi^2a^3}{G \left(M_\star + M_p \right)}}
@@ -673,6 +689,7 @@ class TransitDuration(ExoDataEqn):
 
         return duration.rescale(aq.min)
 
+
 class ImpactParameter(ExoDataEqn):
 
     def __init__(self, a=None, R_s=None, i=None, b=None):
@@ -699,7 +716,7 @@ class ImpactParameter(ExoDataEqn):
         R_s = self._R_s
         i = self._i
 
-        b = (a/R_s) * cos(i.rescale(aq.rad))
+        b = (a / R_s) * cos(i.rescale(aq.rad))
 
         return b.rescale(aq.dimensionless)
 
@@ -721,7 +738,7 @@ class ImpactParameter(ExoDataEqn):
         b = self._b
         i = self._i
 
-        R_s = (a/b) * cos(i.rescale(aq.rad))
+        R_s = (a / b) * cos(i.rescale(aq.rad))
 
         return R_s.rescale(aq.R_s)
 
@@ -805,6 +822,7 @@ def calcRatioTerminatorToStar(params):  # TODO update with new format
 
     return params['delta_F_p_s']
 
+
 def transitDurationCircular(P, R_s, R_p, a, i):
     """ Estimation of the primary transit time. Assumes a circular orbit.
 
@@ -835,26 +853,10 @@ def estimateStellarTemperature(M_s):
     """
     # TODO improve with more x and k values from Cox 2000
     try:
-        temp = (5800*aq.K * float(M_s.rescale(aq.M_s)**0.65)).rescale(aq.K)
+        temp = (5800 * aq.K * float(M_s.rescale(aq.M_s) ** 0.65)).rescale(aq.K)
     except AttributeError:
         temp = np.nan
     return temp
-
-
-def estimateStellarRadius(M_s):
-    """ Estimates radius from mass based on stellar type
-    .. math::
-        R_* = k M^x_*
-    where k is a constant coefficient for each stellar sequence anad x describes the power law of the sequence
-    (Seager & Mallen-Ornelas 2003).
-    """
-
-    x = 0.8
-    k = False
-
-    R = k * M_s^x
-
-    return NotImplementedError
 
 
 def estimateDistance(m, M, Av=0.0):
@@ -874,7 +876,7 @@ def estimateDistance(m, M, Av=0.0):
     except TypeError:
         return np.nan
 
-    d = 10**((m-M+5-Av)/5)
+    d = 10 ** ((m - M + 5 - Av) / 5)
 
     if math.isnan(d):
         return np.nan
@@ -883,10 +885,12 @@ def estimateDistance(m, M, Av=0.0):
 
 
 def _createAbsMagEstimationDict():
-    """ loads magnitude_estimation.dat which is from http://xoomer.virgilio.it/hrtrace/Sk.htm on 24/01/2014 and
-    based on Schmid-Kaler (1982)
+    """ loads magnitude_estimation.dat which is from
+    http://xoomer.virgilio.it/hrtrace/Sk.htm on 24/01/2014 and based on
+    Schmid-Kaler (1982)
 
-    creates a dict in the form [Classletter][ClassNumber][List of values for each L Class]
+    creates a dict in the form [Classletter][ClassNumber][List of values for
+    each L Class]
     """
     magnitude_estimation_filepath = resource_filename(__name__, 'data/magnitude_estimation.dat')
     raw_table = np.loadtxt(magnitude_estimation_filepath, '|S5')
@@ -897,7 +901,8 @@ def _createAbsMagEstimationDict():
             starClass = row[0].decode("utf-8")  # otherwise we get byte ints or b' caused by 2to3
             absMagDict[starClass[0]][int(starClass[1])] = [float(x) for x in row[1:]]
         else:
-            absMagDict[row[0][0]][int(row[0][1])] = [float(x) for x in row[1:]]  # dict of spectral type = {abs mag for each luminosity class}
+            # dict of spectral type = {abs mag for each luminosity class}
+            absMagDict[row[0][0]][int(row[0][1])] = [float(x) for x in row[1:]]
 
     # manually typed from table headers - used to match columns with the L class (header)
     LClassRef = {'V': 0, 'IV': 1, 'III': 2, 'II': 3, 'Ib': 4, 'Iab': 5, 'Ia': 6, 'Ia0': 7}
@@ -929,7 +934,8 @@ def estimateAbsoluteMagnitude(spectralType):
 
     try:
         return absMagDict[classLet][classNum][LNum]
-    except (KeyError, IndexError):  # value not in table. Assume the number isn't there (Key p2.7, Ind p3+)
+    # value not in table. Assume the number isn't there (Key p2.7, Ind p3+)
+    except (KeyError, IndexError):
         try:
             classLookup = absMagDict[classLet]
             values = np.array(list(classLookup.values()))[:, LNum]  # only select the right L Type
@@ -960,12 +966,12 @@ magDict = _createMagConversionDict()
 
 
 def magKtoMagV(*args, **kwargs):
-    """ Converts K magnitude to V magnitude
-    """
-    raise DeprecationWarning("This function has is been phased out in favour of the astroclasses.Magnitude class which can"
-                             " convert between many magnitudes")
+    """ Converts K magnitude to V magnitude."""
+    raise DeprecationWarning(
+        "This function has is been phased out in favour of the"
+        "astroclasses.Magnitude class which can convert between many magnitudes"
+    )
 
-# TODO more orbital equations
 
 class EqnInputError(params.ExoDataError):
     pass
