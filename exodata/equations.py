@@ -1,36 +1,40 @@
 """
-Contains code for simulating observations and calculating signal to noise of
-various targets.
+Exoplanet related equatio. Each equation is a class which takes input of every
+variable bar one and will output the variable left out. They therefore implement
+all permutations of the equation with respect to the variables.
 
-I have changed the logic of equations in this module. Each equation is now a
-class in which you can give it n-1 of the parameters and then ask for the
- remaining one via the variable.
+As an example we choose the equation Kepler's Third Law (KeplersThirdLaw) and
+by defining the values for GJ 1214 b we can calculate the period.
+
+    >>> from exodata.equations import KeplersThirdLaw
+    >>> KeplersThirdLaw(a=0.01488*aq.au, M_s=0.176*aq.M_s).P
+    array(1.579696141940911) * d
 
 Equations are named based on their main purpose or common name. I.e the equation
-scale height is H = \\frac{k T_eff}{\mu g} even though we could use it to
+scale height is :math:`H = \\frac{k T_eff}{\mu g}` even though we could use it to
 calculate g, given the other parameters.
 
-Equations are designed to be user friendly and accurate, not fast. This means
-if you are using this as part of a large simulation and use exodata to generate
-initial parameter you'll be fine, if however you are running a certain equation
-millions of times it may be worth looking at for optimisation, without all the
- checking and overhead we do here.
+Equations are designed to be user friendly and accurate --- not fast. This means
+if you are using this as part of a large simulation and use ExoData to generate
+initial parameters you'll be fine. If however you are running a certain equation
+millions of times it may be worth using your own optimised version.
 
 **Abbreviations used in this module**
 
-Where abbreviations are ambiguous, i.e R could be the radius of anything, we use
-subscript p for planet and s for star
+Where abbreviations are ambiguous (i.e. *R* could be the radius of anything)
+we use the suffix *_p* for the planet and *_s* for the star. A list of
+parameters used is given below.
 
-* R_p - Planetary Radius
-* M_p - Planetary Mass
-* M_s - Stellar Mass
-* R_s - Stellar Radius
-* H - Scale height of the Planets Atmosphere
-* i - orbital inclination
-* e - orbit eccentricity
-* T_eff_s - Effective Temperature of the Star
-* A - Albedo
-* mu - mean molecular weight
+* *R_p* - Planetary Radius
+* *M_p* - Planetary Mass
+* *M_s* - Stellar Mass
+* *R_s* - Stellar Radius
+* *H* - Scale height of the Planets Atmosphere
+* *i* - orbital inclination
+* *e* - orbit eccentricity
+* *T_eff_s* - Effective Temperature of the Star
+* *A* - Albedo
+* *mu* - mean molecular weight
 """
 
 from __future__ import division
@@ -54,7 +58,7 @@ G = const.Newtonian_constant_of_gravitation
 _rootdir = os.path.dirname(__file__)
 
 
-class ExoDataEqn(object):
+class _ExoDataEqn(object):
 
     def __init__(self):
         self.vars = (None,)
@@ -65,14 +69,14 @@ class ExoDataEqn(object):
         return '{}({})'.format(self.__class__.__name__, ', '.join(vs))  # skip final ', '
 
 
-class ScaleHeight(ExoDataEqn):
+class ScaleHeight(_ExoDataEqn):
 
     def __init__(self, T_eff=None, mu=None, g=None, H=None):
-        """ Uses the scale height equation to calculate a parameter given the
+        r""" Uses the scale height equation to calculate a parameter given the
         others.
 
         .. math::
-            H = \\frac{k T_eff}{\mu g}
+            H = \frac{k T_{eff}{\mu g}
 
         Where H is the scale height of the planets atmosphere, :math:`T_{eff}`
         is the planetary effective temperature,
@@ -82,10 +86,10 @@ class ScaleHeight(ExoDataEqn):
         :param T_eff: Effective temperature of the planet
         :param mu: mean molecular weight for the atmosphere
         :param g: surface gravity of the planet
-        :return: H (scale Height) of the atmosphere
+        :return: H (scale height) of the atmosphere
         """
 
-        ExoDataEqn.__init__(self)
+        _ExoDataEqn.__init__(self)
 
         self._T_eff = T_eff
         self._mu = mu
@@ -149,7 +153,7 @@ class ScaleHeight(ExoDataEqn):
 
         return g.rescale(aq.m / aq.s**2)
 
-class MeanPlanetTemp(ExoDataEqn):
+class MeanPlanetTemp(_ExoDataEqn):
 
     def __init__(self, A, T_s, R_s, a, epsilon=0.7, T_p=None):
         """ Calculate the equilibrium planet temperature
@@ -158,7 +162,7 @@ class MeanPlanetTemp(ExoDataEqn):
 
         assumes epsilon = 0.7 by default http://arxiv.org/pdf/1111.1455v2.pdf
         """
-        ExoDataEqn.__init__(self)
+        _ExoDataEqn.__init__(self)
 
         self._A = A
         self._T_s = T_s
@@ -263,7 +267,7 @@ class MeanPlanetTemp(ExoDataEqn):
         return epsilon.rescale(aq.dimensionless)
 
 
-class StellarLuminosity(ExoDataEqn):
+class StellarLuminosity(_ExoDataEqn):
 
     def __init__(self, R=None, T=None, L=None):
         """ Calculate stellar luminosity
@@ -280,7 +284,7 @@ class StellarLuminosity(ExoDataEqn):
         :param L: Stellar luminosity
         """
 
-        ExoDataEqn.__init__(self)
+        _ExoDataEqn.__init__(self)
 
         self._L = L
         self._R = R
@@ -328,7 +332,7 @@ class StellarLuminosity(ExoDataEqn):
         return T.rescale(aq.K)
 
 
-class KeplersThirdLaw(ExoDataEqn):
+class KeplersThirdLaw(_ExoDataEqn):
 
     def __init__(self, a=None, M_s=None, P=None, M_p=0. * aq.M_j):
         """Calculates the period of the orbit using the stellar mass, planet
@@ -338,7 +342,7 @@ class KeplersThirdLaw(ExoDataEqn):
             P = \sqrt{\frac{4\pi^2a^3}{G \left(M_\star + M_p \right)}}
         """
 
-        ExoDataEqn.__init__(self)
+        _ExoDataEqn.__init__(self)
 
         self._a = a
         self._M_s = M_s
@@ -402,7 +406,7 @@ class KeplersThirdLaw(ExoDataEqn):
 
         return M_p.rescale(aq.M_j)
 
-class SurfaceGravity(ExoDataEqn):
+class SurfaceGravity(_ExoDataEqn):
 
     def __init__(self, M=None, R=None, g=None):
         """ Calculates the surface acceleration due to gravity on the planet
@@ -418,7 +422,7 @@ class SurfaceGravity(ExoDataEqn):
         :return: g - acceleration due to gravity * m / s**2
         """
 
-        ExoDataEqn.__init__(self)
+        _ExoDataEqn.__init__(self)
 
         self._M = M
         self._R = R
@@ -463,14 +467,14 @@ class SurfaceGravity(ExoDataEqn):
 
         return R.rescale(aq.R_j)
 
-class Logg(ExoDataEqn):
+class Logg(_ExoDataEqn):
 
     def __init__(self, M=None, R=None, logg=None):
         """ Calculates the surface acceleration due to gravity on the planet as logg, the base 10 logarithm of g in cgs
         units. This function uses :py:func:`surfaceGravity` and then rescales it to cgs and takes the log
         """
 
-        ExoDataEqn.__init__(self)
+        _ExoDataEqn.__init__(self)
 
         self._M = M
         self._R = R
@@ -518,11 +522,11 @@ class Logg(ExoDataEqn):
 
         return R.rescale(aq.R_j)
 
-class TransitDepth(ExoDataEqn):
+class TransitDepth(_ExoDataEqn):
 
     def __init__(self, R_s=None, R_p=None, depth=None):
 
-        ExoDataEqn.__init__(self)
+        _ExoDataEqn.__init__(self)
 
         self._R_s = R_s
         self._R_p = R_p
@@ -568,7 +572,7 @@ class TransitDepth(ExoDataEqn):
         return R_p.rescale(aq.R_j)
 
 
-class Density(ExoDataEqn):
+class Density(_ExoDataEqn):
 
     def __init__(self, M=None, R=None, density=None):
         """ Calculates the density in g/cm**3
@@ -577,7 +581,7 @@ class Density(ExoDataEqn):
         :return:
         """
 
-        ExoDataEqn.__init__(self)
+        _ExoDataEqn.__init__(self)
 
         self._M = M
         self._R = R
@@ -625,7 +629,7 @@ class Density(ExoDataEqn):
         return R.rescale(aq.R_j)
 
 
-class TransitDuration(ExoDataEqn):
+class TransitDuration(_ExoDataEqn):
 
     def __init__(self, P=None, a=None, Rp=None, Rs=None, i=None, e=None, w=None):
         """ Eccentric transit duration equation from Kipping (2011)
@@ -652,7 +656,7 @@ class TransitDuration(ExoDataEqn):
         :param w:
         """
 
-        ExoDataEqn.__init__(self)
+        _ExoDataEqn.__init__(self)
 
         self.P = P
         self.a = a
@@ -690,7 +694,7 @@ class TransitDuration(ExoDataEqn):
         return duration.rescale(aq.min)
 
 
-class ImpactParameter(ExoDataEqn):
+class ImpactParameter(_ExoDataEqn):
 
     def __init__(self, a=None, R_s=None, i=None, b=None):
         """ projected distance between the planet and star centers during mid transit
@@ -699,7 +703,7 @@ class ImpactParameter(ExoDataEqn):
         (Seager & Mallen-Ornelas 2003).
         """
 
-        ExoDataEqn.__init__(self)
+        _ExoDataEqn.__init__(self)
 
         self._a = a
         self._R_s = R_s

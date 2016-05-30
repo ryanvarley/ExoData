@@ -2,6 +2,7 @@ ExoData
 =======
 
 This python interface serves as a link between the raw XML of the `Open Exoplanet Catalogue <https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue>`_. It allows:
+
 * Searching of planets (including alternate names)
 * Easy reference of planet parameters ie GJ1214b.ra, GJ1214b.T, GJ1214b.R
 * Calculation of values like the transit duration.
@@ -10,24 +11,8 @@ This python interface serves as a link between the raw XML of the `Open Exoplane
 * Easily navigate hierarchy (ie from planet to star or star to planets)
 * Availability of system parameters in planets (ie ra, dec, d (distance))
 
-If you use ExoData in a scientific publication, please include a reference to this paper `2015arXiv151002738V <http://arxiv.org/abs/1510.02738>`_.
-
-# Installation
-This module depends on
-* `Quantities <https://github.com/python-quantities/python-quantities>`_
-* `numpy <http://www.numpy.org/>`_
-* nose
-* matplotlib
-* requests
-* hypothesis
-* seaborn
-* `Open Exoplanet Catalogue <https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue>`_ (somewhere on your system)
-
-Contents
---------
-
-.. toctree::
-   :maxdepth: 2
+If you use ExoData in a scientific publication, please include a reference to
+this paper `2015arXiv151002738V <http://arxiv.org/abs/1510.02738>`_.
 
 Installation
 ------------
@@ -40,17 +25,41 @@ Or download the `repo <https://github.com/ryanvarley/ExoData>`_ and run
 
 	python setup.py install
 
-Contribute
-----------
 
-- Issue Tracker: github.com/$project/$project/issues
-- Source Code: github.com/$project/$project
-
-Support
+Modules
 -------
+ExoData is split into a series of modules dealing with the exoplanet database,
+equations, plots and units.
 
-If you are having issues, please let us know.
-We have a mailing list located at: project@google-groups.com
++-----------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+| Module          | Description                                                                                                                                         |
++=================+=====================================================================================================================================================+
+| Assumptions     | Holds classification assumptions such as at what mass or radius a planet is defined as a super-Earth.                                               |
++-----------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+| Astroclasses    | Classes for the System, Binary, Star and Planet object types.                                                                                       |
++-----------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+| Astroquantities | Expands the *Product Quantities* Python package with astronomical units like Solar Radius and compound units such as :math:`g/cm^3`.                |
++-----------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+| Database        | Holds the database class and the various search methods.                                                                                            |
++-----------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+| Equations       | Implementation of exoplanet related equations including orbital equations, planet and star characterisations and estimations.                       |
++-----------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+| Example         | Generate example systems for testing code.                                                                                                          |
++-----------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+| Flags           | Each object has a flag object attached which lets you know which assumptions have been made such as "calculated temperature".                       |
++-----------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+| Plots           | Plot functions for common plot types that can be used to to easily display data from the catalogue.                                                 |
++-----------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+
+Contents
+--------
+
+.. toctree::
+   :maxdepth: 2
+
+   quickstart
+   equations
+
 
 License
 -------

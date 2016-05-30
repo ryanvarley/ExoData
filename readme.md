@@ -3,6 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/ryanvarley/ExoData/badge.svg)](https://coveralls.io/r/ryanvarley/ExoData)
 
 This python interface (formerly oecpy) serves as a link between the raw XML of the [Open Exoplanet Catalogue](https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue). It allows:
+
 * Searching of planets (including alternate names)
 * Easy reference of planet parameters ie GJ1214b.ra, GJ1214b.T, GJ1214b.R
 * Calculation of values like the transit duration.
@@ -15,6 +16,7 @@ If you use ExoData in a scientific publication, please include a reference to th
 
 # Installation
 This module depends on
+
 * [Quantities](https://github.com/python-quantities/python-quantities)
 * [numpy](http://www.numpy.org/)
 * nose
