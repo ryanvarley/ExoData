@@ -22,3 +22,6 @@ cover/
 *.egg*
 exodata/tests/.hypothesis
 .hypothesis
+docs/_build
+docs/_build_html
+texput.log
