@@ -1,7 +1,9 @@
-ExoData
-=======
+Introduction
+============
 
-This python interface serves as a link between the raw XML of the `Open Exoplanet Catalogue <https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue>`_. It allows:
+This python interface serves as a link between the raw XML of the
+ `Open Exoplanet Catalogue <https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue>`_.
+ It allows:
 
 * Searching of planets (including alternate names)
 * Easy reference of planet parameters ie GJ1214b.ra, GJ1214b.T, GJ1214b.R
@@ -24,6 +26,16 @@ Install ExoData by running:
 Or download the `repo <https://github.com/ryanvarley/ExoData>`_ and run
 
 	python setup.py install
+
+
+Getting Started
+---------------
+
+These docs are a work in progress and quite incomplete. The best place to start
+at present is the readme on the project
+`github page <https://github.com/ryanvarley/ExoData/blob/master/readme.md>`_.
+If you want more information the `paper <http://arxiv.org/abs/1510.02738>`_
+gives some more information and examples.
 
 
 Modules
@@ -57,7 +69,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   quickstart
+   index
    equations
 
 

@@ -11,8 +11,8 @@ by defining the values for GJ 1214 b we can calculate the period.
     array(1.579696141940911) * d
 
 Equations are named based on their main purpose or common name. I.e the equation
-scale height is :math:`H = \\frac{k T_eff}{\mu g}` even though we could use it to
-calculate g, given the other parameters.
+scale height is :math:`H = \frac{k T_{eff}}{\mu g}` even though we could use it
+to calculate g, given the other parameters.
 
 Equations are designed to be user friendly and accurate --- not fast. This means
 if you are using this as part of a large simulation and use ExoData to generate
@@ -29,7 +29,7 @@ parameters used is given below.
 * *M_p* - Planetary Mass
 * *M_s* - Stellar Mass
 * *R_s* - Stellar Radius
-* *H* - Scale height of the Planets Atmosphere
+* *H* - Scale height
 * *i* - orbital inclination
 * *e* - orbit eccentricity
 * *T_eff_s* - Effective Temperature of the Star
@@ -66,7 +66,9 @@ class _ExoDataEqn(object):
     def __repr__(self):
         vs = ['{}={}'.format(v, eval('self._{}'.format(v)), self)
               for v in self.vars if v is not None]
-        return '{}({})'.format(self.__class__.__name__, ', '.join(vs))  # skip final ', '
+        return '{}({})'.format(
+            self.__class__.__name__,
+            ', '.join(vs))  # skip final ', '
 
 
 class ScaleHeight(_ExoDataEqn):
@@ -123,7 +125,7 @@ class ScaleHeight(_ExoDataEqn):
         T_eff = self._T_eff
 
         if T_eff is None:
-            T_eff = (H * mu * g)/const.k
+            T_eff = (H * mu * g) / const.k
 
         return T_eff.rescale(aq.K)
 
@@ -153,6 +155,7 @@ class ScaleHeight(_ExoDataEqn):
 
         return g.rescale(aq.m / aq.s**2)
 
+
 class MeanPlanetTemp(_ExoDataEqn):
 
     def __init__(self, A, T_s, R_s, a, epsilon=0.7, T_p=None):
@@ -171,7 +174,8 @@ class MeanPlanetTemp(_ExoDataEqn):
         self._a = a
         self._epsilon = epsilon
 
-        self.vars = ('A', 'T_s', 'T_p', 'R_s', 'a', 'epsilon')  # list of input variables
+        self.vars = ('A', 'T_s', 'T_p', 'R_s', 'a',
+                     'epsilon')  # list of input variables
 
         if (A, T_s, R_s, a, epsilon, T_p).count(None) > 1:
             raise EqnInputError("You must give all parameters bar one")
@@ -187,7 +191,7 @@ class MeanPlanetTemp(_ExoDataEqn):
         epsilon = self._epsilon
 
         if T_p is None:
-            T_p = T_s * ((1-A)/epsilon)**(1/4) * sqrt(R_s/(2*a))
+            T_p = T_s * ((1 - A) / epsilon)**(1 / 4) * sqrt(R_s / (2 * a))
 
         return T_p.rescale(aq.degK)
 
@@ -202,7 +206,7 @@ class MeanPlanetTemp(_ExoDataEqn):
         epsilon = self._epsilon
 
         if A is None:
-            A = 1 - epsilon * (T_p / (T_s * sqrt(R_s/(2*a))))**4
+            A = 1 - epsilon * (T_p / (T_s * sqrt(R_s / (2 * a))))**4
 
         return A.rescale(aq.dimensionless)
 
@@ -217,7 +221,7 @@ class MeanPlanetTemp(_ExoDataEqn):
         epsilon = self._epsilon
 
         if T_s is None:
-            T_s = T_p / (((1-A)/epsilon)**(1/4) * sqrt(R_s/(2*a)))
+            T_s = T_p / (((1 - A) / epsilon)**(1 / 4) * sqrt(R_s / (2 * a)))
 
         return T_s.rescale(aq.K)
 
@@ -232,7 +236,7 @@ class MeanPlanetTemp(_ExoDataEqn):
         epsilon = self._epsilon
 
         if R_s is None:
-           R_s = 2*a*(T_p / (T_s * ((1-A)/epsilon)**(1/4)))**2
+            R_s = 2 * a * (T_p / (T_s * ((1 - A) / epsilon)**(1 / 4)))**2
 
         return R_s.rescale(aq.R_s)
 
@@ -247,7 +251,7 @@ class MeanPlanetTemp(_ExoDataEqn):
         epsilon = self._epsilon
 
         if a is None:
-            a = R_s/(2*(T_p / (T_s * ((1-A)/epsilon)**(1/4)))**2)
+            a = R_s / (2 * (T_p / (T_s * ((1 - A) / epsilon)**(1 / 4)))**2)
 
         return a.rescale(aq.au)
 
@@ -270,7 +274,7 @@ class MeanPlanetTemp(_ExoDataEqn):
 class StellarLuminosity(_ExoDataEqn):
 
     def __init__(self, R=None, T=None, L=None):
-        """ Calculate stellar luminosity
+        r""" Calculate stellar luminosity
 
         .. math::
             L_\star = 4\pi R^2_\star \sigma T^4_\star
@@ -335,7 +339,7 @@ class StellarLuminosity(_ExoDataEqn):
 class KeplersThirdLaw(_ExoDataEqn):
 
     def __init__(self, a=None, M_s=None, P=None, M_p=0. * aq.M_j):
-        """Calculates the period of the orbit using the stellar mass, planet
+        r"""Calculates the period of the orbit using the stellar mass, planet
         mass and sma using keplers Third Law
 
         .. math::
@@ -375,7 +379,7 @@ class KeplersThirdLaw(_ExoDataEqn):
 
         try:
             if a is None:
-                a = ((P**2 * G*(M_s + M_p))/(4*pi**2))**(1./3)
+                a = ((P**2 * G * (M_s + M_p)) / (4 * pi**2))**(1. / 3)
             return a.rescale(aq.au)
         except ValueError:
             return np.nan
@@ -389,7 +393,7 @@ class KeplersThirdLaw(_ExoDataEqn):
         P = self._P
 
         if M_s is None:
-            M_s  = ((4*pi**2 * a**3)/(G*P**2)) - M_p
+            M_s = ((4 * pi**2 * a**3) / (G * P**2)) - M_p
 
         return M_s.rescale(aq.M_s)
 
@@ -402,19 +406,21 @@ class KeplersThirdLaw(_ExoDataEqn):
         P = self._P
 
         if M_p is None:
-            M_p = ((4*pi**2 * a**3)/(G*P**2)) - M_s
+            M_p = ((4 * pi**2 * a**3) / (G * P**2)) - M_s
 
         return M_p.rescale(aq.M_j)
+
 
 class SurfaceGravity(_ExoDataEqn):
 
     def __init__(self, M=None, R=None, g=None):
-        """ Calculates the surface acceleration due to gravity on the planet
+        r""" Calculates the surface acceleration due to gravity on the planet
 
         .. math::
-            g_p = \\frac{GM_p}{R_p^2}
+            g_p = \frac{GM_p}{R_p^2}
 
-        where :math:`g_p` is the acceleration ude to gravity on the planet surface, G is the gravitational constant,
+        where :math:`g_p` is the acceleration ude to gravity on the planet
+        surface, G is the gravitational constant,
         :math:`M_p` planetary mass, :math:`R_p` radius of the planet
 
         :param params: dict containing 'M_p', 'R_p' with units
@@ -439,7 +445,7 @@ class SurfaceGravity(_ExoDataEqn):
         g = self._g
 
         if g is None:
-            g = (G * M)/(R**2)
+            g = (G * M) / (R**2)
 
         return g.rescale(aq.m / aq.s**2)
 
@@ -467,11 +473,13 @@ class SurfaceGravity(_ExoDataEqn):
 
         return R.rescale(aq.R_j)
 
+
 class Logg(_ExoDataEqn):
 
     def __init__(self, M=None, R=None, logg=None):
-        """ Calculates the surface acceleration due to gravity on the planet as logg, the base 10 logarithm of g in cgs
-        units. This function uses :py:func:`surfaceGravity` and then rescales it to cgs and takes the log
+        """Calculates the surface acceleration due to gravity on the planet as
+        logg, the base 10 logarithm of g in cgs units. This function uses
+        :py:func:`surfaceGravity` and then rescales it to cgs and takes the log.
         """
 
         _ExoDataEqn.__init__(self)
@@ -492,7 +500,8 @@ class Logg(_ExoDataEqn):
 
         if logg is None:
             g = SurfaceGravity(M, R).g
-            logg = log10(float(g.rescale(aq.cm / aq.s**2)))  # the float wrapper is needed to remove dimensionality
+            # the float wrapper is needed to remove dimensionality
+            logg = log10(float(g.rescale(aq.cm / aq.s**2)))
 
         return logg
 
@@ -521,6 +530,7 @@ class Logg(_ExoDataEqn):
             R = SurfaceGravity(M, None, g).R
 
         return R.rescale(aq.R_j)
+
 
 class TransitDepth(_ExoDataEqn):
 
@@ -599,7 +609,7 @@ class Density(_ExoDataEqn):
 
         if density is None:
             volume = 4. / 3 * pi * R**3
-            density = (M/volume)
+            density = (M / volume)
 
         return density.rescale(aq.g / aq.cm**3)
 
@@ -624,7 +634,7 @@ class Density(_ExoDataEqn):
         density = self._density
 
         if R is None:
-            R = (M/(density * 4. / 3 * pi))**(1./3)
+            R = (M / (density * 4. / 3 * pi))**(1. / 3)
 
         return R.rescale(aq.R_j)
 
@@ -632,28 +642,21 @@ class Density(_ExoDataEqn):
 class TransitDuration(_ExoDataEqn):
 
     def __init__(self, P=None, a=None, Rp=None, Rs=None, i=None, e=None, w=None):
-        """ Eccentric transit duration equation from Kipping (2011)
+        r"""Eccentric transit duration equation from Kipping (2011).
 
-        Currently only calculates TD given the other values. There is little demand for the rearangements and they
-        are non trivial
+        Currently only calculates TD given the other values. There is little
+        demand for the rearrangements and they are non trivial to implement.
 
         .. math::
             T_{14} = \frac{P}{\pi} \frac{\varrho_{P,T}^2}{\sqrt{1-e^2}}
-            \arcsin{\left( \sqrt{\frac{S^2_{P*} - b^2_{P,T}}{(a_P/R_\star)^2\varrho^2_{P,T} -b^2_{P,T}}}\right)}
+            \arcsin{\left( \sqrt{\frac{S^2_{P*} -
+            b^2_{P,T}}{(a_P/R_\star)^2\varrho^2_{P,T} -b^2_{P,T}}}\right)}
 
             a_R = (a / R_\star)
 
             \varrho_{P,T}(f_p) = \frac{1-e^2_P}{1+e_P \sin(\omega)}
 
             b_{P,T} = (a_P / R_\star)\varrho_{P,T}\cos{i}
-
-        :param P:
-        :param a:
-        :param Rp:
-        :param Rs:
-        :param i:
-        :param e:
-        :param w:
         """
 
         _ExoDataEqn.__init__(self)
@@ -684,12 +687,13 @@ class TransitDuration(_ExoDataEqn):
         RpRs = (self.Rp / self.Rs).rescale(aq.dimensionless)
         e = self.e
 
-        ro_pt = (1-e**2)/(1+e*np.sin(w))
-        b_pt = a*ro_pt*np.cos(i)
+        ro_pt = (1 - e**2) / (1 + e * np.sin(w))
+        b_pt = a * ro_pt * np.cos(i)
         s_ps = 1.0 + RpRs
-        df = np.arcsin(np.sqrt((s_ps**2-b_pt**2)/((a**2)*(ro_pt**2)-b_pt**2)))
+        df = np.arcsin(np.sqrt((s_ps**2 - b_pt**2) /
+                               ((a**2) * (ro_pt**2) - b_pt**2)))
 
-        duration = (P*(ro_pt**2))/(np.pi*np.sqrt(1-e**2))*df
+        duration = (P * (ro_pt**2)) / (np.pi * np.sqrt(1 - e**2)) * df
 
         return duration.rescale(aq.min)
 
@@ -697,9 +701,12 @@ class TransitDuration(_ExoDataEqn):
 class ImpactParameter(_ExoDataEqn):
 
     def __init__(self, a=None, R_s=None, i=None, b=None):
-        """ projected distance between the planet and star centers during mid transit
+        r"""Projected distance between the planet and star centres during
+        mid-transit.
+
         .. math::
             b \equiv \frac{a}{R_*} \cos{i}
+
         (Seager & Mallen-Ornelas 2003).
         """
 
@@ -759,85 +766,61 @@ class ImpactParameter(_ExoDataEqn):
 
 
 def ratioTerminatorToStar(H_p, R_p, R_s):  # TODO add into planet class
-    """ Calculates the ratio of the terminator to the star assuming 5 scale heights large. If you dont know all of the
-    input try :py:func:`calcRatioTerminatorToStar`
+    r"""Calculates the ratio of the terminator to the star assuming 5 scale
+    heights large. If you dont know all of the input try
+    :py:func:`calcRatioTerminatorToStar`
 
     .. math::
-        \Delta F = \\frac{10 H R_p + 25 H^2}{R_\star^2}
+        \Delta F = \frac{10 H R_p + 25 H^2}{R_\star^2}
 
-    Where :math:`\Delta F` is the ration of the terminator to the star, H scale height planet atmosphere,
-    :math:`R_p` radius of the planet, :math:`R_s` radius of the star
+    Where :math:`\Delta F` is the ration of the terminator to the star,
+    H scale height planet atmosphere, :math:`R_p` radius of the planet,
+    :math:`R_s` radius of the star
 
     :param H_p:
     :param R_p:
     :param R_s:
     :return: ratio of the terminator to the star
     """
-    # TODO let user overwrite scale heights and auto function to select on planet type?
 
     deltaF = ((10 * H_p * R_p) + (25 * H_p**2)) / (R_s**2)
     return deltaF.simplified
 
 
 def SNRPlanet(SNRStar, starPlanetFlux, Nobs, pixPerbin, NVisits=1):
-    """ Calculate the Signal to Noise Ratio of the planet atmosphere
+    r""" Calculate the Signal to Noise Ratio of the planet atmosphere
 
     .. math::
-        \\text{SNR}_\\text{planet} = \\text{SNR}_\\text{star} \\times \Delta F \\times \sqrt{N_\\text{obs}}
-        \\times \sqrt{N_\\text{pixPerbin}} \\times \sqrt{N_\\text{visits}}
+        \text{SNR}_\text{planet} = \text{SNR}_\text{star} \times \Delta F \times
+        \sqrt{N_\text{obs}}
+        \times \sqrt{N_\text{pixPerbin}} \times \sqrt{N_\text{visits}}
 
-    Where :math:`\\text{SNR}_\star` SNR of the star detection, :math:`\Delta F` ratio of the terminator to the star,
-    :math:`N_\\text{obs}` number of exposures per visit, :math:`N_\\text{pixPerBin}` number of pixels per wavelength bin
-    , :math:`N_\\text{visits}` number of visits
+    Where :math:`\text{SNR}_\star` SNR of the star detection, :math:`\Delta F`
+    ratio of the terminator to the star, :math:`N_\text{obs}` number of
+    exposures per visit, :math:`N_\text{pixPerBin}` number of pixels per
+    wavelength bin, :math:`N_\text{visits}` number of visits.
 
     :return:
     """
 
-    SNRplanet = SNRStar * starPlanetFlux * sqrt(Nobs) * sqrt(pixPerbin) * sqrt(NVisits)
+    SNRplanet = SNRStar * starPlanetFlux * \
+        sqrt(Nobs) * sqrt(pixPerbin) * sqrt(NVisits)
 
     return SNRplanet
 
 
-def calcRatioTerminatorToStar(params):  # TODO update with new format
-    """ Calculates the ratio of the Terminator to the Star using :py:func:`ratioTerminatorToStar` but calculates all
-    intermediary params on route.
-
-    This is a convenience function which will largely be used over the others as the intermediary params arent often given
-    in detection papers.
-
-    :param params: dict containing ...
-    :return: ratio of the terminator to the star
-    """
-
-    # check for optional params and calc if missing
-
-    if 'H_p' not in params:
-        if 'T_eff_p' not in params:
-            if 'L_s' not in params:
-                params['L_s'] = starLuminosity(params)
-            params['T_eff_p'] = meanPlanetTemp(params)
-
-        if 'g_p' not in params:
-            params['g_p'] = surfaceGravity(params)
-
-        params['H_p'] = scaleHeight(params)
-
-    params['delta_F_p_s'] = ratioTerminatorToStar(params)
-
-    return params['delta_F_p_s']
-
-
 def transitDurationCircular(P, R_s, R_p, a, i):
-    """ Estimation of the primary transit time. Assumes a circular orbit.
+    r"""Estimation of the primary transit time. Assumes a circular orbit.
 
     .. math::
-        T_\\text{dur} = \\frac{P}{\pi}\sin^{-1} \left[\\frac{R_\star}{a}\\frac{\sqrt{(1+k)^2 + b^2}}{\sin{a}} \\right]
+        T_\text{dur} = \frac{P}{\pi}\sin^{-1}
+        \left[\frac{R_\star}{a}\frac{\sqrt{(1+k)^2 + b^2}}{\sin{a}} \right]
 
-    Where :math:`T_\\text{dur}` transit duration, P orbital period, :math:`R_\star` radius of the star,
-    a is the semi-major axis, k is :math:`\\frac{R_p}{R_s}`, b is :math:`\frac{a}{R_*} \cos{i}` (Seager & Mallen-Ornelas 2003)
+    Where :math:`T_\text{dur}` transit duration, P orbital period,
+    :math:`R_\star` radius of the star, a is the semi-major axis,
+    k is :math:`\frac{R_p}{R_s}`, b is :math:`\frac{a}{R_*} \cos{i}`
 
-    :param i: orbital inclination
-    :return:
+    (Seager & Mallen-Ornelas 2003)
     """
 
     if i is nan:
@@ -847,13 +830,15 @@ def transitDurationCircular(P, R_s, R_p, a, i):
     k = R_p / R_s  # lit reference for eclipsing binaries
     b = (a * cos(i)) / R_s
 
-    duration = (P / pi) * arcsin(((R_s * sqrt((1 + k) ** 2 - b ** 2)) / (a * sin(i))).simplified)
+    duration = (P / pi) * arcsin(((R_s * sqrt((1 + k) **
+                                              2 - b ** 2)) / (a * sin(i))).simplified)
 
     return duration.rescale(aq.min)
 
 
 def estimateStellarTemperature(M_s):
-    """ Estimates stellar temperature using the main sequence relationship T ~ 5800*M^0.65 (Cox 2000)??
+    """Estimates stellar temperature using the main sequence relationship
+    T ~ 5800*M^0.65 (Cox 2000).
     """
     # TODO improve with more x and k values from Cox 2000
     try:
@@ -864,8 +849,8 @@ def estimateStellarTemperature(M_s):
 
 
 def estimateDistance(m, M, Av=0.0):
-    """ estimate the distance to star based on the absolute magnitude, apparent magnitude and the
-    absorbtion / extinction
+    """ estimate the distance to star based on the absolute magnitude, apparent
+    magnitude and the absorption / extinction.
 
     :param m: apparent magnitude
     :param M: absolute magnitude
@@ -896,20 +881,39 @@ def _createAbsMagEstimationDict():
     creates a dict in the form [Classletter][ClassNumber][List of values for
     each L Class]
     """
-    magnitude_estimation_filepath = resource_filename(__name__, 'data/magnitude_estimation.dat')
+    magnitude_estimation_filepath = resource_filename(
+        __name__, 'data/magnitude_estimation.dat')
     raw_table = np.loadtxt(magnitude_estimation_filepath, '|S5')
 
-    absMagDict = {'O': {}, 'B': {}, 'A': {}, 'F': {}, 'G': {}, 'K': {}, 'M': {}}
+    absMagDict = {
+        'O': {},
+        'B': {},
+        'A': {},
+        'F': {},
+        'G': {},
+        'K': {},
+        'M': {}}
     for row in raw_table:
         if sys.hexversion >= 0x03000000:
-            starClass = row[0].decode("utf-8")  # otherwise we get byte ints or b' caused by 2to3
-            absMagDict[starClass[0]][int(starClass[1])] = [float(x) for x in row[1:]]
+            # otherwise we get byte ints or b' caused by 2to3
+            starClass = row[0].decode("utf-8")
+            absMagDict[starClass[0]][int(starClass[1])] = [
+                float(x) for x in row[1:]]
         else:
             # dict of spectral type = {abs mag for each luminosity class}
             absMagDict[row[0][0]][int(row[0][1])] = [float(x) for x in row[1:]]
 
-    # manually typed from table headers - used to match columns with the L class (header)
-    LClassRef = {'V': 0, 'IV': 1, 'III': 2, 'II': 3, 'Ib': 4, 'Iab': 5, 'Ia': 6, 'Ia0': 7}
+    # manually typed from table headers - used to match columns with the L
+    # class (header)
+    LClassRef = {
+        'V': 0,
+        'IV': 1,
+        'III': 2,
+        'II': 3,
+        'Ib': 4,
+        'Iab': 5,
+        'Ia': 6,
+        'Ia0': 7}
 
     return absMagDict, LClassRef
 
@@ -917,7 +921,8 @@ absMagDict, LClassRef = _createAbsMagEstimationDict()
 
 
 def estimateAbsoluteMagnitude(spectralType):
-    """ Uses the spectral type to lookup an approximate absolute magnitude for the star.
+    """Uses the spectral type to lookup an approximate absolute magnitude for
+    the star.
     """
 
     from .astroclasses import SpectralType
@@ -927,7 +932,7 @@ def estimateAbsoluteMagnitude(spectralType):
     if specType.classLetter == '':
         return np.nan
     elif specType.classNumber == '':
-        specType.classNumber = 5  # aproximation using mid magnitude value
+        specType.classNumber = 5  # approximation using mid magnitude value
 
     if specType.lumType == '':
         specType.lumType = 'V'  # assume main sequence
@@ -942,22 +947,25 @@ def estimateAbsoluteMagnitude(spectralType):
     except (KeyError, IndexError):
         try:
             classLookup = absMagDict[classLet]
-            values = np.array(list(classLookup.values()))[:, LNum]  # only select the right L Type
+            values = np.array(list(classLookup.values()))[
+                :, LNum]  # only select the right L Type
             return np.interp(classNum, list(classLookup.keys()), values)
         except (KeyError, ValueError):
             return np.nan  # class not covered in table
 
 
 def _createMagConversionDict():
-    """ loads magnitude_conversion.dat which is table A% 1995ApJS..101..117K
+    """Loads magnitude_conversion.dat which is table A% 1995ApJS..101..117K
     """
-    magnitude_conversion_filepath = resource_stream(__name__, 'data/magnitude_conversion.dat')
+    magnitude_conversion_filepath = resource_stream(
+        __name__, 'data/magnitude_conversion.dat')
     raw_table = np.loadtxt(magnitude_conversion_filepath, '|S5')
 
     magDict = {}
     for row in raw_table:
         if sys.hexversion >= 0x03000000:
-            starClass = row[1].decode("utf-8")  # otherwise we get byte ints or b' caused by 2to3
+            # otherwise we get byte ints or b' caused by 2to3
+            starClass = row[1].decode("utf-8")
             tableData = [x.decode("utf-8") for x in row[3:]]
         else:
             starClass = row[1]
@@ -973,8 +981,7 @@ def magKtoMagV(*args, **kwargs):
     """ Converts K magnitude to V magnitude."""
     raise DeprecationWarning(
         "This function has is been phased out in favour of the"
-        "astroclasses.Magnitude class which can convert between many magnitudes"
-    )
+        "astroclasses.Magnitude class which can convert between many magnitudes")
 
 
 class EqnInputError(params.ExoDataError):

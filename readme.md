@@ -14,6 +14,11 @@ This python interface (formerly oecpy) serves as a link between the raw XML of t
 
 If you use ExoData in a scientific publication, please include a reference to this paper [2015arXiv151002738V](http://arxiv.org/abs/1510.02738).
 
+# Documentation
+
+Full documentation is currently being built [here](http://exodata.readthedocs.io/en/latest/).
+For now this page and the [ExoData paper](http://arxiv.org/abs/1510.02738) are the best sources.
+
 # Installation
 This module depends on
 
