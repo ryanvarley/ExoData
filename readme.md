@@ -1,5 +1,6 @@
 # ExoData
 [![Build Status](https://api.travis-ci.org/ryanvarley/ExoData.png?branch=master)](https://travis-ci.org/ryanvarley/ExoData)
+[![Documentation Status](https://readthedocs.org/projects/exodata/badge/?version=latest)](http://exodata.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/ryanvarley/ExoData/badge.svg)](https://coveralls.io/r/ryanvarley/ExoData)
 
 This python interface (formerly oecpy) serves as a link between the raw XML of the [Open Exoplanet Catalogue](https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue). It allows:
