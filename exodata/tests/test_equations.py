@@ -2,31 +2,31 @@ import unittest
 
 import math
 
-from hypothesis import given, example, assume
+from hypothesis import given, assume
 from hypothesis.strategies import floats
 
 from .. import astroquantities as aq
-from ..equations import ScaleHeight, MeanPlanetTemp, StellarLuminosity, ratioTerminatorToStar, SNRPlanet,\
-    SurfaceGravity, transitDurationCircular, Density, KeplersThirdLaw, TransitDepth, estimateDistance, \
-    estimateAbsoluteMagnitude, ExoDataEqn, TransitDuration
+from ..equations import (ScaleHeight, MeanPlanetTemp, StellarLuminosity, ratioTerminatorToStar,
+                         SNRPlanet, SurfaceGravity, transitDurationCircular, Density,
+                         KeplersThirdLaw, TransitDepth, estimateDistance, estimateAbsoluteMagnitude,
+                         _ExoDataEqn, TransitDuration)
 
 from .. import equations as eq
 from .patches import TestCase
 
-class Test_ExoDataEqn(TestCase):
+
+class Test__ExoDataEqn(TestCase):
 
     def test__repr__(self):
-
-        eqn = ExoDataEqn()
-
-        self.assertEqual(eqn.__repr__(), 'ExoDataEqn()')
+        eqn = _ExoDataEqn()
+        self.assertEqual(eqn.__repr__(), '_ExoDataEqn()')
 
 
 class Test_ScaleHeight(TestCase):
 
     def test__repr__works(self):
 
-        eqn = ScaleHeight(100*aq.K, 1*aq.atomic_mass_unit, 9.81 * aq.m / aq.s ** 2)
+        eqn = ScaleHeight(100 * aq.K, 1 * aq.atomic_mass_unit, 9.81 * aq.m / aq.s ** 2)
 
         answer = 'ScaleHeight(H=None, T_eff=100.0 K, mu=1.0 u, g=9.81 m/s**2)'
 
@@ -43,11 +43,12 @@ class Test_ScaleHeight(TestCase):
 
         self.assertAlmostEqual(answer, result, 2)
 
-    @given(floats(500,20000), floats(0.001,1), floats(0.1,1000))
+    @given(floats(500, 20000), floats(0.001, 1), floats(0.1, 1000))
     def test_can_derive_other_vars_from_one_calculated(self, T_eff, mu, g):
-        """ We calculate H from a range of values given by hypothesis and then see if we can accurately calculate the
-         other variables given this calculated value. This tests the rearrangements of the equation are correct.
-        :return:
+        """We calculate H from a range of values given by hypothesis and then
+        see if we can accurately calculate the other variables given this
+        calculated value. This tests the rearrangements of the equation are
+        correct.
         """
         assume(T_eff > 0 and mu > 0 and g > 0)
         inf = float('inf')
@@ -135,7 +136,7 @@ class Test_KeplersThirdLaw(TestCase):
 
         self.assertAlmostEqual(answer, result, 3)
 
-    @given(a=floats(0.0001, 1000), M_s=floats(0.0001, 10000), M_p=floats(0,10000))
+    @given(a=floats(0.0001, 1000), M_s=floats(0.0001, 10000), M_p=floats(0, 10000))
     def test_can_derive_other_vars_from_one_calculated(self, a, M_s, M_p):
         assume(M_s > 0 and a > 0)
         inf = float('inf')
@@ -184,7 +185,7 @@ class Test_logg(TestCase):
         """ Christian et al. 2009 values
         """
         answer = 4.51
-        result = eq.Logg(0.703*aq.M_s, 0.775*aq.R_s).logg
+        result = eq.Logg(0.703 * aq.M_s, 0.775 * aq.R_s).logg
 
         self.assertAlmostEqual(answer, result, 1)
 
@@ -208,7 +209,7 @@ class Test_transitDepth(TestCase):
     def test_works_gj1214(self):
         """Charbonneau et. al. 2009 values"""
         answer = 0.1162**2
-        result = TransitDepth(0.2110*aq.R_s, 2.678*aq.R_e).depth
+        result = TransitDepth(0.2110 * aq.R_s, 2.678 * aq.R_e).depth
         self.assertAlmostEqual(answer, result, 2)
 
     @given(R_p=floats(0.0001, 10000), R_s=floats(0.0001, 10000))
@@ -254,7 +255,7 @@ class Test_density(TestCase):
         d = 1.326 * aq.g / aq.cm**3
 
         result = Density(None, R, d).M.rescale(aq.kg)
-        answer = 1.898*(10**27)*aq.kg
+        answer = 1.898 * (10**27) * aq.kg
 
         self.assertAlmostEqual(answer, result, delta=1e24)
 
@@ -357,15 +358,16 @@ class Test_starTemperature(TestCase):
 
     def test_works_sun(self):
         answer = 5800 * aq.K
-        result = eq.estimateStellarTemperature(1*aq.M_s)
+        result = eq.estimateStellarTemperature(1 * aq.M_s)
 
         self.assertAlmostEqual(answer, result, 0)
 
     def test_works_hd189(self):
         answer = 4939 * aq.K
-        result = eq.estimateStellarTemperature(0.846*aq.M_s)
+        result = eq.estimateStellarTemperature(0.846 * aq.M_s)
 
-        self.assertTrue(result-answer < 300)
+        self.assertTrue(result - answer < 300)
+
 
 @unittest.skip("Not written")
 class Test_estimateStellarMass(TestCase):
@@ -383,11 +385,6 @@ class Test_impactParameter(TestCase):
 
     @given(floats(0.001, 10000), floats(0.001, 10000), floats(0, 180))
     def test_can_derive_other_vars_from_one_calculated(self, a, R_s, i):
-        """ We calculate H from a range of values given by hypothesis and then see if we can accurately calculate the
-         other variables given this calculated value. This tests the rearrangements of the equation are correct.
-        :return:
-        """
-
         assume(a > 0 and R_s > 0)
 
         a *= aq.au
