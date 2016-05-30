@@ -1,4 +1,5 @@
-""" Contains structural classes ie binary, star, planet etc which mimic the xml structure with objects
+""" Contains structural classes ie binary, star, planet etc which mimic the xml
+structure with objects
 """
 import sys
 import math
@@ -197,7 +198,7 @@ class PlanetAndBinaryCommon(_BaseObject):
     @a.setter
     def a(self, a):
         a = a.rescale(aq.au)
-        self.params['a'] = a
+        self.params['semimajoraxis'] = a
 
     def calcSMA(self):
         raise NotImplementedError('Only implemented for Binary and Planet child classes')
@@ -250,11 +251,11 @@ class StarAndBinaryCommon(_BaseObject):
     def __init__(self, *args, **kwargs):
         _BaseObject.__init__(self, *args, **kwargs)
         self.classType = 'StarAndBinaryCommon'
-        
+
     @property
     def magU(self):
         return self.getParam('magU')
-    
+
     @magU.setter
     def magU(self, mag):
         self.params['magU'] = mag
@@ -306,27 +307,27 @@ class StarAndBinaryCommon(_BaseObject):
     @magV.setter
     def magV(self, mag):
         self.params['magV'] = mag
-        
+
     @property
     def magL(self):
         return self.getParam('magL')
-    
+
     @magL.setter
     def magL(self, mag):
         self.params['magL'] = mag
-        
+
     @property
     def magM(self):
         return self.getParam('magM')
-    
+
     @magM.setter
     def magM(self, mag):
         self.params['magM'] = mag
-        
+
     @property
     def magN(self):
         return self.getParam('magN')
-    
+
     @magN.setter
     def magN(self, mag):
         self.params['magN'] = mag
@@ -557,7 +558,7 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
     @property
     def Z(self):
         return self.getParam('metallicity')
-    
+
     @Z.setter
     def Z(self, Z):
         self.params['metallicity'] = Z
@@ -565,7 +566,7 @@ class Star(StarAndPlanetCommon, StarAndBinaryCommon):
     @property
     def spectralType(self):
         return self.getParam('spectraltype')
-    
+
     @spectralType.setter
     def spectralType(self, spectraltype):
         self.params['spectraltype'] = spectraltype

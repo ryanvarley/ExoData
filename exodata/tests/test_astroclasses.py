@@ -1,16 +1,16 @@
-""" Note that many tests for the astroclasses are actually done in example. This is because this file generates fake
-planets from which the tests can be ran. In future some xml could be included here for the same purpose.
+""" Note that many tests for the astroclasses are actually done in example.
+This is because this file generates fake planets from which the tests can be
+ran. In future some xml could be included here for the same purpose.
 """
 
 import unittest
 
-import math
-
 import numpy as np
 
 from .. import astroquantities as aq
-from ..astroclasses import Parameters, Star, Planet, Binary, System, _findNearest, SpectralType, _BaseObject,\
-    Magnitude, isNanOrNone
+from ..astroclasses import (Parameters, Star, Planet, Binary, System,
+                            _findNearest, SpectralType, _BaseObject,
+                            Magnitude, isNanOrNone, PlanetAndBinaryCommon)
 from ..example import genExamplePlanet
 from .patches import TestCase
 
@@ -367,6 +367,21 @@ class Test_Planet_Parameter_Estimation(TestCase):
         planet.params.pop('semimajoraxis')
 
         self.assertAlmostEqual(planet.a, 0.449636494929 * aq.au, 5)
+
+
+class Test_PlanetAndBinaryCommon(TestCase):
+
+    def setUp(self):
+        self.common_class = PlanetAndBinaryCommon()
+
+    def test_setting_of_sma(self):
+        initial_sma = self.common_class.a
+
+        new_sma = 1 * aq.m
+        self.assertNotEqual(initial_sma, new_sma)
+
+        self.common_class.a = new_sma
+        self.assertEqual(self.common_class.a, new_sma)
 
 
 class Test_Magnitude(TestCase):
