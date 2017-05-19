@@ -9,8 +9,6 @@ matrix:
       env: DEPS="numpy nose matplotlib requests pandas scipy"
     - python: "3.4"
       env: DEPS="numpy nose matplotlib requests pandas scipy"
-    - python: "3.5"
-      env: DEPS="numpy nose matplotlib requests pandas scipy"
 
 install:
   # See:
