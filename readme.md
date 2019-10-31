@@ -3,6 +3,8 @@
 [![Documentation Status](https://readthedocs.org/projects/exodata/badge/?version=latest)](http://exodata.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/ryanvarley/ExoData/badge.svg)](https://coveralls.io/r/ryanvarley/ExoData)
 
+*This package is not actively maintained. If you would like to get involved please let me know*
+
 This python interface (formerly oecpy) serves as a link between the raw XML of the [Open Exoplanet Catalogue](https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue). It allows:
 
 * Searching of planets (including alternate names)
